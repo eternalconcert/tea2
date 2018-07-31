@@ -1,0 +1,35 @@
+# Comment
+
+CONST INT const_number = 1;
+CONST STR const_string = "String";
+CONST BOOL const_boolean = false;
+
+INT var_number_no_assignment;
+INT var_number = 1;
+BOOL boolean_val = true;
+
+STR var_string_no_assignment;
+STR var_string = "String";
+
+ARRAY list1 = [1, 2, 3, "Hello ", "world!"];
+ARRAY list2;
+
+INT num = list1[0]
+
+fn name(INT formal_param1, INT formal_param2) -> INT {
+    INT result;
+    result = formal_param1 + formal_param2;
+    return result;
+};
+
+var_number_no_assignment = name(const_number, 2);
+
+INT res = 1 + 2;
+INT res2 = res - 4;
+INT res3 = 3 * 3;
+INT res4 = 9 / 3;
+
+
+---------------------------------------------------
+EBNF:
+Program = { Statement, ';' }
