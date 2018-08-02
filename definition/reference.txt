@@ -16,20 +16,59 @@ ARRAY list2;
 
 INT num = list1[0]
 
-fn name(INT formal_param1, INT formal_param2) -> INT {
+INT fn name(INT formal_param1, INT formal_param2) {
     INT result;
     result = formal_param1 + formal_param2;
     return result;
 };
 
-var_number_no_assignment = name(const_number, 2);
+VOID FN empty(INT formal_param1, INT formal_param2) {
+    # Do something with formal_param1 and formal_param2
+};
+
+var_number_no_assignment_1 = name(const_number, 2);
+INT var_number_no_assignment_2 = name(const_number, 3);
+
+1 + 1;
+2 - 2;
+3 * 3;
+4 / 4;
+
+FLOAT number = -0.5;
 
 INT res = 1 + 2;
 INT res2 = res - 4;
 INT res3 = 3 * 3;
 INT res4 = 9 / 3;
+res4 = 3 * 3 + 4
 
 
 ---------------------------------------------------
 EBNF:
-Program = { Statement, ';' }
+Program             = { Statement, ';' };
+Statement           = { [Expression] |
+                        [Const Declaration] |
+                        [Var Declaration] |
+                        [Var Assignment] |
+                        [Func Declaration] |
+                        [Func Call] };
+Expression          = Operand, Operator, Operand, { Operator, Operand };
+Operand             = Literal | Identifier;
+Operator            = '+' | '-' | '*' | '/';
+Literal             = String | Integer | Float, Boolean, List;
+String              = '"', (Letter | PosInt | Operator ), { Letter | PosInt | Operator } , '"'; (Ohne ")
+Letter              = 'A' | 'B' | ... | 'x' | 'y' | 'z';
+Integer             = (['-'], '0') | ['-'], (PosInt, [{ PosInt | '0' }]);
+PosInt              = | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+Float               = Integer, '.', ('0' | PosInt ), { ('0' | PosInt ) };
+Boolean             = 'true' | 'false';
+List                = '[', [{ ( Literal | Identifier ) }], ']';
+
+Const Declaration   = 'CONST', TypeIdent, Identifier '=', Literal | Identifier;
+Var Declaration     = 'VAR', TypeIdent, Identifier ['=', Literal | Identifier];
+Var Assignment      = Identifier, '=', Literal | Identifier;
+
+Identifier          =
+TypeIdent           =
+Func Declaration    =
+Func Call           =
