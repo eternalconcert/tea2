@@ -16,13 +16,13 @@ ARRAY list2;
 
 INT num = list1[0]
 
-INT fn name(INT formal_param1, INT formal_param2) {
+INT fn name(INT formal_param1, INT formal_param2=2) {
     INT result;
     result = formal_param1 + formal_param2;
     return result;
 };
 
-VOID FN empty(INT formal_param1, INT formal_param2) {
+VOID FN empty(INT formal_param1=1, INT formal_param2) {
     # Do something with formal_param1 and formal_param2
 };
 
@@ -57,7 +57,8 @@ Operand             = Literal | Identifier;
 Operator            = '+' | '-' | '*' | '/';
 Literal             = String | Integer | Float, Boolean, List;
 String              = '"', (Letter | PosInt | Operator ), { Letter | PosInt | Operator } , '"'; (Ohne ")
-Letter              = 'A' | 'B' | ... | 'x' | 'y' | 'z';
+Letter              =  Capital Letter, | 'a' | 'b' | ... | 'z';
+Capital Letter      = 'A' | 'B' | ... | 'Z';
 Integer             = (['-'], '0') | ['-'], (PosInt, [{ PosInt | '0' }]);
 PosInt              = | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 Float               = Integer, '.', ('0' | PosInt ), { ('0' | PosInt ) };
@@ -68,7 +69,7 @@ Const Declaration   = 'CONST', TypeIdent, Identifier '=', Literal | Identifier;
 Var Declaration     = 'VAR', TypeIdent, Identifier ['=', Literal | Identifier];
 Var Assignment      = Identifier, '=', Literal | Identifier;
 
-Identifier          =
-TypeIdent           =
-Func Declaration    =
-Func Call           =
+Identifier          = Letter, { Letter | PosInt };
+TypeIdent           = Capital Letter, { Capital Letter };
+Func Declaration    = TypeIdent, 'fn', Identifier, '(', { TypeIdent, Identifier, ['=', Literal] }, ')', '{' { [ Statement ] , [ 'return', [ Literal | Identifier ] ] }, '}';
+Func Call           = Identifier, '(', { Literal | Identifier }, ')';
