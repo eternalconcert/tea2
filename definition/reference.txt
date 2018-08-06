@@ -45,31 +45,35 @@ res4 = 3 * 3 + 4
 
 ---------------------------------------------------
 EBNF:
-Program             = { Statement, ';' };
-Statement           = { [Expression] |
-                        [Const Declaration] |
-                        [Var Declaration] |
-                        [Var Assignment] |
-                        [Func Declaration] |
-                        [Func Call] };
-Expression          = Operand, Operator, Operand, { Operator, Operand };
-Operand             = Literal | Identifier;
-Operator            = '+' | '-' | '*' | '/';
-Literal             = String | Integer | Float, Boolean, List;
-String              = '"', (Letter | PosInt | Operator ), { Letter | PosInt | Operator } , '"'; (Ohne ")
-Letter              =  Capital Letter, | 'a' | 'b' | ... | 'z';
-Capital Letter      = 'A' | 'B' | ... | 'Z';
-Integer             = (['-'], '0') | ['-'], (PosInt, [{ PosInt | '0' }]);
-PosInt              = | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
-Float               = Integer, '.', ('0' | PosInt ), { ('0' | PosInt ) };
-Boolean             = 'true' | 'false';
-List                = '[', [{ ( Literal | Identifier ) }], ']';
-
-Const Declaration   = 'CONST', TypeIdent, Identifier '=', Literal | Identifier;
-Var Declaration     = 'VAR', TypeIdent, Identifier ['=', Literal | Identifier];
-Var Assignment      = Identifier, '=', Literal | Identifier;
-
-Identifier          = Letter, { Letter | PosInt };
-TypeIdent           = Capital Letter, { Capital Letter };
-Func Declaration    = TypeIdent, 'fn', Identifier, '(', { TypeIdent, Identifier, ['=', Literal] }, ')', '{' { [ Statement ] , [ 'return', [ Literal | Identifier ] ] }, '}';
-Func Call           = Identifier, '(', { Literal | Identifier }, ')';
+Program              = { Statement  ';'}.
+Statement            = { Expression |
+                        ConstDeclaration |
+                        VarDeclaration |
+                        VarAssignment |
+                        FuncDeclaration |
+                        FuncCall }.
+Expression           = ArithmeticExpression | LogicalExpression.
+ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
+Operand              = Literal | Identifier.
+ArithmeticOperator   = '+' | '-' | '*' | '/'.
+LogicalExpression    = Operand | ( Operand LogicalOperator Operand { LogicalOperator Operand } ).
+LogicalOperator      = '<' | '>' | '<=' | '>=' | '==' | 'and' | 'or' | 'xor' | 'not'.
+Literal              = String | Integer | Float Boolean List.
+String               = '"' (Letter | PosInt | ArithmeticOperator ) { Letter | PosInt | ArithmeticOperator } '"'.
+Letter               =  CapitalLetter | 'a' | 'b' | '...' | 'z'.
+CapitalLetter        = 'A' | 'B' | '...' | 'Z'.
+Integer              = (['-'] '0') | ['-'] (PosInt [{ PosInt | '0' }]).
+PosInt               = | '1' | '2' | '...' | '9'.
+Float                = Integer '.' ('0' | PosInt ) { ('0' | PosInt ) }.
+Boolean              = 'true' | 'false'.
+List                 = '[' [{ ( Literal | Identifier ) }] ']'.
+ConstDeclaration     = 'CONST' TypeIdent Identifier '=' Literal.
+VarDeclaration       = 'VAR' TypeIdent Identifier ['=' (Literal | Identifier)].
+VarAssignment        = Identifier '=' (Literal | Identifier).
+Identifier           = Letter { Letter | PosInt }.
+TypeIdent            = CapitalLetter { CapitalLetter }.
+FuncDeclaration      = TypeIdent 'fn' Identifier '('
+					 [ TypeIdent Identifier ['=' Literal] { ',' TypeIdent Identifier ['=' Literal] } ]
+					 ')' '{' { [ Statement ]  [ 'return' [ Literal | Identifier ] ] } '}'.
+FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | Identifier) } ] ')'.
+IfStatement          = 'if' LogicalExpression Operand { LogicalExpression Operand } '{' { Statement } '}' [ 'else' '{' { Statement } '}' ].
