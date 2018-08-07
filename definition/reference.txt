@@ -76,4 +76,4 @@ FuncDeclaration      = TypeIdent 'fn' Identifier '('
 					 [ TypeIdent Identifier ['=' Literal] { ',' TypeIdent Identifier ['=' Literal] } ]
 					 ')' '{' { [ Statement ]  [ 'return' [ Literal | Identifier ] ] } '}'.
 FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | Identifier) } ] ')'.
-IfStatement          = 'if' LogicalExpression Operand { LogicalExpression Operand } '{' { Statement } '}' [ 'else' '{' { Statement } '}' ].
+IfStatement          = 'if' LogicalExpression { LogicalExpression } '{' { Statement } '}' [ 'else' '{' { Statement } '}' ].
