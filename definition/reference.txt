@@ -52,7 +52,8 @@ Statement            = { Expression |
                          VarAssignment |
                          FuncDeclaration |
                          FuncCall  |
-                         IfStatement }.
+                         IfStatement |
+                         ForLoop }.
 Expression           = ArithmeticExpression | LogicalExpression.
 ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
 Operand              = Literal | Identifier.
@@ -74,7 +75,8 @@ VarAssignment        = Identifier '=' (Literal | Identifier).
 Identifier           = Letter { Letter | PosInt }.
 TypeIdent            = CapitalLetter { CapitalLetter }.
 FuncDeclaration      = TypeIdent 'fn' Identifier '('
-					 [ TypeIdent Identifier ['=' Literal] { ',' TypeIdent Identifier ['=' Literal] } ]
-					 ')' '{' { [ Statement ]  [ 'return' [ Literal | Identifier ] ] } '}'.
+                     [ TypeIdent Identifier ['=' Literal] { ',' TypeIdent Identifier ['=' Literal] } ]
+                     ')' '{' { [ Statement ]  [ 'return' [ Literal | Identifier ] ] } '}'.
 FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | Identifier) } ] ')'.
-IfStatement          = 'if' LogicalExpression {',' LogicalExpression } '{' Statement {',' Statement } '}' [ 'else' '{' Statement {',' Statement } '}' ].
+IfStatement          = 'if' LogicalExpression {',' LogicalExpression } '{' [Statement {',' Statement }] '}' [ 'else' '{' [Statement {',' Statement }] '}' ].
+ForLoop              = 'for' Identifier 'in' ( Identifier | List ) '{' [Statement {',' Statement }] '}'.
