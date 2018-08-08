@@ -23,7 +23,6 @@ INT fn name(INT formal_param1, INT formal_param2=2) {
 };
 
 VOID FN empty(INT formal_param1=1, INT formal_param2) {
-    # Do something with formal_param1 and formal_param2
 };
 
 var_number_no_assignment_1 = name(const_number, 2);

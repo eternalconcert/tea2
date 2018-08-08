@@ -4,6 +4,7 @@
 extern YYSTYPE yylval;
 %}
 %%
+\;                      return TERMINATOR;
 [0-9]+                  return NUMBER;
 heat                    return TOKHEAT;
 on|off                  return STATE;

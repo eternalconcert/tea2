@@ -19,7 +19,7 @@ main()
 
 %}
 
-%token NUMBER TOKHEAT STATE TOKTARGET TOKTEMPERATURE
+%token TERMINATOR NUMBER TOKHEAT STATE TOKTARGET TOKTEMPERATURE
 
 %%
 
@@ -31,6 +31,8 @@ command:
         heat_switch
         |
         target_set
+        |
+        terminator
         ;
 
 heat_switch:
@@ -44,5 +46,11 @@ target_set:
         TOKTARGET TOKTEMPERATURE NUMBER
         {
                 printf("\tTemperature set\n");
+        }
+        ;
+terminator:
+        TERMINATOR
+        {
+                printf("\tTerminator hit\n");
         }
         ;
