@@ -45,7 +45,7 @@ res4 = 3 * 3 + 4
 
 ---------------------------------------------------
 EBNF:
-Program              = { (Statement  ';') | Comment }.
+Program              = { Statement  ';' }.
 Statement            = { Expression |
                          ConstDeclaration |
                          VarDeclaration |
@@ -54,7 +54,6 @@ Statement            = { Expression |
                          FuncCall  |
                          IfStatement |
                          ForLoop }.
-Comment              = '#' { (Letter | Integer) }.
 Expression           = ArithmeticExpression | LogicalExpression.
 ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
 Operand              = Literal | Identifier.
