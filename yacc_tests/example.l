@@ -1,15 +1,13 @@
 %{
 #include <stdio.h>
 #include "y.tab.h"
-extern YYSTYPE yylval;
+// extern YYSTYPE yylval;
 %}
 %%
-\;                      return TERMINATOR;
-[0-9]+                  return NUMBER;
+[0-9]+                  yylval=atoi(yytext); return NUMBER;
 heat                    return TOKHEAT;
-on|off                  return STATE;
+on|off                  yylval=!strcmp(yytext,"on"); return STATE;
 target                  return TOKTARGET;
 temperature             return TOKTEMPERATURE;
 \n                      /* ignore end of line */;
 [ \t]+                  /* ignore whitespace */;
-%%

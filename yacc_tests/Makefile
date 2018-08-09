@@ -4,8 +4,10 @@ info:
 all:
 	lex example.l
 	yacc -d example.y
-	gcc lex.yy.c y.tab.c -o example
+	gcc -c lex.yy.c -o lex.yy.o
+	g++ lex.yy.o y.tab.c -o example
+
 
 
 clean:
-	rm example lex.yy.c y.tab.c y.tab.h
+	rm example lex.yy.c y.tab.c y.tab.h lex.yy.o
