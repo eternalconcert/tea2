@@ -1,5 +1,3 @@
-# Comment
-
 CONST INT const_number = 1;
 CONST STR const_string = "String";
 CONST BOOL const_boolean = false;
@@ -22,7 +20,7 @@ INT fn name(INT formal_param1, INT formal_param2=2) {
     return result;
 };
 
-VOID FN empty(INT formal_param1=1, INT formal_param2) {
+VOID fn empty(INT formal_param1=1, INT formal_param2) {
 };
 
 var_number_no_assignment_1 = name(const_number, 2);
@@ -41,41 +39,12 @@ INT res3 = 3 * 3;
 INT res4 = 9 / 3;
 res4 = 3 * 3 + 4
 
+for item in list1 {
+    item = item + 1;
+};
 
----------------------------------------------------
-EBNF:
-Program              = { Statement  ';' }.
-Statement            = { Expression |
-                         ConstDeclaration |
-                         VarDeclaration |
-                         VarAssignment |
-                         FuncDeclaration |
-                         FuncCall  |
-                         IfStatement |
-                         ForLoop }.
-Expression           = ArithmeticExpression | LogicalExpression.
-ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
-Operand              = Literal | Identifier.
-ArithmeticOperator   = '+' | '-' | '*' | '/'.
-LogicalExpression    = Operand | ( Operand LogicalOperator Operand { LogicalOperator Operand } ).
-LogicalOperator      = '<' | '>' | '<=' | '>=' | '==' | 'and' | 'or' | 'xor' | 'not'.
-Literal              = String | Integer | Float Boolean List.
-String               = '"' (Letter | PosInt | ArithmeticOperator ) { Letter | PosInt | ArithmeticOperator } '"'.
-Letter               =  CapitalLetter | 'a' | 'b' | '...' | 'z'.
-CapitalLetter        = 'A' | 'B' | '...' | 'Z'.
-Integer              = (['-'] '0') | ['-'] (PosInt [{ PosInt | '0' }]).
-PosInt               = | '1' | '2' | '...' | '9'.
-Float                = Integer '.' ('0' | PosInt ) { ('0' | PosInt ) }.
-Boolean              = 'true' | 'false'.
-List                 = '[' [{ ( Literal | Identifier ) }] ']'.
-ConstDeclaration     = 'CONST' TypeIdent Identifier '=' Literal.
-VarDeclaration       = 'VAR' TypeIdent Identifier ['=' (Literal | Identifier)].
-VarAssignment        = Identifier '=' (Literal | Identifier).
-Identifier           = Letter { Letter | PosInt }.
-TypeIdent            = CapitalLetter { CapitalLetter }.
-FuncDeclaration      = TypeIdent 'fn' Identifier '('
-                     [ TypeIdent Identifier ['=' Literal] { ',' TypeIdent Identifier ['=' Literal] } ]
-                     ')' '{' { [ Statement ]  [ 'return' [ Literal | Identifier ] ] } '}'.
-FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | Identifier) } ] ')'.
-IfStatement          = 'if' LogicalExpression {',' LogicalExpression } '{' [Statement {',' Statement }] '}' [ 'else' '{' [Statement {',' Statement }] '}' ].
-ForLoop              = 'for' Identifier 'in' ( Identifier | List ) '{' [Statement {',' Statement }] '}'.
+if var_number == 1 or var_number not in list1 and var_number != 0 {
+    INT a = 2;
+} else {
+    INT a = 3;
+};

@@ -1,0 +1,35 @@
+Program              = { Statement  ';' }.
+Statement            = { Expression |
+                         ConstDeclaration |
+                         VarDeclaration |
+                         VarAssignment |
+                         FuncDeclaration |
+                         FuncCall  |
+                         IfStatement |
+                         ForLoop }.
+Expression           = ArithmeticExpression | LogicalExpression.
+ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
+Operand              = Literal | Identifier.
+ArithmeticOperator   = '+' | '-' | '*' | '/'.
+LogicalExpression    = ['('] Operand [')'] | ( ['('] Operand LogicalOperator Operand [')'] { ['('] LogicalOperator Operand [')'] } ).
+LogicalOperator      = '<' | '>' | '<=' | '>=' | '==' | '!=' | 'and' | 'or' | 'xor' | 'not' | 'in.
+Literal              = String | Integer | Float Boolean List.
+String               = '"' (Letter | PosInt | ArithmeticOperator ) { Letter | PosInt | ArithmeticOperator } '"'.
+Letter               =  CapitalLetter | 'a' | 'b' | '...' | 'z'.
+CapitalLetter        = 'A' | 'B' | '...' | 'Z'.
+Integer              = (['-'] '0') | ['-'] (PosInt [{ PosInt | '0' }]).
+PosInt               = | '1' | '2' | '...' | '9'.
+Float                = Integer '.' ('0' | PosInt ) { ('0' | PosInt ) }.
+Boolean              = 'true' | 'false'.
+List                 = '[' [{ ( Literal | Identifier ) }] ']'.
+ConstDeclaration     = 'CONST' TypeIdent Identifier '=' Literal.
+VarDeclaration       = 'VAR' TypeIdent Identifier ['=' (Literal | Identifier)].
+VarAssignment        = Identifier '=' (Literal | Identifier).
+Identifier           = Letter { Letter | PosInt }.
+TypeIdent            = CapitalLetter { CapitalLetter }.
+FuncDeclaration      = TypeIdent 'fn' Identifier '('
+                     [ TypeIdent Identifier ['=' Literal] { ',' TypeIdent Identifier ['=' Literal] } ]
+                     ')' '{' { [ Statement ]  [ 'return' [ Literal | Identifier ] ] } '}'.
+FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | Identifier) } ] ')'.
+IfStatement          = 'if' LogicalExpression {',' LogicalExpression } '{' [Statement {',' Statement }] '}' [ 'else' '{' [Statement {',' Statement }] '}' ].
+ForLoop              = 'for' Identifier 'in' ( Identifier | List ) '{' [Statement {',' Statement }] '}'.

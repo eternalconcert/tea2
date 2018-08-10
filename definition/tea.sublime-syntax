@@ -1,0 +1,26 @@
+%YAML 1.2
+---
+name: Tea
+file_extensions: [tea]
+scope: source.tea
+
+contexts:
+  main:
+    - match: \b(CONST|fn|return|for|if|else)\b
+      scope: keyword.control.tea
+    - match: \b(INT|FLOAT|STR|BOOL|ARRAY|VOID)\b
+      scope: storage.type.tea
+    - match: (\+|\-|\=|\*|\/)
+      scope: keyword.operator.assignment.tea
+    - match: (>|>=|<|<=|==|!=)
+      scope: keyword.operator.assignment.tea
+    - match: ( in | and | or | xor | not )
+      scope: keyword.operator.word.tea
+    - match: '"'
+      push: string
+
+  string:
+    - meta_scope: string.quoted.double.tea
+    - match: '"'
+      pop: true
+
