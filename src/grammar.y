@@ -1,4 +1,7 @@
 %{
+    #include <stdio.h>
+    #include <string.h>
+
     extern "C" {
         int yyparse(void);
         int yylex(void);
@@ -9,8 +12,6 @@
 
     }
 
-    #include <stdio.h>
-    #include <string.h>
 
     void yyerror(const char *str) {
         fprintf(stderr, "Error: %s\n", str);
@@ -21,7 +22,18 @@
     }
 %}
 
-%token NUMBER TOKHEAT STATE TOKTARGET TOKTEMPERATURE
+%token TOKCONST TOKHEAT TOKTARGET TOKTEMPERATURE
+
+%union
+{
+    int number;
+    char *string;
+}
+
+%token <string> TOKTYPEIDENT
+%token <number> STATE
+%token <number> NUMBER
+
 
 %%
 
@@ -33,6 +45,10 @@ command:
         heat_switch
         |
         target_set
+        |
+        const
+        |
+        typeidentifier
         ;
 
 heat_switch:
@@ -51,3 +67,16 @@ target_set:
         {
             printf("Temperature set to %d\n", $3);
         }
+
+const:
+    TOKCONST
+    {
+        printf("CONST!\n");
+    }
+
+
+typeidentifier:
+    TOKTYPEIDENT
+    {
+        printf("Typeident: %s\n", $1);
+    }
