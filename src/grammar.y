@@ -43,6 +43,7 @@ main(int argc, char *argv[0]) {
 %token <sval> TYPEIDENT
 %token <sval> IDENT
 %token <sval> STRING_LIT
+%token <sval> ASSIGNMENT_OP
 %token <ival> STATE
 %token <ival> INTEGER_LIT
 %token <fval> FLOAT_LIT
@@ -50,12 +51,14 @@ main(int argc, char *argv[0]) {
 
 
 %%
-
+program: statements
 statements: /* empty */
-        | statements statement
+        | statements statement ';'
         ;
 
 statement:
+    const_assignment
+    |
     heat_switch
     |
     target_set
@@ -65,15 +68,13 @@ statement:
     identifier
     |
     typeidentifier
-    |
-    string
-    |
-    integer
-    |
-    float
-    |
-    bool
     ;
+
+const_assignment:
+    TOKCONST TYPEIDENT IDENT '=' INTEGER_LIT
+    {
+        printf("Const assignment %d\n", $5);
+    }
 
 heat_switch:
     TOKHEAT STATE
@@ -108,28 +109,4 @@ typeidentifier:
     TYPEIDENT
     {
         printf("Typeident: %s\n", $1);
-    }
-
-string:
-    STRING_LIT
-    {
-        printf("String: %s\n", $1);
-    }
-
-integer:
-    INTEGER_LIT
-    {
-        printf("Integer: %d\n", $1);
-    }
-
-float:
-    FLOAT_LIT
-    {
-        printf("Float: %.2f\n", $1);
-    }
-
-bool:
-    BOOL_LIT
-    {
-        printf("Boolean: %s\n", $1);
     }
