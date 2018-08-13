@@ -2,6 +2,7 @@
     #include <stdio.h>
     #include <string.h>
 
+    extern FILE *yyin;
     extern "C" {
         int yyparse(void);
         int yylex(void);
@@ -9,7 +10,6 @@
         int yywrap() {
             return 1;
         }
-
     }
 
 
@@ -17,9 +17,18 @@
         fprintf(stderr, "Error: %s\n", str);
     }
 
-    main() {
-        yyparse();
+
+main(int argc, char *argv[0]) {
+
+    FILE *inFile = fopen(argv[1], "r");
+    if (!inFile) {
+        return -1;
     }
+    yyin = inFile;
+
+    yyparse();
+}
+
 %}
 
 %token TOKCONST TOKHEAT TOKTARGET TOKTEMPERATURE
