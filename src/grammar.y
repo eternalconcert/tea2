@@ -35,57 +35,101 @@ main(int argc, char *argv[0]) {
 
 %union
 {
-    int number;
-    char *string;
+    int ival;
+    char *sval;
+    float fval;
 }
 
-%token <string> TOKTYPEIDENT
-%token <number> STATE
-%token <number> NUMBER
+%token <sval> TYPEIDENT
+%token <sval> IDENT
+%token <sval> STRING_LIT
+%token <ival> STATE
+%token <ival> INTEGER_LIT
+%token <fval> FLOAT_LIT
+%token <sval> BOOL_LIT
 
 
 %%
 
-commands: /* empty */
-        | commands command
+statements: /* empty */
+        | statements statement
         ;
 
-command:
-        heat_switch
-        |
-        target_set
-        |
-        const
-        |
-        typeidentifier
-        ;
+statement:
+    heat_switch
+    |
+    target_set
+    |
+    const_declaration
+    |
+    identifier
+    |
+    typeidentifier
+    |
+    string
+    |
+    integer
+    |
+    float
+    |
+    bool
+    ;
 
 heat_switch:
-        TOKHEAT STATE
-        {
-            if ($2) {
-                printf("Heat turned on\n");
-            }
-            else {
-                printf("Heat turned off\n");
-            }
-        }
-
-target_set:
-        TOKTARGET TOKTEMPERATURE NUMBER
-        {
-            printf("Temperature set to %d\n", $3);
-        }
-
-const:
-    TOKCONST
+    TOKHEAT STATE
     {
-        printf("CONST!\n");
+        if ($2) {
+            printf("Heat turned on\n");
+        }
+        else {
+            printf("Heat turned off\n");
+        }
     }
 
+target_set:
+    TOKTARGET TOKTEMPERATURE INTEGER_LIT
+    {
+        printf("Temperature set to %d\n", $3);
+    }
+
+const_declaration:
+    TOKCONST TYPEIDENT
+    {
+        printf("CONST Identifier: %s\n", $2);
+    }
+
+identifier:
+    IDENT
+    {
+        printf("Identifier: %s\n", $1);
+    }
 
 typeidentifier:
-    TOKTYPEIDENT
+    TYPEIDENT
     {
         printf("Typeident: %s\n", $1);
+    }
+
+string:
+    STRING_LIT
+    {
+        printf("String: %s\n", $1);
+    }
+
+integer:
+    INTEGER_LIT
+    {
+        printf("Integer: %d\n", $1);
+    }
+
+float:
+    FLOAT_LIT
+    {
+        printf("Float: %.2f\n", $1);
+    }
+
+bool:
+    BOOL_LIT
+    {
+        printf("Boolean: %s\n", $1);
     }

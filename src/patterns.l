@@ -5,11 +5,12 @@
 
 %%
 CONST                                   return TOKCONST;
-INT|STR|BOOL|ARRAY|VOID                 yylval.string=strdup(yytext); return TOKTYPEIDENT;
-[0-9]+                                  yylval.number=atoi(yytext); return NUMBER;
-heat                                    return TOKHEAT;
-on|off                                  yylval.number=!strcmp(yytext, "on"); return STATE;
-target                                  return TOKTARGET;
-temperature                             return TOKTEMPERATURE;
+INT|FLOAT|STR|BOOL|ARRAY|VOID           yylval.sval=strdup(yytext); return TYPEIDENT;
+true|false                              yylval.sval=strdup(yytext); return BOOL_LIT;
+[A-Za-z][A-Za-z0-9]*                    yylval.sval=strdup(yytext); return IDENT;
+\"(\\.|[^"\\])*\"                        yylval.sval=strdup(yytext); return STRING_LIT;
+[+-]?[0-9]+                             yylval.ival=atoi(yytext); return INTEGER_LIT;
+[+-]?[0-9]+\.[0-9]+                     yylval.fval=atof(yytext); return FLOAT_LIT;
+
 \n                                      /* ignore EOL */;
 [ \t]+                                  /* ingnore whitespace */;

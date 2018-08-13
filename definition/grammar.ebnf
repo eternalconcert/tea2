@@ -13,10 +13,9 @@ Operand              = Literal | Identifier.
 ArithmeticOperator   = '+' | '-' | '*' | '/'.
 LogicalExpression    = ['('] Operand [')'] | ( ['('] Operand LogicalOperator Operand [')'] { ['('] LogicalOperator Operand [')'] } ).
 LogicalOperator      = '<' | '>' | '<=' | '>=' | '==' | '!=' | 'and' | 'or' | 'xor' | 'not' | 'in.
-Literal              = String | Integer | Float Boolean List.
+Literal              = String | Integer | Float | Boolean | List.
 String               = '"' (Letter | PosInt | ArithmeticOperator ) { Letter | PosInt | ArithmeticOperator } '"'.
-Letter               =  CapitalLetter | 'a' | 'b' | '...' | 'z'.
-CapitalLetter        = 'A' | 'B' | '...' | 'Z'.
+Letter               =  'A' | '...' | 'Z' | 'a' | '...' | 'z'.
 Integer              = (['-'] '0') | ['-'] (PosInt [{ PosInt | '0' }]).
 PosInt               = | '1' | '2' | '...' | '9'.
 Float                = Integer '.' ('0' | PosInt ) { ('0' | PosInt ) }.
@@ -26,7 +25,7 @@ ConstDeclaration     = 'CONST' TypeIdent Identifier '=' Literal.
 VarDeclaration       = 'VAR' TypeIdent Identifier ['=' (Literal | Identifier)].
 VarAssignment        = Identifier '=' (Literal | Identifier).
 Identifier           = Letter { Letter | PosInt }.
-TypeIdent            = CapitalLetter { CapitalLetter }.
+TypeIdent            = ( 'INT' | 'STR' | 'BOOL' | 'ARRAY' | 'VOID' ) .
 FuncDeclaration      = TypeIdent 'fn' Identifier '('
                      [ TypeIdent Identifier ['=' Literal] { ',' TypeIdent Identifier ['=' Literal] } ]
                      ')' '{' { [ Statement ]  [ 'return' [ Literal | Identifier ] ] } '}'.
