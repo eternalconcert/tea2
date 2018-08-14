@@ -42,12 +42,12 @@ main(int argc, char *argv[0]) {
 
 %token <sval> TYPEIDENT
 %token <sval> IDENT
-%token <sval> ASSIGNMENT_OP
 %token <ival> STATE
 %token <sval> STRING_LIT
 %token <ival> INTEGER_LIT
 %token <fval> FLOAT_LIT
 %token <sval> BOOL_LIT
+%token <sval> ARITH_OP
 
 %%
 
@@ -57,6 +57,8 @@ statements: /* empty */
         ;
 
 statement:
+    expression
+    |
     const_declaration
     |
     var_declaration
@@ -76,8 +78,15 @@ statement:
     typeidentifier
     ;
 
+
 literal:
     STRING_LIT | INTEGER_LIT | FLOAT_LIT | BOOL_LIT
+
+expression:
+    literal ARITH_OP literal
+    {
+        printf("Expression\n");
+    }
 
 const_declaration:
     TOKCONST TYPEIDENT IDENT '=' literal
