@@ -6,8 +6,12 @@
 %%
 "="                                     return '=';
 ";"                                     return ';';
-"+"|"-"|"*"|"\/"                  yylval.sval=strdup(yytext); return ARITH_OP;
-
+"+"|"-"|"*"|"\/"                        yylval.sval=strdup(yytext); return ARITH_OP;
+"{"                                     return '{';
+"}"                                     return '}';
+"("                                     return '(';
+")"                                     return ')';
+"fn"                                    return TOKFUNC;
 CONST                                   return TOKCONST;
 VAR                                     return TOKVAR;
 INT|FLOAT|STR|BOOL|ARRAY|VOID           yylval.sval=strdup(yytext); return TYPEIDENT;

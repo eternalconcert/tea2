@@ -31,7 +31,7 @@ main(int argc, char *argv[0]) {
 
 %}
 
-%token TOKCONST TOKVAR TOKHEAT TOKTARGET TOKTEMPERATURE
+%token TOKCONST TOKVAR TOKFUNC
 
 %union
 {
@@ -63,15 +63,9 @@ statement:
     |
     var_declaration
     |
-    var_assignment_literal
+    var_assignment
     |
-    var_assignment_ident
-    |
-    var_declaration_assignment
-    |
-    heat_switch
-    |
-    target_set
+    func_declaration
     |
     identifier
     |
@@ -83,21 +77,22 @@ literal:
     STRING_LIT | INTEGER_LIT | FLOAT_LIT | BOOL_LIT
 
 expression:
-    literal ARITH_OP literal
-    {
-        printf("Expression\n");
-    }
+    literal ARITH_OP expression { printf("Literal arith MULTI literal expression\n"); }
+    |
+    IDENT ARITH_OP expression { printf("Ident arith ident expression\n"); }
+    |
+    literal ARITH_OP literal { printf("Literal arith literal expression\n"); }
+    |
+    IDENT ARITH_OP IDENT { printf("Ident arith ident expression\n"); }
+    |
+    literal ARITH_OP IDENT { printf("Literal arith ident expression\n"); }
+    |
+    IDENT ARITH_OP literal { printf("Ident arith literal expression\n"); }
 
 const_declaration:
     TOKCONST TYPEIDENT IDENT '=' literal
     {
         printf("Const assignment\n");
-    }
-
-var_declaration_assignment:
-    TOKVAR TYPEIDENT IDENT '=' literal
-    {
-        printf("var declaration assignment\n");
     }
 
 var_declaration:
@@ -106,34 +101,14 @@ var_declaration:
         printf("var declaration\n");
     }
 
-var_assignment_literal:
-    IDENT '=' literal
-    {
-        printf("var assignment literal\n");
-    }
-
-var_assignment_ident:
-    IDENT '=' IDENT
-    {
-        printf("var assignment ident\n");
-    }
-
-heat_switch:
-    TOKHEAT STATE
-    {
-        if ($2) {
-            printf("Heat turned on\n");
-        }
-        else {
-            printf("Heat turned off\n");
-        }
-    }
-
-target_set:
-    TOKTARGET TOKTEMPERATURE INTEGER_LIT
-    {
-        printf("Temperature set to %d\n", $3);
-    }
+var_assignment:
+    var_declaration '=' literal { printf("var declaration assignment literal\n"); }
+    |
+    var_declaration '=' IDENT { printf("var declaration assignment ident\n"); }
+    |
+    IDENT '=' literal { printf("var assignment literal\n"); }
+    |
+    IDENT '=' IDENT { printf("var assignment ident\n"); }
 
 identifier:
     IDENT
@@ -146,3 +121,7 @@ typeidentifier:
     {
         printf("Typeident: %s\n", $1);
     }
+
+
+func_declaration:
+    TYPEIDENT TOKFUNC IDENT '(' ')' '{' '}' { printf("func declarations\n"); }
