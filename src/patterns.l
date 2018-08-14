@@ -5,6 +5,7 @@
 
 %%
 CONST                                   return TOKCONST;
+VAR                                     return TOKVAR;
 INT|FLOAT|STR|BOOL|ARRAY|VOID           yylval.sval=strdup(yytext); return TYPEIDENT;
 true|false                              yylval.sval=strdup(yytext); return BOOL_LIT;
 [A-Za-z][A-Za-z0-9]*                    yylval.sval=strdup(yytext); return IDENT;

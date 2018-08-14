@@ -31,7 +31,7 @@ main(int argc, char *argv[0]) {
 
 %}
 
-%token TOKCONST TOKHEAT TOKTARGET TOKTEMPERATURE
+%token TOKCONST TOKVAR TOKHEAT TOKTARGET TOKTEMPERATURE
 
 %union
 {
@@ -59,6 +59,14 @@ statements: /* empty */
 statement:
     const_declaration
     |
+    var_declaration
+    |
+    var_assignment_literal
+    |
+    var_assignment_ident
+    |
+    var_declaration_assignment
+    |
     heat_switch
     |
     target_set
@@ -75,6 +83,30 @@ const_declaration:
     TOKCONST TYPEIDENT IDENT '=' literal
     {
         printf("Const assignment\n");
+    }
+
+var_declaration_assignment:
+    TOKVAR TYPEIDENT IDENT '=' literal
+    {
+        printf("var declaration assignment\n");
+    }
+
+var_declaration:
+    TOKVAR TYPEIDENT IDENT
+    {
+        printf("var declaration\n");
+    }
+
+var_assignment_literal:
+    IDENT '=' literal
+    {
+        printf("var assignment literal\n");
+    }
+
+var_assignment_ident:
+    IDENT '=' IDENT
+    {
+        printf("var assignment ident\n");
     }
 
 heat_switch:
