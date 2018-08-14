@@ -42,38 +42,39 @@ main(int argc, char *argv[0]) {
 
 %token <sval> TYPEIDENT
 %token <sval> IDENT
-%token <sval> STRING_LIT
 %token <sval> ASSIGNMENT_OP
 %token <ival> STATE
+%token <sval> STRING_LIT
 %token <ival> INTEGER_LIT
 %token <fval> FLOAT_LIT
 %token <sval> BOOL_LIT
 
-
 %%
+
 program: statements
 statements: /* empty */
         | statements statement ';'
         ;
 
 statement:
-    const_assignment
+    const_declaration
     |
     heat_switch
     |
     target_set
-    |
-    const_declaration
     |
     identifier
     |
     typeidentifier
     ;
 
-const_assignment:
-    TOKCONST TYPEIDENT IDENT '=' INTEGER_LIT
+literal:
+    STRING_LIT | INTEGER_LIT | FLOAT_LIT | BOOL_LIT
+
+const_declaration:
+    TOKCONST TYPEIDENT IDENT '=' literal
     {
-        printf("Const assignment %d\n", $5);
+        printf("Const assignment\n");
     }
 
 heat_switch:
@@ -91,12 +92,6 @@ target_set:
     TOKTARGET TOKTEMPERATURE INTEGER_LIT
     {
         printf("Temperature set to %d\n", $3);
-    }
-
-const_declaration:
-    TOKCONST TYPEIDENT
-    {
-        printf("CONST Identifier: %s\n", $2);
     }
 
 identifier:
