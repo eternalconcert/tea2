@@ -12,7 +12,7 @@ ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator O
 Operand              = Literal | Identifier.
 ArithmeticOperator   = '+' | '-' | '*' | '/'.
 LogicalExpression    = ['('] Operand [')'] | ( ['('] Operand LogicalOperator Operand [')'] { ['('] LogicalOperator Operand [')'] } ).
-LogicalOperator      = '<' | '>' | '<=' | '>=' | '==' | '!=' | 'and' | 'or' | 'xor' | 'not' | 'in.
+LogicalOperator      = '<' | '>' | '<=' | '>=' | '==' | '!=' | 'and' | 'or' | 'xor' | 'not' | 'in' | '\|' | '&' .
 Literal              = String | Integer | Float | Boolean | List.
 String               = '"' (Letter | PosInt | ArithmeticOperator ) { Letter | PosInt | ArithmeticOperator } '"'.
 Letter               =  'A' | '...' | 'Z' | 'a' | '...' | 'z'.
