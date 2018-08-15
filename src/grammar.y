@@ -31,7 +31,7 @@ main(int argc, char *argv[0]) {
 
 %}
 
-%token TOKCONST TOKVAR TOKFUNC
+%token TOKCONST TOKFUNC TOKRETURN
 
 %union
 {
@@ -67,11 +67,10 @@ statement:
     |
     func_declaration
     |
-    identifier
+    func_call
     |
-    typeidentifier
+    return_statement
     ;
-
 
 literal:
     STRING_LIT | INTEGER_LIT | FLOAT_LIT | BOOL_LIT
@@ -96,32 +95,57 @@ const_declaration:
     }
 
 var_declaration:
-    TOKVAR TYPEIDENT IDENT
+    TYPEIDENT IDENT
     {
         printf("var declaration\n");
     }
 
 var_assignment:
-    var_declaration '=' literal { printf("var declaration assignment literal\n"); }
+    var_declaration '=' literal
     |
-    var_declaration '=' IDENT { printf("var declaration assignment ident\n"); }
+    var_declaration '=' IDENT
     |
-    IDENT '=' literal { printf("var assignment literal\n"); }
+    var_declaration '=' expression
     |
-    IDENT '=' IDENT { printf("var assignment ident\n"); }
+    var_declaration '=' func_call
+    |
+    IDENT '=' literal
+    |
+    IDENT '=' IDENT
+    |
+    IDENT '=' expression
+    |
+    IDENT '=' func_call
+    {
+        printf("var assignment\n");
+    }
 
-identifier:
+return_statement:
+    TOKRETURN |
+    TOKRETURN IDENT |
+    TOKRETURN literal
+
+formal_arguments_list:
+    |
+    TYPEIDENT IDENT |
+    TYPEIDENT IDENT '=' literal |
+    TYPEIDENT IDENT ',' formal_arguments_list |
+    TYPEIDENT IDENT '=' literal ',' formal_arguments_list
+
+actual_arguments_list:
+    |
     IDENT
-    {
-        printf("Identifier: %s\n", $1);
-    }
-
-typeidentifier:
-    TYPEIDENT
-    {
-        printf("Typeident: %s\n", $1);
-    }
+    |
+    IDENT ',' actual_arguments_list
+    |
+    literal
+    |
+    literal ',' actual_arguments_list
 
 
 func_declaration:
-    TYPEIDENT TOKFUNC IDENT '(' ')' '{' '}' { printf("func declarations\n"); }
+    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' '{' statements '}' { printf("func declaration\n"); }
+
+func_call:
+    IDENT '(' actual_arguments_list ')' { printf("func call\n"); }
+

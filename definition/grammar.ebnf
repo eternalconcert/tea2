@@ -6,7 +6,8 @@ Statement            = { Expression |
                          FuncDeclaration |
                          FuncCall  |
                          IfStatement |
-                         ForLoop }.
+                         ForLoop |
+                         Return }.
 Expression           = ArithmeticExpression | LogicalExpression.
 ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
 Operand              = Literal | Identifier.
@@ -32,3 +33,4 @@ FuncDeclaration      = TypeIdent 'fn' Identifier '('
 FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | Identifier) } ] ')'.
 IfStatement          = 'if' LogicalExpression {',' LogicalExpression } '{' [Statement {',' Statement }] '}' [ 'else' '{' [Statement {',' Statement }] '}' ].
 ForLoop              = 'for' Identifier 'in' ( Identifier | List ) '{' [Statement {',' Statement }] '}'.
+Return               = 'return' [Identifier | Literal] .

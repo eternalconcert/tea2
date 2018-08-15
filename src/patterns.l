@@ -6,17 +6,18 @@
 %%
 "="                                     return '=';
 ";"                                     return ';';
+","                                     return ',';
 "+"|"-"|"*"|"\/"                        yylval.sval=strdup(yytext); return ARITH_OP;
 "{"                                     return '{';
 "}"                                     return '}';
 "("                                     return '(';
 ")"                                     return ')';
-"fn"                                    return TOKFUNC;
+"FN"                                    return TOKFUNC;
 CONST                                   return TOKCONST;
-VAR                                     return TOKVAR;
 INT|FLOAT|STR|BOOL|ARRAY|VOID           yylval.sval=strdup(yytext); return TYPEIDENT;
 true|false                              yylval.sval=strdup(yytext); return BOOL_LIT;
-[A-Za-z][A-Za-z0-9]*                    yylval.sval=strdup(yytext); return IDENT;
+return                                  return TOKRETURN;
+[A-Za-z_][A-Za-z0-9_]*                    yylval.sval=strdup(yytext); return IDENT;
 
 
 \"(\\.|[^"\\])*\"                       yylval.sval=strdup(yytext); return STRING_LIT;

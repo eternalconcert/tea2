@@ -6,16 +6,19 @@ scope: source.tea
 
 contexts:
   main:
-    - match: \b(CONST|fn|return|for|if|else)\b
-      scope: keyword.control.tea
-    - match: \b(INT|FLOAT|STR|BOOL|ARRAY|VOID)\b
-      scope: storage.type.tea
+    - match: \b(CONST|FN|return|for|if|else)\b
+      scope: keyword.control
+    - match: \b(INT|FLOAT|STR|BOOL|ARRAY|VOID|)\b
+      scope: storage.type
+
+    - match: \b(true|false|[0-9]+.[0-9]+|[0-9]+)\b
+      scope: constant.language
     - match: (\+|\-|\=|\*|\/)
-      scope: keyword.operator.assignment.tea
+      scope: keyword.operator.assignment
     - match: (>|>=|<|<=|==|!=)
-      scope: keyword.operator.assignment.tea
+      scope: keyword.operator.assignment
     - match: ( in | and | or | xor | not )
-      scope: keyword.operator.word.tea
+      scope: keyword.operator.word
     - match: '"'
       push: string
 
