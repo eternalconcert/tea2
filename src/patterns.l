@@ -32,8 +32,8 @@ else                                    return TOKELSE;
 "not in"                                yylval.sval=strdup(yytext); return TOKNOTIN;
 for                                     return TOKFOR;
 return                                  return TOKRETURN;
+print                                   return TOKPRINT;
 [A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return IDENT;
-
 
 \"(\\.|[^"\\])*\"                       yylval.sval=strdup(yytext); return STRING_LIT;
 [+-]?[0-9]+                             yylval.ival=atoi(yytext); return INTEGER_LIT;

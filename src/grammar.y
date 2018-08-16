@@ -31,7 +31,7 @@ main(int argc, char *argv[0]) {
 
 %}
 
-%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE
+%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE TOKPRINT
 
 %union
 {
@@ -62,6 +62,7 @@ main(int argc, char *argv[0]) {
 %token <sval> TOKGTE
 
 %type <sval> logic_op
+%type <sval> string
 
 %%
 
@@ -88,10 +89,21 @@ statement:
     if_statement
     |
     return_statement
+    |
+    print_statement
     ;
 
+string:
+    STRING_LIT { $$=$1; }
+
 literal:
-    STRING_LIT | INTEGER_LIT | FLOAT_LIT | BOOL_LIT
+    string
+    |
+    INTEGER_LIT
+    |
+    FLOAT_LIT
+    |
+    BOOL_LIT
 
 expression:
     literal ARITH_OP expression
@@ -221,4 +233,15 @@ if_statement:
     TOKIF comparison '{' statements '}' TOKELSE '{' statements '}'
     {
         printf("if else statement\n");
+    }
+
+print_statement:
+    TOKPRINT '(' string ')'
+    {
+        printf("%s\n", $3);
+    }
+    |
+    TOKPRINT '(' INTEGER_LIT ')'
+    {
+        printf("%d\n", $3);
     }
