@@ -31,7 +31,7 @@ main(int argc, char *argv[0]) {
 
 %}
 
-%token TOKCONST TOKFUNC TOKRETURN
+%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE
 
 %union
 {
@@ -48,6 +48,20 @@ main(int argc, char *argv[0]) {
 %token <fval> FLOAT_LIT
 %token <sval> BOOL_LIT
 %token <sval> ARITH_OP
+%token <sval> TOKIN
+%token <sval> TOKNOTIN
+%token <sval> TOKOR
+%token <sval> TOKXOR
+%token <sval> TOKNOT
+%token <sval> TOKAND
+%token <sval> TOKEQ
+%token <sval> TOKNEQ
+%token <sval> TOKLT
+%token <sval> TOKGT
+%token <sval> TOKLTE
+%token <sval> TOKGTE
+
+%type <sval> logic_op
 
 %%
 
@@ -69,6 +83,10 @@ statement:
     |
     func_call
     |
+    for_loop
+    |
+    if_statement
+    |
     return_statement
     ;
 
@@ -76,17 +94,17 @@ literal:
     STRING_LIT | INTEGER_LIT | FLOAT_LIT | BOOL_LIT
 
 expression:
-    literal ARITH_OP expression { printf("Literal arith MULTI literal expression\n"); }
+    literal ARITH_OP expression
     |
-    IDENT ARITH_OP expression { printf("Ident arith ident expression\n"); }
+    IDENT ARITH_OP expression
     |
-    literal ARITH_OP literal { printf("Literal arith literal expression\n"); }
+    literal ARITH_OP literal
     |
-    IDENT ARITH_OP IDENT { printf("Ident arith ident expression\n"); }
+    IDENT ARITH_OP IDENT
     |
-    literal ARITH_OP IDENT { printf("Literal arith ident expression\n"); }
+    literal ARITH_OP IDENT
     |
-    IDENT ARITH_OP literal { printf("Ident arith literal expression\n"); }
+    IDENT ARITH_OP literal
 
 const_declaration:
     TOKCONST TYPEIDENT IDENT '=' literal
@@ -149,3 +167,58 @@ func_declaration:
 func_call:
     IDENT '(' actual_arguments_list ')' { printf("func call\n"); }
 
+for_loop:
+    TOKFOR IDENT TOKIN IDENT '{' statements '}'
+    {
+        { printf("for loop\n"); }
+    }
+
+
+logic_op:
+    TOKIN
+    |
+    TOKNOTIN
+    |
+    TOKOR
+    |
+    TOKXOR
+    |
+    TOKNOT
+    |
+    TOKAND
+    |
+    TOKEQ
+    |
+    TOKNEQ
+    |
+    TOKLT
+    |
+    TOKGT
+    |
+    TOKLTE
+    |
+    TOKGTE
+
+comparison:
+    literal logic_op comparison
+    |
+    IDENT logic_op comparison
+    |
+    literal logic_op literal
+    |
+    IDENT logic_op IDENT
+    |
+    literal logic_op IDENT
+    |
+    IDENT logic_op literal
+
+if_statement:
+    TOKIF comparison '{' statements '}'
+    {
+        printf("if statement\n");
+    }
+    |
+    TOKIF comparison '{' statements '}' TOKELSE '{' statements '}'
+    {
+        printf("if else statement\n");
+    }

@@ -16,8 +16,23 @@
 CONST                                   return TOKCONST;
 INT|FLOAT|STR|BOOL|ARRAY|VOID           yylval.sval=strdup(yytext); return TYPEIDENT;
 true|false                              yylval.sval=strdup(yytext); return BOOL_LIT;
+if                                      return TOKIF;
+else                                    return TOKELSE;
+"=="                                    yylval.sval=strdup(yytext); return TOKEQ;
+"!="                                    yylval.sval=strdup(yytext); return TOKNEQ;
+"<"                                     yylval.sval=strdup(yytext); return TOKLT;
+">"                                     yylval.sval=strdup(yytext); return TOKGT;
+"<="                                    yylval.sval=strdup(yytext); return TOKLTE;
+">="                                    yylval.sval=strdup(yytext); return TOKGTE;
+"or"                                    yylval.sval=strdup(yytext); return TOKOR;
+"xor"                                   yylval.sval=strdup(yytext); return TOKXOR;
+"not"                                   yylval.sval=strdup(yytext); return TOKNOT;
+"and"                                   yylval.sval=strdup(yytext); return TOKAND;
+"in"                                    yylval.sval=strdup(yytext); return TOKIN;
+"not in"                                yylval.sval=strdup(yytext); return TOKNOTIN;
+for                                     return TOKFOR;
 return                                  return TOKRETURN;
-[A-Za-z_][A-Za-z0-9_]*                    yylval.sval=strdup(yytext); return IDENT;
+[A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return IDENT;
 
 
 \"(\\.|[^"\\])*\"                       yylval.sval=strdup(yytext); return STRING_LIT;
