@@ -124,9 +124,9 @@ literal:
     ;
 
 expression:
-    literal ARITH_OP expression
+    expression ARITH_OP literal
     |
-    IDENT ARITH_OP expression
+    expression ARITH_OP IDENT
     |
     literal ARITH_OP literal
     |
@@ -222,9 +222,9 @@ logic_op:
     ;
 
 comparison:
-    literal logic_op comparison
+    comparison logic_op literal
     |
-    IDENT logic_op comparison
+    comparison logic_op IDENT
     |
     literal logic_op literal
     |
