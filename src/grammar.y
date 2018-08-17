@@ -96,6 +96,20 @@ statement:
 string:
     STRING_LIT { $$=$1; }
 
+list_elems:
+    |
+    IDENT
+    |
+    literal
+    |
+    IDENT ',' list_elems
+    |
+    literal ',' list_elems
+
+
+array_lit:
+    '[' list_elems ']'
+
 literal:
     string
     |
@@ -104,6 +118,8 @@ literal:
     FLOAT_LIT
     |
     BOOL_LIT
+    |
+    array_lit
 
 expression:
     literal ARITH_OP expression
@@ -120,15 +136,9 @@ expression:
 
 const_declaration:
     TOKCONST TYPEIDENT IDENT '=' literal
-    {
-        printf("Const assignment\n");
-    }
 
 var_declaration:
     TYPEIDENT IDENT
-    {
-        printf("var declaration\n");
-    }
 
 var_assignment:
     var_declaration '=' literal
@@ -146,9 +156,6 @@ var_assignment:
     IDENT '=' expression
     |
     IDENT '=' func_call
-    {
-        printf("var assignment\n");
-    }
 
 return_statement:
     TOKRETURN |
@@ -174,17 +181,13 @@ actual_arguments_list:
 
 
 func_declaration:
-    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' '{' statements '}' { printf("func declaration\n"); }
+    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' '{' statements '}'
 
 func_call:
-    IDENT '(' actual_arguments_list ')' { printf("func call\n"); }
+    IDENT '(' actual_arguments_list ')'
 
 for_loop:
     TOKFOR IDENT TOKIN IDENT '{' statements '}'
-    {
-        { printf("for loop\n"); }
-    }
-
 
 logic_op:
     TOKIN
@@ -226,14 +229,8 @@ comparison:
 
 if_statement:
     TOKIF comparison '{' statements '}'
-    {
-        printf("if statement\n");
-    }
     |
     TOKIF comparison '{' statements '}' TOKELSE '{' statements '}'
-    {
-        printf("if else statement\n");
-    }
 
 print_statement:
     TOKPRINT '(' string ')'

@@ -10,6 +10,8 @@
 "+"|"-"|"*"|"\/"                        yylval.sval=strdup(yytext); return ARITH_OP;
 "{"                                     return '{';
 "}"                                     return '}';
+"["                                     return '[';
+"]"                                     return ']';
 "("                                     return '(';
 ")"                                     return ')';
 "FN"                                    return TOKFUNC;
