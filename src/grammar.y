@@ -105,6 +105,7 @@ list_elems:
     IDENT ',' list_elems
     |
     literal ',' list_elems
+    ;
 
 
 array_lit:
@@ -120,6 +121,7 @@ literal:
     BOOL_LIT
     |
     array_lit
+    ;
 
 expression:
     literal ARITH_OP expression
@@ -133,12 +135,13 @@ expression:
     literal ARITH_OP IDENT
     |
     IDENT ARITH_OP literal
+    ;
 
 const_declaration:
-    TOKCONST TYPEIDENT IDENT '=' literal
+    TOKCONST TYPEIDENT IDENT '=' literal;
 
 var_declaration:
-    TYPEIDENT IDENT
+    TYPEIDENT IDENT;
 
 var_assignment:
     var_declaration '=' literal
@@ -156,11 +159,13 @@ var_assignment:
     IDENT '=' expression
     |
     IDENT '=' func_call
+    ;
 
 return_statement:
     TOKRETURN |
     TOKRETURN IDENT |
     TOKRETURN literal
+    ;
 
 formal_arguments_list:
     |
@@ -168,6 +173,7 @@ formal_arguments_list:
     TYPEIDENT IDENT '=' literal |
     TYPEIDENT IDENT ',' formal_arguments_list |
     TYPEIDENT IDENT '=' literal ',' formal_arguments_list
+    ;
 
 actual_arguments_list:
     |
@@ -178,16 +184,16 @@ actual_arguments_list:
     literal
     |
     literal ',' actual_arguments_list
-
+    ;
 
 func_declaration:
-    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' '{' statements '}'
+    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' '{' statements '}';
 
 func_call:
-    IDENT '(' actual_arguments_list ')'
+    IDENT '(' actual_arguments_list ')';
 
 for_loop:
-    TOKFOR IDENT TOKIN IDENT '{' statements '}'
+    TOKFOR IDENT TOKIN IDENT '{' statements '}';
 
 logic_op:
     TOKIN
@@ -213,6 +219,7 @@ logic_op:
     TOKLTE
     |
     TOKGTE
+    ;
 
 comparison:
     literal logic_op comparison
@@ -226,11 +233,13 @@ comparison:
     literal logic_op IDENT
     |
     IDENT logic_op literal
+    ;
 
 if_statement:
     TOKIF comparison '{' statements '}'
     |
     TOKIF comparison '{' statements '}' TOKELSE '{' statements '}'
+    ;
 
 print_statement:
     TOKPRINT '(' string ')'
@@ -242,3 +251,4 @@ print_statement:
     {
         printf("%d\n", $3);
     }
+    ;
