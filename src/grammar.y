@@ -3,6 +3,8 @@
     #include <string.h>
 
     extern FILE *yyin;
+    extern int yylineno;
+    extern char *yytext;
     extern "C" {
         int yyparse(void);
         int yylex(void);
@@ -14,7 +16,7 @@
 
 
     void yyerror(const char *str) {
-        fprintf(stderr, "Error: %s\n", str);
+        fprintf(stderr, "Error: %s: %s on line %d\n", str, yytext, yylineno);
     }
 
 
@@ -93,7 +95,7 @@ statement:
     |
     if_statement
     |
-    return_statement
+    return
     |
     print_statement
     ;
@@ -166,7 +168,7 @@ var_assignment:
     IDENT '=' func_call
     ;
 
-return_statement:
+return:
     TOKRETURN |
     TOKRETURN IDENT |
     TOKRETURN literal

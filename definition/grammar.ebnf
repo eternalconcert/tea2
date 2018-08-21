@@ -1,5 +1,7 @@
 Program              = { Statement ';' }.
-Statement            = { Expression |
+Statement            = { Literal |
+                         Identifier |
+                         Expression |
                          ConstDeclaration |
                          VarDeclaration |
                          VarAssignment |

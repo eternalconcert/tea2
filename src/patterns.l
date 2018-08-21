@@ -2,6 +2,7 @@
     #include <stdio.h>
     #include "y.tab.h"
 %}
+%option yylineno
 
 %%
 "="                                     return '=';
