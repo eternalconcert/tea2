@@ -148,38 +148,22 @@ expression:
 const_declaration:
     TOKCONST TYPEIDENT IDENT '=' INTEGER_LIT
     {
-        Constant constant = Constant();
-        char *type = $2;
-        char *ident = $3;
-        int value = $5;
-        printf("Const %s: %s val %d \n", type, ident, value);
-    };
-    |
-    TOKCONST TYPEIDENT IDENT '=' string
-    {
-        Constant constant = Constant();
-        char *type = $2;
-        char *ident = $3;
-        char *value = $5;
-        printf("Const %s: %s val %s \n", type, ident, value);
+        addConstant(std::string($3), INT, $5, 0, NULL, NULL);
     };
     |
     TOKCONST TYPEIDENT IDENT '=' FLOAT_LIT
     {
-        Constant constant = Constant();
-        char *type = $2;
-        char *ident = $3;
-        int value = $5;
-        printf("Const %s: %s val %d \n", type, ident, value);
+        addConstant(std::string($3), FLOAT, 0, $5, NULL, NULL);
+    };
+    |
+    TOKCONST TYPEIDENT IDENT '=' string
+    {
+        addConstant(std::string($3), STR, 0, 0, $5, NULL);
     };
     |
     TOKCONST TYPEIDENT IDENT '=' BOOL_LIT
     {
-        Constant constant = Constant();
-        char *type = $2;
-        char *ident = $3;
-        char *value = $5;
-        printf("Const %s: %s val %s \n", type, ident, value);
+        addConstant(std::string($3), BOOL, 0, 0, NULL, $5);
     };
 
 var_declaration:
@@ -292,5 +276,22 @@ print_statement:
     TOKPRINT '(' INTEGER_LIT ')'
     {
         printf("%d\n", $3);
+    }
+    |
+    TOKPRINT '(' IDENT ')'
+    {
+        Constant constant = constants[std::string($3)];
+        if (constant.type == INT) {
+            printf("%d\n", constant.int_value);
+        }
+        if (constant.type == FLOAT) {
+            printf("%d\n", constant.float_value);
+        }
+        if (constant.type == STR) {
+            printf("%s\n", constant.string_value);
+        }
+        if (constant.type == BOOL) {
+            printf("%d\n", constant.bool_value);
+        }
     }
     ;

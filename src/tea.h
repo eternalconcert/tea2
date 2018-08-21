@@ -1,21 +1,51 @@
 #include <map>
 
-enum types {INT, STR, BOOL, VOID, ARRAY};
+enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY};
 
 class Constant {
-    std::string ident;
-    types type;
-    int int_value;
-    std::string string_value;
-    bool bool_value;
-
     public:
-        void setValue();
+        std::string ident;
+        TYPE_ID type;
+        int int_value;
+        float float_value;
+        char *string_value;
+        bool bool_value;
 };
 
 
-void Constant::setValue() {
-    printf("%s\n", "JAA");
-}
-
 std::map <std::string, Constant> constants;
+
+
+void addConstant(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
+    Constant new_constant = Constant();
+    new_constant.ident = ident;
+    new_constant.type = type;
+
+    switch(type) {
+        case INT:
+            new_constant.int_value = int_value;
+            break;
+
+        case FLOAT:
+            new_constant.float_value = float_value;
+            break;
+
+        case STR:
+            new_constant.string_value = string_value;
+            break;
+
+        case BOOL:
+            new_constant.bool_value = strcmp(bool_value, "true") == 0;
+            break;
+
+        case VOID:
+            break;
+
+        case ARRAY:
+            break;
+        };
+
+        constants[ident] = new_constant;
+
+};
+
