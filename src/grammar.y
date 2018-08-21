@@ -72,6 +72,11 @@ statements: /* empty */
         ;
 
 statement:
+    |
+    literal
+    |
+    IDENT
+    |
     expression
     |
     const_declaration
