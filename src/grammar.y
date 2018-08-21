@@ -2,6 +2,8 @@
     #include <stdio.h>
     #include <string.h>
 
+    #include "src/tea.h"
+
     extern FILE *yyin;
     extern int yylineno;
     extern char *yytext;
@@ -114,7 +116,6 @@ list_elems:
     literal ',' list_elems
     ;
 
-
 array_lit:
     '[' list_elems ']'
 
@@ -145,7 +146,41 @@ expression:
     ;
 
 const_declaration:
-    TOKCONST TYPEIDENT IDENT '=' literal;
+    TOKCONST TYPEIDENT IDENT '=' INTEGER_LIT
+    {
+        Constant constant = Constant();
+        char *type = $2;
+        char *ident = $3;
+        int value = $5;
+        printf("Const %s: %s val %d \n", type, ident, value);
+    };
+    |
+    TOKCONST TYPEIDENT IDENT '=' string
+    {
+        Constant constant = Constant();
+        char *type = $2;
+        char *ident = $3;
+        char *value = $5;
+        printf("Const %s: %s val %s \n", type, ident, value);
+    };
+    |
+    TOKCONST TYPEIDENT IDENT '=' FLOAT_LIT
+    {
+        Constant constant = Constant();
+        char *type = $2;
+        char *ident = $3;
+        int value = $5;
+        printf("Const %s: %s val %d \n", type, ident, value);
+    };
+    |
+    TOKCONST TYPEIDENT IDENT '=' BOOL_LIT
+    {
+        Constant constant = Constant();
+        char *type = $2;
+        char *ident = $3;
+        char *value = $5;
+        printf("Const %s: %s val %s \n", type, ident, value);
+    };
 
 var_declaration:
     TYPEIDENT IDENT;
