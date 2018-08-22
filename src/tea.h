@@ -1,4 +1,15 @@
 #include <map>
+#include <stdexcept>
+
+
+class RuntimeError: public std::exception {
+    public:
+        RuntimeError(std::string message) {
+            printf("RuntimeError: %s\n", message.c_str());
+            exit(1);
+        };
+};
+
 
 enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY};
 
@@ -20,6 +31,10 @@ void addConstant(std::string ident, TYPE_ID type, int int_value, float float_val
     Constant new_constant = Constant();
     new_constant.ident = ident;
     new_constant.type = type;
+
+    if (constants.find(ident) != constants.end()) {
+        throw RuntimeError("Constant redaclared: " + ident);
+    }
 
     switch(type) {
         case INT:

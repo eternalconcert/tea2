@@ -285,7 +285,7 @@ print_statement:
             printf("%d\n", constant.int_value);
         }
         if (constant.type == FLOAT) {
-            printf("%d\n", constant.float_value);
+            printf("%f\n", constant.float_value);
         }
         if (constant.type == STR) {
             printf("%s\n", constant.string_value);
