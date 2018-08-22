@@ -1,0 +1,116 @@
+<!doctype html>
+
+<html lang="de">
+    <head>
+        <title>The Tea Programming Language</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" type="text/css" href="sunburst.css" />
+        <link rel="stylesheet" type="text/css" href="main.css" />
+        <link rel="stylesheet" type="text/css" href="prettify.css" />
+        <script src="prettify.js"></script>
+        <script src="lang-tea.js"></script>
+    </head>
+
+    <body>
+        <h1>The Tea Programming Language</h1>
+        <h2>0. Preface</h2>
+        <p>
+            This language is designed to be used for small tasks. It is not intended to be a full stack language.
+        </p>
+        <h2>1. Basic usage</h2>
+        <p>
+            <pre class="prettyprint lang-tea">
+CONST INT NUMBER = 12314;
+CONST FLOAT FLOATING = 0.5;
+CONST STR TEXT = "Hello world!";
+CONST BOOL BOOLEAN = true;
+# print(NUMBER);
+# print(FLOATING);
+# print(TEXT);
+print(BOOLEAN);
+
+INT var_number_no_assignment;
+INT var_number = 11233;
+BOOL boolean_val = true;
+
+STR var_string_no_assignment;
+STR var_string = "String";
+
+FN INT name(INT formal_param1, INT formal_param2) {
+    INT result;
+    result = formal_param1 + formal_param2;
+    return result;
+};
+
+FN VOID empty(INT formal_param1=1, INT formal_param2) {
+
+    INT message1 = 1000000;
+
+    FN VOID empty() {
+        INT message2 = 1;
+        INT message2 = 3;
+        print(message1);
+    };
+
+    print(message1);
+};
+
+var_number_no_assignment_1 = name(const_number, 2);
+INT var_number_no_assignment_2 = name(const_number, 3);
+
+1 + 1;
+2 - 2;
+3 * 3;
+4 / 4;
+
+FLOAT number = -0.5;
+
+res = 1 + 2;
+INT res2 = res - 4;
+INT res3 = 3 * 3;
+INT res4 = 9 / 3;
+res4 = 3 * 3 + 4;
+
+for item in list1 {
+    item = item + 1;
+    print("In der Schleife!");
+};
+
+if var_number == 1 or var_number not in list1 and var_number != 0 {
+    item = item + 1;
+    print("Im If-Block!");
+};
+
+if var_number == 1 or var_number not in list1 and var_number != 0 {
+    item = item + 1;
+    print("Im If-Block!");
+}
+else {
+    item = item + 2;
+    print("Im Else-Block!");
+};
+
+print("Hallo Welt!");
+print(23235);
+print(23235.2);
+
+
+INT test;
+ARRAY list2 = [12, test];
+
+a;
+1.2;
+-12;
+
+
+            </pre>
+
+        </p>
+        <h2>2. Constants</h2>
+        <p>
+
+        </p>
+
+    </body>
+</html>
