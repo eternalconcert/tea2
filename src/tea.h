@@ -67,6 +67,7 @@ void addConstant(std::string ident, TYPE_ID type, int int_value, float float_val
 class Scope {
     public:
         std::map <std::string, ValueStore> variables;
+        int index;
         Scope *prev = NULL;
 };
 
@@ -75,15 +76,27 @@ Scope *scopeHead = NULL;
 
 
 Scope *pushScope() {
-    printf("%s\n", "PUSH SCOPE");
     Scope *new_scope = new Scope();
     new_scope->prev = scopeHead;
+    new_scope->index = 0;
+    if (new_scope->prev) {
+        new_scope->index = scopeHead->index + 1;
+    };
     scopeHead = new_scope;
 };
 
 
+Scope *getScopeHead() {
+    if (scopeHead) {
+        return scopeHead;
+    }
+    else {
+        return pushScope();
+    }
+}
+
+
 Scope *popScope() {
-    printf("%s\n", "POP SCOPE");
     Scope *oldScope = scopeHead;
     scopeHead = scopeHead->prev;
     delete oldScope;

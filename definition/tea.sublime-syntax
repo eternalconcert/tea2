@@ -21,9 +21,15 @@ contexts:
       scope: keyword.operator.word
     - match: '"'
       push: string
+    - match: '#'
+      push: comment
 
   string:
     - meta_scope: string.quoted.double.tea
     - match: '"'
       pop: true
 
+  comment:
+    - meta_scope: comment.line
+    - match: \n
+      pop: true

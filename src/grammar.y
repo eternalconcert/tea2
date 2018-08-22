@@ -174,7 +174,7 @@ var_declaration:
 var_assignment:
     var_declaration '=' literal
     {
-        printf("TETETETE\n");
+        printf("Scope Idx %d\n", getScopeHead()->index);
     }
     |
     var_declaration '=' IDENT

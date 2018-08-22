@@ -5,6 +5,7 @@
 %option yylineno
 
 %%
+"#".*                                   /* ignore comments */;
 "="                                     return '=';
 ";"                                     return ';';
 ","                                     return ',';
@@ -41,6 +42,5 @@ print                                   return TOKPRINT;
 \"(\\.|[^"\\])*\"                       yylval.sval=strdup(yytext); return STRING_LIT;
 [+-]?[0-9]+                             yylval.ival=atoi(yytext); return INTEGER_LIT;
 [+-]?[0-9]+\.[0-9]+                     yylval.fval=atof(yytext); return FLOAT_LIT;
-
 \n                                      /* ignore EOL */;
 [ \t]+                                  /* ingnore whitespace */;
