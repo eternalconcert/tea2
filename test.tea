@@ -2,10 +2,10 @@ CONST INT NUMBER = 12314;
 CONST FLOAT FLOATING = 0.5;
 CONST STR TEXT = "Hello world!";
 CONST BOOL BOOLEAN = false;
-print(NUMBER);
-print(FLOATING);
-print(TEXT);
-print(BOOLEAN);
+# print(NUMBER);
+# print(FLOATING);
+# print(TEXT);
+# print(BOOLEAN);
 
 INT var_number_no_assignment;
 INT var_number = 1;
@@ -21,7 +21,13 @@ FN INT name(INT formal_param1, INT formal_param2) {
 };
 
 FN VOID empty(INT formal_param1=1, INT formal_param2) {
-    STR message = "In der VOID-Funktion!";
+    STR message = "Scope Test 1";
+    FN VOID empty() {
+        STR message = "Scope Test 2";
+        STR message = "Scope Test 3";
+    };
+    STR message = "Scope Test 4";
+
     print(message);
 };
 
