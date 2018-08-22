@@ -42,6 +42,12 @@ main(int argc, char *argv[0]) {
     int ival;
     char *sval;
     float fval;
+
+    struct {
+        char *value1;
+        char *value2;
+        char *value3;
+    } values;
 }
 
 %token <sval> TYPEIDENT
@@ -67,6 +73,7 @@ main(int argc, char *argv[0]) {
 
 %type <sval> logic_op
 %type <sval> string
+%type <values> var_declaration
 
 %%
 
@@ -169,14 +176,33 @@ const_declaration:
     };
 
 var_declaration:
-    TYPEIDENT IDENT;
+    TYPEIDENT IDENT
+    {
+        $$.value1 = $1;
+        $$.value2 = $2;
+    }
+    ;
 
 var_assignment:
-    var_declaration '=' literal
+    var_declaration '=' INTEGER_LIT
     {
-        printf("Scope Idx %d\n", getScopeHead()->index);
+        Scope *scope = getScopeHead();
+        ValueStore new_variable = ValueStore();
+        new_variable.type = INT;
+        new_variable.int_value = $3;
+        new_variable.ident = $1.value2;
+        scope->variables[$1.value2] = new_variable;
     }
     |
+    var_declaration '=' BOOL_LIT
+    |
+    var_declaration '=' STRING_LIT
+    |
+    var_declaration '=' FLOAT_LIT
+    |
+    var_declaration '=' array_lit
+    |
+
     var_declaration '=' IDENT
     |
     var_declaration '=' expression
@@ -296,20 +322,37 @@ print_statement:
         printf("%d\n", $3);
     }
     |
+    TOKPRINT '(' FLOAT_LIT ')'
+    {
+        printf("%f\n", $3);
+    }
+    |
     TOKPRINT '(' IDENT ')'
     {
-        ValueStore constant = constants[std::string($3)];
-        if (constant.type == INT) {
-            printf("%d\n", constant.int_value);
+        std::string ident = std::string($3);
+        if (constants.find(ident) != constants.end()) {
+            ValueStore constant = constants[ident];
+            if (constant.type == INT) {
+                printf("%d\n", constant.int_value);
+            }
+            if (constant.type == FLOAT) {
+                printf("%f\n", constant.float_value);
+            }
+            if (constant.type == STR) {
+                printf("%s\n", constant.string_value);
+            }
+            if (constant.type == BOOL) {
+                printf("%s\n", constant.bool_value);
+            }
+            break;
         }
-        if (constant.type == FLOAT) {
-            printf("%f\n", constant.float_value);
+
+        Scope *scope = getScopeHead();
+        if (scope->variables.find(ident) != scope->variables.end()) {
+            printf("PRINTING VARIABLE: %d\n", scope->variables[ident].int_value);
+            break;
         }
-        if (constant.type == STR) {
-            printf("%s\n", constant.string_value);
-        }
-        if (constant.type == BOOL) {
-            printf("%d\n", constant.bool_value);
-        }
+
+        throw RuntimeError("Undeclared identifier: " + ident);
     }
     ;

@@ -1,14 +1,14 @@
 CONST INT NUMBER = 12314;
 CONST FLOAT FLOATING = 0.5;
 CONST STR TEXT = "Hello world!";
-CONST BOOL BOOLEAN = false;
+CONST BOOL BOOLEAN = true;
 # print(NUMBER);
 # print(FLOATING);
 # print(TEXT);
-# print(BOOLEAN);
+print(BOOLEAN);
 
 INT var_number_no_assignment;
-INT var_number = 1;
+INT var_number = 11233;
 BOOL boolean_val = true;
 
 STR var_string_no_assignment;
@@ -21,14 +21,16 @@ FN INT name(INT formal_param1, INT formal_param2) {
 };
 
 FN VOID empty(INT formal_param1=1, INT formal_param2) {
-    STR message = "Scope Test 1";
-    FN VOID empty() {
-        STR message = "Scope Test 2";
-        STR message = "Scope Test 3";
-    };
-    STR message = "Scope Test 4";
 
-    print(message);
+    INT message1 = 1000000;
+
+    FN VOID empty() {
+        INT message2 = 1;
+        INT message2 = 3;
+        print(message1);
+    };
+
+    print(message1);
 };
 
 var_number_no_assignment_1 = name(const_number, 2);
@@ -68,6 +70,8 @@ else {
 
 print("Hallo Welt!");
 print(23235);
+print(23235.2);
+
 
 INT test;
 ARRAY list2 = [12, test];
@@ -75,3 +79,4 @@ ARRAY list2 = [12, test];
 a;
 1.2;
 -12;
+

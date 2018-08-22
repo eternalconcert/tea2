@@ -20,7 +20,7 @@ class ValueStore {
         int int_value;
         float float_value;
         char *string_value;
-        bool bool_value;
+        char *bool_value;
 };
 
 
@@ -50,7 +50,7 @@ void addConstant(std::string ident, TYPE_ID type, int int_value, float float_val
             break;
 
         case BOOL:
-            new_constant.bool_value = strcmp(bool_value, "true") == 0;
+            new_constant.bool_value = bool_value;
             break;
 
         case VOID:
