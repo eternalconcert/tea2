@@ -9,8 +9,8 @@
 ";"                                     return ';';
 ","                                     return ',';
 "+"|"-"|"*"|"\/"                        yylval.sval=strdup(yytext); return ARITH_OP;
-"{"                                     return '{';
-"}"                                     return '}';
+"{"                                     return OCBRACE;
+"}"                                     return CCBRACE;
 "["                                     return '[';
 "]"                                     return ']';
 "("                                     return '(';

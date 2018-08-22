@@ -35,7 +35,7 @@ main(int argc, char *argv[0]) {
 
 %}
 
-%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE TOKPRINT
+%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE OCBRACE CCBRACE TOKPRINT
 
 %union
 {
@@ -70,7 +70,9 @@ main(int argc, char *argv[0]) {
 
 %%
 
-program: statements
+program:
+    statements
+
 statements: /* empty */
         | statements statement ';'
         ;
@@ -171,6 +173,9 @@ var_declaration:
 
 var_assignment:
     var_declaration '=' literal
+    {
+        printf("TETETETE\n");
+    }
     |
     var_declaration '=' IDENT
     |
@@ -212,14 +217,27 @@ actual_arguments_list:
     literal ',' actual_arguments_list
     ;
 
+ccbrace:
+    OCBRACE
+    {
+        pushScope();
+    };
+
+ocbrace:
+    CCBRACE
+    {
+        popScope();
+    };
+
 func_declaration:
-    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' '{' statements '}';
+    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' ccbrace statements ocbrace
+    ;
 
 func_call:
     IDENT '(' actual_arguments_list ')';
 
 for_loop:
-    TOKFOR IDENT TOKIN IDENT '{' statements '}';
+    TOKFOR IDENT TOKIN IDENT OCBRACE statements CCBRACE;
 
 logic_op:
     TOKIN
@@ -262,9 +280,9 @@ comparison:
     ;
 
 if_statement:
-    TOKIF comparison '{' statements '}'
+    TOKIF comparison OCBRACE statements CCBRACE
     |
-    TOKIF comparison '{' statements '}' TOKELSE '{' statements '}'
+    TOKIF comparison OCBRACE statements CCBRACE TOKELSE OCBRACE statements CCBRACE
     ;
 
 print_statement:
@@ -280,7 +298,7 @@ print_statement:
     |
     TOKPRINT '(' IDENT ')'
     {
-        Constant constant = constants[std::string($3)];
+        ValueStore constant = constants[std::string($3)];
         if (constant.type == INT) {
             printf("%d\n", constant.int_value);
         }

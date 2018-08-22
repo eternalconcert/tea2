@@ -13,7 +13,7 @@ class RuntimeError: public std::exception {
 
 enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY};
 
-class Constant {
+class ValueStore {
     public:
         std::string ident;
         TYPE_ID type;
@@ -24,11 +24,11 @@ class Constant {
 };
 
 
-std::map <std::string, Constant> constants;
+std::map <std::string, ValueStore> constants;
 
 
 void addConstant(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
-    Constant new_constant = Constant();
+    ValueStore new_constant = ValueStore();
     new_constant.ident = ident;
     new_constant.type = type;
 
@@ -61,6 +61,30 @@ void addConstant(std::string ident, TYPE_ID type, int int_value, float float_val
         };
 
         constants[ident] = new_constant;
-
 };
 
+
+class Scope {
+    public:
+        std::map <std::string, ValueStore> variables;
+        Scope *prev = NULL;
+};
+
+
+Scope *scopeHead = NULL;
+
+
+Scope *pushScope() {
+    printf("%s\n", "PUSH SCOPE");
+    Scope *new_scope = new Scope();
+    new_scope->prev = scopeHead;
+    scopeHead = new_scope;
+};
+
+
+Scope *popScope() {
+    printf("%s\n", "POP SCOPE");
+    Scope *oldScope = scopeHead;
+    scopeHead = scopeHead->prev;
+    delete oldScope;
+};
