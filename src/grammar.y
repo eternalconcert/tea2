@@ -330,29 +330,7 @@ print_statement:
     TOKPRINT '(' IDENT ')'
     {
         std::string ident = std::string($3);
-        if (constants.find(ident) != constants.end()) {
-            ValueStore constant = constants[ident];
-            if (constant.type == INT) {
-                printf("%d\n", constant.int_value);
-            }
-            if (constant.type == FLOAT) {
-                printf("%f\n", constant.float_value);
-            }
-            if (constant.type == STR) {
-                printf("%s\n", constant.string_value);
-            }
-            if (constant.type == BOOL) {
-                printf("%s\n", constant.bool_value);
-            }
-            break;
-        }
-
-        Scope *scope = getScopeHead();
-        if (scope->variables.find(ident) != scope->variables.end()) {
-            printf("PRINTING VARIABLE: %d\n", scope->variables[ident].int_value);
-            break;
-        }
-
-        throw RuntimeError("Undeclared identifier: " + ident);
+        ValueStore item = getFromValueStore(ident);
+        item.repr();
     }
     ;
