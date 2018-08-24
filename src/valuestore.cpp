@@ -2,12 +2,62 @@
 #include "exceptions.h"
 
 
-enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY};
+enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY, IDENTIFIER};
+
+TYPE_ID getTypeIdByName(std::string name) {
+
+    if (name == "INT"){
+        return INT;
+    }
+
+    if (name == "FLOAT"){
+        return FLOAT;
+    }
+
+    if (name == "STR"){
+        return STR;
+    }
+
+    if (name == "BOOL"){
+        return BOOL;
+    }
+
+    if (name == "IDENTIFIER") {
+        return IDENTIFIER;
+    }
+};
+
+std::string getTypeNameById(TYPE_ID id) {
+
+    switch (id) {
+        case INT:
+            return "INT";
+
+        case FLOAT:
+            return "FLOAT";
+
+        case STR:
+            return "STR";
+
+        case BOOL:
+            return "BOOL";
+
+        case VOID:
+            return "VOID";
+
+        case ARRAY:
+            return "ARRAY";
+
+        case IDENTIFIER:
+            return "IDENTIFIER";
+    };
+};
 
 class ValueStore {
     public:
         std::string ident;
         TYPE_ID type;
+        bool assigned = true;
         int int_value;
         float float_value;
         char *string_value;
@@ -105,34 +155,47 @@ ValueStore getFromValueStore(std::string ident) {
 
         Scope *scope = getScopeHead();
         ValueStore variable = getVariable(scope, ident);
+        if (!variable.assigned) {
+            throw RuntimeError(ident + " has been declared but not assigned");
+        }
         return variable;
-}
+};
 
 
-void addConstant(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
-    ValueStore new_constant = ValueStore();
-    new_constant.ident = ident;
-    new_constant.type = type;
+void makeEmptyVariable(Scope *scope, std::string ident, TYPE_ID type) {
+    ValueStore variable = ValueStore();
+    variable.ident = ident;
+    variable.type = type;
+    variable.assigned = false;
+    scope->variables[ident] = variable;
+};
 
-    if (constants.find(ident) != constants.end()) {
-        throw RuntimeError("Constant redaclared: " + ident);
-    }
+
+ValueStore makeValue(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
+    ValueStore value = ValueStore();
+    value.ident = ident;
+    value.type = type;
 
     switch(type) {
         case INT:
-            new_constant.int_value = int_value;
+            value.int_value = int_value;
             break;
 
         case FLOAT:
-            new_constant.float_value = float_value;
+            value.float_value = float_value;
             break;
 
         case STR:
-            new_constant.string_value = string_value;
+            value.string_value = string_value;
             break;
 
         case BOOL:
-            new_constant.bool_value = bool_value;
+            value.bool_value = bool_value;
+            break;
+
+        case IDENTIFIER:
+            printf("Die Idee ist: Die Variable nimmt nur den WERT der anderen an und wird nicht zu der anderen.\n");
+            getFromValueStore("identifier");
             break;
 
         case VOID:
@@ -142,5 +205,37 @@ void addConstant(std::string ident, TYPE_ID type, int int_value, float float_val
             break;
         };
 
-        constants[ident] = new_constant;
+    return value;
+
+};
+
+
+void addConstant(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
+
+    if (constants.find(ident) != constants.end()) {
+        throw RuntimeError("Constant redaclared: " + ident);
+    }
+
+    ValueStore new_constant = makeValue(ident, type, int_value, float_value, string_value, bool_value);
+    constants[ident] = new_constant;
+};
+
+
+void addVariable(Scope *scope, std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
+        ValueStore new_variable = makeValue(ident, type, int_value, float_value, string_value, bool_value);
+        scope->variables[ident] = new_variable;
+};
+
+void updateVariable(Scope *scope, std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
+    ValueStore variable = getVariable(scope, ident);
+    if (variable.type != type) {
+        throw RuntimeError("Type mismatch: " + ident + " == " + getTypeNameById(variable.type) + " != " + getTypeNameById(type));
+    }
+
+    variable.int_value = int_value;
+    variable.float_value = float_value;
+    variable.string_value = string_value;
+    variable.bool_value = bool_value;
+    variable.assigned = true;
+    scope->variables[ident] = variable;
 };

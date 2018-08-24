@@ -42,12 +42,6 @@ main(int argc, char *argv[0]) {
     int ival;
     char *sval;
     float fval;
-
-    struct {
-        char *value1;
-        char *value2;
-        char *value3;
-    } values;
 }
 
 %token <sval> TYPEIDENT
@@ -73,7 +67,6 @@ main(int argc, char *argv[0]) {
 
 %type <sval> logic_op
 %type <sval> string
-%type <values> var_declaration
 
 %%
 
@@ -178,38 +171,64 @@ const_declaration:
 var_declaration:
     TYPEIDENT IDENT
     {
-        $$.value1 = $1;
-        $$.value2 = $2;
+        makeEmptyVariable(getScopeHead(), $2, getTypeIdByName($1));
     }
     ;
 
 var_assignment:
-    var_declaration '=' INTEGER_LIT
+    TYPEIDENT IDENT '=' INTEGER_LIT
     {
-        Scope *scope = getScopeHead();
-        ValueStore new_variable = ValueStore();
-        new_variable.type = INT;
-        new_variable.int_value = $3;
-        new_variable.ident = $1.value2;
-        scope->variables[$1.value2] = new_variable;
+        addVariable(getScopeHead(), $2, INT, $4, 0, NULL, NULL);
     }
     |
-    var_declaration '=' BOOL_LIT
+    TYPEIDENT IDENT '=' FLOAT_LIT
+    {
+        addVariable(getScopeHead(), $2, FLOAT, 0, $4, NULL, NULL);
+    };
     |
-    var_declaration '=' STRING_LIT
+    TYPEIDENT IDENT '=' STRING_LIT
+    {
+        addVariable(getScopeHead(), $2, STR, 0, 0, $4, NULL);
+    };
     |
-    var_declaration '=' FLOAT_LIT
+    TYPEIDENT IDENT '=' BOOL_LIT
+    {
+        addVariable(getScopeHead(), $2, BOOL, 0, 0, NULL, $4);
+    };
     |
-    var_declaration '=' array_lit
+    TYPEIDENT IDENT '=' IDENT
+    {
+        addVariable(getScopeHead(), $2, IDENTIFIER, 0, 0, NULL, $4);
+    };
     |
 
-    var_declaration '=' IDENT
+    TYPEIDENT IDENT '=' array_lit
     |
-    var_declaration '=' expression
+    TYPEIDENT IDENT '=' expression
     |
-    var_declaration '=' func_call
+    TYPEIDENT IDENT '=' func_call
     |
-    IDENT '=' literal
+
+    IDENT '=' INTEGER_LIT
+    {
+        updateVariable(getScopeHead(), $1, INT, $3, 0, NULL, NULL);
+    }
+    |
+    IDENT '=' FLOAT_LIT
+    {
+        updateVariable(getScopeHead(), $1, FLOAT, 0, $3, NULL, NULL);
+    };
+    |
+    IDENT '=' STRING_LIT
+    {
+        updateVariable(getScopeHead(), $1, STR, 0, 0, $3, NULL);
+    };
+    |
+    IDENT '=' BOOL_LIT
+    {
+        updateVariable(getScopeHead(), $1, BOOL, 0, 0, NULL, $3);
+    };
+
     |
     IDENT '=' IDENT
     |
