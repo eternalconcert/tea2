@@ -2,7 +2,7 @@
     #include <stdio.h>
     #include <string.h>
 
-    #include "src/tea.h"
+    #include "src/valuestore.cpp"
 
     extern FILE *yyin;
     extern int yylineno;
@@ -16,7 +16,6 @@
         }
     }
 
-
     void yyerror(const char *str) {
         fprintf(stderr, "Error: %s: %s on line %d\n", str, yytext, yylineno);
     }
@@ -26,6 +25,7 @@ main(int argc, char *argv[0]) {
 
     FILE *inFile = fopen(argv[1], "r");
     if (!inFile) {
+        printf("No file named %s found\n", argv[1]);
         return -1;
     }
     yyin = inFile;

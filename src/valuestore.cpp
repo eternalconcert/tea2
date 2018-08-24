@@ -1,14 +1,5 @@
 #include <map>
-#include <stdexcept>
-
-
-class RuntimeError: public std::exception {
-    public:
-        RuntimeError(std::string message) {
-            printf("RuntimeError: %s\n", message.c_str());
-            exit(1);
-        };
-};
+#include "exceptions.h"
 
 
 enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY};
@@ -89,6 +80,7 @@ Scope *getScopeHead() {
 Scope *popScope() {
     Scope *oldScope = scopeHead;
     scopeHead = scopeHead->parent;
+    oldScope->variables.clear();
     delete oldScope;
 };
 
