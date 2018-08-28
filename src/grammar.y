@@ -42,6 +42,15 @@ main(int argc, char *argv[0]) {
     int ival;
     char *sval;
     float fval;
+
+    struct {
+        const char *type;
+        int integerVal;
+        char *stringVal;
+        float floatVal;
+        char *booleanVal;
+        char *identifier;
+    } var;
 }
 
 %token <sval> TYPEIDENT
@@ -66,7 +75,7 @@ main(int argc, char *argv[0]) {
 %token <sval> TOKGTE
 
 %type <sval> logic_op
-%type <sval> string
+%type <var> literal
 
 %%
 
@@ -104,9 +113,6 @@ statement:
     print_statement
     ;
 
-string:
-    STRING_LIT { $$=$1; }
-
 list_elems:
     |
     IDENT
@@ -122,15 +128,30 @@ array_lit:
     '[' list_elems ']'
 
 literal:
-    string
+    STRING_LIT
+    {
+        $$.stringVal = $1;
+        $$.type = "STR";
+    }
     |
     INTEGER_LIT
+    {
+        $$.integerVal = $1;
+        $$.type = "INT";
+    }
     |
     FLOAT_LIT
+    {
+        $$.floatVal = $1;
+        $$.type = "FLOAT";
+    }
     |
     BOOL_LIT
-    |
-    array_lit
+    {
+        $$.booleanVal = $1;
+        $$.type = "BOOL";
+    }
+
     ;
 
 expression:
@@ -148,57 +169,50 @@ expression:
     ;
 
 const_declaration:
-    TOKCONST TYPEIDENT IDENT '=' INTEGER_LIT
+    TOKCONST TYPEIDENT IDENT '=' literal
     {
-        addConstant(std::string($3), INT, $5, 0, NULL, NULL);
-    };
-    |
-    TOKCONST TYPEIDENT IDENT '=' FLOAT_LIT
-    {
-        addConstant(std::string($3), FLOAT, 0, $5, NULL, NULL);
-    };
-    |
-    TOKCONST TYPEIDENT IDENT '=' string
-    {
-        addConstant(std::string($3), STR, 0, 0, $5, NULL);
-    };
-    |
-    TOKCONST TYPEIDENT IDENT '=' BOOL_LIT
-    {
-        addConstant(std::string($3), BOOL, 0, 0, NULL, $5);
-    };
+        TYPE_ID id = getTypeIdByName($2);
+        switch(id) {
+            case INT:
+                addConstant(std::string($3), INT, $5.integerVal, 0, NULL, NULL);
+                break;
+
+            case FLOAT:
+                addConstant(std::string($3), FLOAT, 0, $5.floatVal, NULL, NULL);
+                break;
+
+            case STR:
+                addConstant(std::string($3), STR, 0, 0, $5.stringVal, NULL);
+                break;
+
+            case BOOL:
+                addConstant(std::string($3), BOOL, 0, 0, NULL, $5.booleanVal);
+                break;
+        };
+        };
+
 
 var_declaration:
     TYPEIDENT IDENT
     {
-        makeEmptyVariable(getScopeHead(), $2, getTypeIdByName($1));
+        makeEmptyVariable($2, getTypeIdByName($1));
     }
     ;
 
 var_assignment:
-    TYPEIDENT IDENT '=' INTEGER_LIT
+    TYPEIDENT IDENT '=' literal
     {
-        addVariable(getScopeHead(), $2, INT, $4, 0, NULL, NULL);
+        std::string typeName = std::string($4.type);
+        if (strcmp($4.type, $1)) {
+            throw RuntimeError("Type mismatch: Cannot assign " + typeName + " to variable of type " + $1);
+        };
+        TYPE_ID typeId = getTypeIdByName($1);
+        addVariable($2, typeId, $4.integerVal, $4.floatVal, $4.stringVal, $4.booleanVal, NULL);
     }
-    |
-    TYPEIDENT IDENT '=' FLOAT_LIT
-    {
-        addVariable(getScopeHead(), $2, FLOAT, 0, $4, NULL, NULL);
-    };
-    |
-    TYPEIDENT IDENT '=' STRING_LIT
-    {
-        addVariable(getScopeHead(), $2, STR, 0, 0, $4, NULL);
-    };
-    |
-    TYPEIDENT IDENT '=' BOOL_LIT
-    {
-        addVariable(getScopeHead(), $2, BOOL, 0, 0, NULL, $4);
-    };
     |
     TYPEIDENT IDENT '=' IDENT
     {
-        addVariable(getScopeHead(), $2, IDENTIFIER, 0, 0, NULL, $4);
+        addVariable($2, IDENTIFIER, 0, 0, NULL, NULL, $4);
     };
     |
 
@@ -211,26 +225,29 @@ var_assignment:
 
     IDENT '=' INTEGER_LIT
     {
-        updateVariable(getScopeHead(), $1, INT, $3, 0, NULL, NULL);
+        updateVariable($1, INT, $3, 0, NULL, NULL, NULL);
     }
     |
     IDENT '=' FLOAT_LIT
     {
-        updateVariable(getScopeHead(), $1, FLOAT, 0, $3, NULL, NULL);
+        updateVariable($1, FLOAT, 0, $3, NULL, NULL, NULL);
     };
     |
     IDENT '=' STRING_LIT
     {
-        updateVariable(getScopeHead(), $1, STR, 0, 0, $3, NULL);
+        updateVariable($1, STR, 0, 0, $3, NULL, NULL);
     };
     |
     IDENT '=' BOOL_LIT
     {
-        updateVariable(getScopeHead(), $1, BOOL, 0, 0, NULL, $3);
+        updateVariable($1, BOOL, 0, 0, NULL, $3, NULL);
     };
 
     |
     IDENT '=' IDENT
+    {
+        updateVariable($1, IDENTIFIER, 0, 0, NULL, NULL, $3);
+    };
     |
     IDENT '=' expression
     |
@@ -331,7 +348,7 @@ if_statement:
     ;
 
 print_statement:
-    TOKPRINT '(' string ')'
+    TOKPRINT '(' STRING_LIT ')'
     {
         printf("%s\n", $3);
     }

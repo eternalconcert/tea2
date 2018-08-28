@@ -1,7 +1,7 @@
 CONST INT NUMBER = 12314;
 CONST FLOAT FLOATING = 0.5;
 CONST STR TEXT = "Hello world!";
-CONST BOOL BOOLEAN = true;
+CONST BOOL BOOLEAN = false;
 # print(NUMBER);
 # print(FLOATING);
 # print(TEXT);
@@ -27,6 +27,7 @@ FN INT name(INT formal_param1, INT formal_param2) {
 
 STR message1 = "This is an outer scope string variable it should appear unchanged far below.";
 FN VOID empty(INT formal_param1=1, INT formal_param2) {
+    CONST BOOL BOOLEAN = true;
     print(message1);
     message1 = "Right here it should be changed";
     FN VOID empty() {
@@ -87,5 +88,5 @@ a;
 
 
 INT number1 = 12;
-INT number2 = number1;
+INT number2 = 3333;
 print(number2);
