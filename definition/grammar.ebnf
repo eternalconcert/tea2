@@ -1,12 +1,11 @@
 Program              = { Statement ';' | Expression ';' | Comment}.
 Statement            = { ConstDeclaration |
                          VarDeclaration |
-                         VarAssignment |
                          FuncDeclaration |
                          IfStatement |
                          ForLoop |
                          Return }.
-Expression           = Literal | Identifier | FuncCall | ArithmeticExpression | LogicalExpression.
+Expression           = Literal | Identifier | FuncCall | VarAssignment| ArithmeticExpression | LogicalExpression.
 ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
 Operand              = Literal | Identifier.
 ArithmeticOperator   = '+' | '-' | '*' | '/'.
