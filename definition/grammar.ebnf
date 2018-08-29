@@ -1,26 +1,23 @@
-Program              = { Statement ';' }.
-Statement            = { Literal |
-                         Identifier |
-                         Expression |
-                         ConstDeclaration |
+Program              = { Statement ';' | Expression ';' | Comment}.
+Statement            = { ConstDeclaration |
                          VarDeclaration |
                          VarAssignment |
                          FuncDeclaration |
-                         FuncCall  |
                          IfStatement |
                          ForLoop |
                          Return }.
-Expression           = ArithmeticExpression | LogicalExpression.
+Expression           = Literal | Identifier | FuncCall | ArithmeticExpression | LogicalExpression.
 ArithmeticExpression = Operand ArithmeticOperator Operand { ArithmeticOperator Operand }.
 Operand              = Literal | Identifier.
 ArithmeticOperator   = '+' | '-' | '*' | '/'.
 LogicalExpression    = ['('] Operand [')'] | ( ['('] Operand LogicalOperator Operand [')'] { ['('] LogicalOperator Operand [')'] } ).
 LogicalOperator      = '<' | '>' | '<=' | '>=' | '==' | '!=' | 'and' | 'or' | 'xor' | 'not' | 'in' | '\|' | '&' .
 Literal              = String | Integer | Float | Boolean | List.
-String               = '"' (Letter | PosInt | ArithmeticOperator ) { Letter | PosInt | ArithmeticOperator } '"'.
+String               = '"' {Character} '"'.
 Letter               =  'A' | '...' | 'Z' | 'a' | '...' | 'z'.
 Integer              = (['-'] '0') | ['-'] (PosInt [{ PosInt | '0' }]).
 PosInt               = | '1' | '2' | '...' | '9'.
+Character            = Letter | Integer | ArithmeticOperator | ' ' | '!' | '...' | '+'.
 Float                = Integer '.' ('0' | PosInt ) { ('0' | PosInt ) }.
 Boolean              = 'true' | 'false'.
 List                 = '[' [{ ( Literal | Identifier ) }] ']'.
@@ -36,3 +33,4 @@ FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | I
 IfStatement          = 'if' LogicalExpression {',' LogicalExpression } '{' [Statement {',' Statement }] '}' [ 'else' '{' [Statement {',' Statement }] '}' ].
 ForLoop              = 'for' Identifier 'in' ( Identifier | List ) '{' [Statement {',' Statement }] '}'.
 Return               = 'return' [Identifier | Literal] .
+Comment              = '#' {Character}.
