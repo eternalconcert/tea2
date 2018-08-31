@@ -4,9 +4,7 @@
 
 enum typeId {INT, FLOAT, STR, BOOL, VOID, ARRAY, IDENTIFIER};
 
-
 class AstNode {
-
 };
 
 
@@ -19,6 +17,7 @@ public:
     float floatValue;
     char *stringValue;
     char *boolValue;
+
     void repr() {
         switch (this->type) {
             case INT:
@@ -40,9 +39,15 @@ public:
     };
 };
 
+class Identifier: public AstNode {};
+
+class Expression: public AstNode {
+    AstNode leftValue;
+    AstNode rightValue;
+};
 
 class Assignment: public AstNode {
 public:
-    AstNode leftValue;
-    AstNode rightValue;
+    Identifier leftValue;
+    Expression rightValue;
 };
