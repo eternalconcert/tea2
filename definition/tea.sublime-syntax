@@ -19,6 +19,8 @@ contexts:
       scope: keyword.operator.assignment
     - match: ( in | and | or | xor | not )
       scope: keyword.operator.word
+    - match: '(\w+)\s*(?=\()'
+      scope: entity.name.type
     - match: '"'
       push: string
     - match: '#'

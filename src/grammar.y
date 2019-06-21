@@ -363,6 +363,11 @@ print_statement:
         printf("%f\n", $3);
     }
     |
+    TOKPRINT '(' BOOL_LIT ')'
+    {
+        printf("%s\n", $3);
+    }
+    |
     TOKPRINT '(' IDENT ')'
     {
         std::string ident = std::string($3);
