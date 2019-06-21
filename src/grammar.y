@@ -151,7 +151,6 @@ literal:
         $$.booleanVal = $1;
         $$.type = "BOOL";
     }
-
     ;
 
 expression:
@@ -188,7 +187,7 @@ const_declaration:
             case BOOL:
                 addConstant(std::string($3), BOOL, 0, 0, NULL, $5.booleanVal);
                 break;
-        };
+            };
         };
 
 
@@ -217,6 +216,9 @@ var_assignment:
     |
 
     TYPEIDENT IDENT '=' array_lit
+    {
+        printf("Array assignment not yet implemented: %s\n", $2);
+    }
     |
     TYPEIDENT IDENT '=' expression
     |

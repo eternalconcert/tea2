@@ -81,6 +81,7 @@ print(23235.2);
 
 INT test;
 ARRAY list2 = [12, test];
+print(list2);
 
 a;
 1.2;
