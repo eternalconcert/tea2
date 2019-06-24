@@ -250,3 +250,9 @@ void updateVariable(std::string ident, TYPE_ID type, int int_value, float float_
     variable.assigned = true;
     scope->values[ident] = variable;
 };
+
+
+// Helper method should get an own home
+std::string stripStrLit(std::string lit) {
+    return lit.substr(1, lit.size() -2);
+}

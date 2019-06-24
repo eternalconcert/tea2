@@ -35,7 +35,7 @@ main(int argc, char *argv[0]) {
 
 %}
 
-%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE OCBRACE CCBRACE TOKPRINT
+%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE OCBRACE CCBRACE TOKPRINT TOKCMD
 
 %union
 {
@@ -111,6 +111,8 @@ statement:
     return
     |
     print_statement
+    |
+    cmd_statement
     ;
 
 list_elems:
@@ -377,3 +379,22 @@ print_statement:
         item.repr();
     }
     ;
+
+cmd_statement:
+    TOKCMD '(' STRING_LIT ')'
+    {
+        std::string command = std::string($3);
+        command = stripStrLit(command);
+        std::system(command.c_str());
+    }
+    |
+    TOKCMD '(' IDENT ')'
+    {
+        std::string ident = std::string($3);
+        ValueStore item = getFromValueStore(ident);
+
+        std::string command = item.string_value;
+        command = stripStrLit(command);
+        std::system(command.c_str());
+    }
+

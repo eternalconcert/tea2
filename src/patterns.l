@@ -37,6 +37,7 @@ else                                    return TOKELSE;
 for                                     return TOKFOR;
 return                                  return TOKRETURN;
 print                                   return TOKPRINT;
+cmd                                     return TOKCMD;
 [A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return IDENT;
 
 \"(\\.|[^"\\])*\"                       yylval.sval=strdup(yytext); return STRING_LIT;

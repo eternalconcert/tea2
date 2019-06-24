@@ -77,11 +77,11 @@ else {
 print("Hallo Welt!");
 print(23235);
 print(23235.2);
-
+cmd("echo 'Hello world!'");
+STR command = "echo 'Hello from the world!'";
+cmd(command);
 
 INT test;
-ARRAY list2 = [12, test];
-print(list2);
 
 a;
 1.2;
@@ -91,3 +91,7 @@ a;
 INT number1 = 12;
 INT number2 = 3333;
 print(number2);
+
+
+ARRAY list2 = [12, test];
+print(list2);
