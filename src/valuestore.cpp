@@ -2,6 +2,12 @@
 #include "exceptions.h"
 
 
+// Helper method should get an own home
+std::string stripStrLit(std::string lit) {
+    return lit.substr(1, lit.size() -2);
+}
+
+
 enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY, IDENTIFIER};
 
 TYPE_ID getTypeIdByName(std::string name) {
@@ -250,9 +256,3 @@ void updateVariable(std::string ident, TYPE_ID type, int int_value, float float_
     variable.assigned = true;
     scope->values[ident] = variable;
 };
-
-
-// Helper method should get an own home
-std::string stripStrLit(std::string lit) {
-    return lit.substr(1, lit.size() -2);
-}

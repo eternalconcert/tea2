@@ -9,11 +9,6 @@ BOOL boolean_val = true;
 STR var_string_no_assignment;
 STR var_string = "String";
 
-ARRAY list1 = [1, 2, 3, "Hello ", "world!"];
-ARRAY list2;
-
-INT num = list1[0];
-
 FN INT name(INT formal_param1, INT formal_param2=2) {
     INT result;
     result = formal_param1 + formal_param2;
@@ -48,3 +43,27 @@ if var_number == 1 or var_number not in list1 and var_number != 0 {
 } else {
     INT a = 3;
 };
+
+# Some builtin functions
+# 1) Print
+print("Printing a literal");
+
+CONST STR stringConst = "Printing a stringConst";
+print(stringConst);
+
+STR stringVar = "Printing a stringVar";
+print(stringVar);
+
+# 2) CMD
+cmd("echo 'Echoing a literal'");
+
+CONST STR cmdConst = "echo 'Echoing a cmdConst'";
+cmd(cmdConst);
+
+STR cmdVar = "echo 'Echoing a cmdVar'";
+cmd(cmdVar);
+
+# Not fully implemented by now
+ARRAY list1 = [1, 2, 3, "Hello ", "world!"];
+INT num = list1[0];
+ARRAY list2;

@@ -132,7 +132,14 @@ array_lit:
 literal:
     STRING_LIT
     {
-        $$.stringVal = $1;
+        std::string res = std::string($1);
+        res = stripStrLit(res);
+
+        char *stripped = new char[res.size() + 1];
+        std::copy(res.begin(), res.end(), stripped);
+        stripped[res.size()] = '\0';
+
+        $$.stringVal = stripped;
         $$.type = "STR";
     }
     |
@@ -354,7 +361,8 @@ if_statement:
 print_statement:
     TOKPRINT '(' STRING_LIT ')'
     {
-        printf("%s\n", $3);
+        std::string lit = stripStrLit(std::string($3));
+        printf("%s\n", lit.c_str());
     }
     |
     TOKPRINT '(' INTEGER_LIT ')'
@@ -392,9 +400,6 @@ cmd_statement:
     {
         std::string ident = std::string($3);
         ValueStore item = getFromValueStore(ident);
-
-        std::string command = item.string_value;
-        command = stripStrLit(command);
-        std::system(command.c_str());
+        std::system(item.string_value);
     }
 
