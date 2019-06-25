@@ -184,6 +184,11 @@ const_declaration:
     TOKCONST TYPEIDENT IDENT '=' literal
     {
         TYPE_ID id = getTypeIdByName($2);
+        std::string typeName = std::string($5.type);
+        if (strcmp($5.type, $2)) {
+            throw RuntimeError("Type mismatch: Cannot assign " + typeName + " to constant of type " + $2);
+        };
+
         switch(id) {
             case INT:
                 addConstant(std::string($3), INT, $5.integerVal, 0, NULL, NULL);
@@ -216,7 +221,7 @@ var_assignment:
     {
         std::string typeName = std::string($4.type);
         if (strcmp($4.type, $1)) {
-            throw RuntimeError("Type mismatch: Cannot assign " + typeName + " to variable of type " + $1);
+            throw RuntimeError("Type mismatch: Cannot assign " + typeName + " to variable " + "(" + ($2) + ")" + " of type " + $1);
         };
         TYPE_ID typeId = getTypeIdByName($1);
         addVariable($2, typeId, $4.integerVal, $4.floatVal, $4.stringVal, $4.booleanVal, NULL);

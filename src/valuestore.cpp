@@ -245,8 +245,19 @@ void addVariable(std::string ident, TYPE_ID type, int int_value, float float_val
 void updateVariable(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value, char *identifier) {
     Scope *scope = getScopeHead();
     ValueStore variable = getValue(scope, ident);
+
+    if (type == IDENTIFIER) {
+        ValueStore otherVariable = getValue(scope, identifier);
+        if (variable.type != otherVariable.type) {
+            throw RuntimeError("Type mismatch: Cannot assign variable (" + ident + ") of type " + getTypeNameById(variable.type) + " to variable (" + identifier + ") of type " + getTypeNameById(otherVariable.type));
+        }
+        type = otherVariable.type;
+        scope->values[ident] = otherVariable;
+        return;
+    }
+
     if (variable.type != type) {
-        throw RuntimeError("Type mismatch: " + ident + " == " + getTypeNameById(variable.type) + " != " + getTypeNameById(type));
+        throw RuntimeError("Type mismatch: " + ident + " of type " + getTypeNameById(variable.type) + " of type " + getTypeNameById(type));
     }
 
     variable.int_value = int_value;
