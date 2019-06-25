@@ -10,6 +10,7 @@
     extern "C" {
         int yyparse(void);
         int yylex(void);
+        int yy_scan_string(const char* instream);
 
         int yywrap() {
             return 1;
@@ -27,12 +28,23 @@ main(int argc, char *argv[0]) {
         exit(1);
     }
 
-    FILE *inFile = fopen(argv[1], "r");
-    if (!inFile) {
-        printf("tea: /%s: No such file or directory\n", argv[1]);
+    if (argc == 2) {
+        FILE *inFile = fopen(argv[1], "r");
+        if (!inFile) {
+            printf("tea: /%s: No such file or directory\n", argv[1]);
+            exit(1);
+        }
+        yyin = inFile;
+    }
+
+    if (argc >= 3 and !strcmp(argv[1], "-c")) {
+        yy_scan_string(argv[2]);
+    }
+
+    else {
+        printf("tea: Problem during startup\n");
         exit(1);
     }
-    yyin = inFile;
 
     yyparse();
 }
