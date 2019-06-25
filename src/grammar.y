@@ -172,6 +172,34 @@ expression:
     expression ARITH_OP IDENT
     |
     literal ARITH_OP literal
+    {
+        // TODO: Here we need to work with tables
+        TYPE_ID lType = getTypeIdByName($1.type);
+        ValueStore *lVal = new ValueStore;
+        switch (lType) {
+            case INT:
+                lVal->type = INT;
+                lVal->int_value = $1.integerVal;
+                break;
+        }
+
+        TYPE_ID rType = getTypeIdByName($3.type);
+        ValueStore *rVal = new ValueStore;
+        switch (rType) {
+            case INT:
+                rVal->type = INT;
+                rVal->int_value = $3.integerVal;
+                break;
+        }
+
+        if (!strcmp($2, "+")) {
+            printf("[Debug] addition: %i + %i = %i\n", lVal->int_value , rVal->int_value, (lVal->int_value + rVal->int_value));
+        }
+
+        if (!strcmp($2, "-")) {
+            printf("[Debug] substraction: %i - %i = %i\n", lVal->int_value, rVal->int_value, (lVal->int_value - rVal->int_value));
+        }
+    }
     |
     IDENT ARITH_OP IDENT
     |
