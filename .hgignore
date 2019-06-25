@@ -1,5 +1,9 @@
+syntax: glob
+pythonenv/*
+
 lex.yy.c
 lex.yy.o
 tea
 y.tab.c
 y.tab.h
+
