@@ -133,7 +133,7 @@ literal:
     STRING_LIT
     {
         std::string res = std::string($1);
-        res = stripStrLit(res);
+        res = cleanStrLit(res);
 
         char *stripped = new char[res.size() + 1];
         std::copy(res.begin(), res.end(), stripped);
@@ -246,7 +246,14 @@ var_assignment:
     |
     IDENT '=' STRING_LIT
     {
-        updateVariable($1, STR, 0, 0, $3, NULL, NULL);
+        std::string res = std::string($3);
+        res = cleanStrLit(res);
+
+        char *stripped = new char[res.size() + 1];
+        std::copy(res.begin(), res.end(), stripped);
+        stripped[res.size()] = '\0';
+
+        updateVariable($1, STR, 0, 0, stripped, NULL, NULL);
     };
     |
     IDENT '=' BOOL_LIT
@@ -361,7 +368,7 @@ if_statement:
 print_statement:
     TOKPRINT '(' STRING_LIT ')'
     {
-        std::string lit = stripStrLit(std::string($3));
+        std::string lit = cleanStrLit(std::string($3));
         printf("%s\n", lit.c_str());
     }
     |
@@ -392,7 +399,7 @@ cmd_statement:
     TOKCMD '(' STRING_LIT ')'
     {
         std::string command = std::string($3);
-        command = stripStrLit(command);
+        command = cleanStrLit(command);
         std::system(command.c_str());
     }
     |

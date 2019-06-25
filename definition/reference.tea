@@ -54,6 +54,11 @@ print(stringConst);
 STR stringVar = "Printing a stringVar";
 print(stringVar);
 
+FN VOID printing() {
+    stringVar = "New value for stringVar";
+    print(stringVar);
+};
+
 # 2) CMD
 cmd("echo 'Echoing a literal'");
 
@@ -62,6 +67,11 @@ cmd(cmdConst);
 
 STR cmdVar = "echo 'Echoing a cmdVar'";
 cmd(cmdVar);
+
+FN VOID printing() {
+    cmdVar = "echo 'New value for cmdVar'";
+    cmd(cmdVar);
+};
 
 # Not fully implemented by now
 ARRAY list1 = [1, 2, 3, "Hello ", "world!"];

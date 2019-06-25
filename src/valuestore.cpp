@@ -2,8 +2,8 @@
 #include "exceptions.h"
 
 
-// Helper method should get an own home
-std::string stripStrLit(std::string lit) {
+// Helper methods should get an own home
+std::string cleanStrLit(std::string lit) {
     return lit.substr(1, lit.size() -2);
 }
 
