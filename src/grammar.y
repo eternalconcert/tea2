@@ -27,8 +27,7 @@ main(int argc, char *argv[0]) {
         printf("%s\n", "No file or command specified");
         exit(1);
     }
-
-    if (argc == 2) {
+    else if (argc == 2) {
         FILE *inFile = fopen(argv[1], "r");
         if (!inFile) {
             printf("tea: /%s: No such file or directory\n", argv[1]);
@@ -37,7 +36,7 @@ main(int argc, char *argv[0]) {
         yyin = inFile;
     }
 
-    if (argc >= 3 and !strcmp(argv[1], "-c")) {
+    else if (argc >= 3 and !strcmp(argv[1], "-c")) {
         yy_scan_string(argv[2]);
     }
 

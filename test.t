@@ -1,3 +1,5 @@
+#!/usr/bin/tea
+
 5 - 1;
 1 + 3;
 
@@ -100,5 +102,3 @@ print(number2);
 
 ARRAY list2 = [12, test];
 print(list2);
-
-
