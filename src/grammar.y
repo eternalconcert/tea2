@@ -22,11 +22,15 @@
 
 
 main(int argc, char *argv[0]) {
+    if (argc <= 1) {
+        printf("%s\n", "No file or command specified");
+        exit(1);
+    }
 
     FILE *inFile = fopen(argv[1], "r");
     if (!inFile) {
-        printf("No file named %s found\n", argv[1]);
-        return -1;
+        printf("tea: /%s: No such file or directory\n", argv[1]);
+        exit(1);
     }
     yyin = inFile;
 
