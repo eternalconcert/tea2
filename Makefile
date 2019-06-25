@@ -11,10 +11,10 @@ pythonenv:
 	virtualenv --python=python3 pythonenv
 	pythonenv/bin/pip install robotframework
 
-tests:
+robottests:
 	pythonenv/bin/robot robottests
 
 clean:
 	rm parser lex.yy.c y.tab.c y.tab.h lex.yy.o
 
-.PHONY: tea
+.PHONY: tea robottests
