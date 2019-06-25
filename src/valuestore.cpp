@@ -1,11 +1,6 @@
 #include <map>
 #include "exceptions.h"
-
-
-// Helper methods should get an own home
-std::string cleanStrLit(std::string lit) {
-    return lit.substr(1, lit.size() -2);
-}
+#include "helpers.h"
 
 
 enum TYPE_ID {INT, FLOAT, STR, BOOL, VOID, ARRAY, IDENTIFIER};
