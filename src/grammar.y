@@ -263,12 +263,12 @@ var_assignment:
             throw RuntimeError("Type mismatch: Cannot assign " + typeName + " to variable " + "(" + ($2) + ")" + " of type " + $1);
         };
         TYPE_ID typeId = getTypeIdByName($1);
-        addVariable($2, typeId, $4.integerVal, $4.floatVal, $4.stringVal, $4.booleanVal, NULL);
+        addVariable($2, typeId, false, $4.integerVal, $4.floatVal, $4.stringVal, $4.booleanVal, NULL);
     }
     |
     TYPEIDENT IDENT '=' IDENT
     {
-        addVariable($2, IDENTIFIER, 0, 0, NULL, NULL, $4);
+        addVariable($2, IDENTIFIER, false, 0, 0, NULL, NULL, $4);
     };
     |
 
@@ -284,12 +284,12 @@ var_assignment:
 
     IDENT '=' INTEGER_LIT
     {
-        updateVariable($1, INT, $3, 0, NULL, NULL, NULL);
+        updateVariable($1, INT, false, $3, 0, NULL, NULL, NULL);
     }
     |
     IDENT '=' FLOAT_LIT
     {
-        updateVariable($1, FLOAT, 0, $3, NULL, NULL, NULL);
+        updateVariable($1, FLOAT, false, 0, $3, NULL, NULL, NULL);
     };
     |
     IDENT '=' STRING_LIT
@@ -301,18 +301,18 @@ var_assignment:
         std::copy(res.begin(), res.end(), stripped);
         stripped[res.size()] = '\0';
 
-        updateVariable($1, STR, 0, 0, stripped, NULL, NULL);
+        updateVariable($1, STR, false, 0, 0, stripped, NULL, NULL);
     };
     |
     IDENT '=' BOOL_LIT
     {
-        updateVariable($1, BOOL, 0, 0, NULL, $3, NULL);
+        updateVariable($1, BOOL, false, 0, 0, NULL, $3, NULL);
     };
 
     |
     IDENT '=' IDENT
     {
-        updateVariable($1, IDENTIFIER, 0, 0, NULL, NULL, $3);
+        updateVariable($1, IDENTIFIER, false, 0, 0, NULL, NULL, $3);
     };
     |
     IDENT '=' expression

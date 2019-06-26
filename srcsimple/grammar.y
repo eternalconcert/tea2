@@ -31,11 +31,13 @@ main(int argc, char *argv[0]) {
     yyin = inFile;
 
     yyparse();
+
+    runProgram();
 }
 
 %}
 
-%token TOKCONST TOKPRINT
+%token TOKPRINT
 
 %union
 {
@@ -46,14 +48,17 @@ main(int argc, char *argv[0]) {
 
 %token <sval> TYPEIDENT
 %token <sval> IDENT
+%token <sval> ARITH_OP
 %token <sval> TOKSTRING
-%token <ival> TOKINTEGER
-%token <fval> TOKFLOAT
+%token <sval> TOKINTEGER
+%token <sval> TOKFLOAT
 %token <sval> TOKBOOL
 
 %%
 
-program:
+program: {
+        AstNode *currentHeadNode = rootNode;
+    }
     items
     ;
 
@@ -67,7 +72,7 @@ item:
     expression
 
 statement:
-    const_declaration
+    declaration
     |
     print_statement
     ;
@@ -81,53 +86,58 @@ expression:
     |
     TOKBOOL
     |
-    IDENT {printf("TESTSTST\n");}
+    IDENT
+    |
+    TOKINTEGER ARITH_OP TOKINTEGER {
+        nodeTypeId nodeType = getNodeTypeByName($2);
+        AstNode *op = new AstNode(nodeType);
+        currentHeadNode->addToChildList(op);
+
+        AstNode *lOperand = new AstNode(INT);
+        lOperand->value = $1;
+        op->addToChildList(lOperand);
+
+        AstNode *rOperand = new AstNode(INT);
+        rOperand->value = $3;
+        op->addToChildList(rOperand);
+    }
     ;
 
-const_declaration:
-    TOKCONST TYPEIDENT IDENT '=' TOKSTRING
-    {
-        printf("CONST STRING\n");
+declaration:
+    TYPEIDENT IDENT '=' TOKSTRING {
+        declareLit($1, $2, $4, "STR");
     }
     |
-    TOKCONST TYPEIDENT IDENT '=' TOKINTEGER
-    {
-        printf("CONST INTEGER\n");
+    TYPEIDENT IDENT '=' TOKINTEGER {
+        declareLit($1, $2, $4, "INT");
     }
     |
-    TOKCONST TYPEIDENT IDENT '=' TOKFLOAT
-    {
-        printf("CONST FLOAT\n");
+    TYPEIDENT IDENT '=' TOKFLOAT {
+        declareLit($1, $2, $4, "FLOAT");
     }
     |
-    TOKCONST TYPEIDENT IDENT '=' TOKBOOL
-    {
-        printf("CONST BOOL\n");
+    TYPEIDENT IDENT '=' TOKBOOL {
+        declareLit($1, $2, $4, "BOOL");
     }
     |
-    TOKCONST TYPEIDENT IDENT '=' IDENT
-    {
-        printf("CONST IDENT\n");
+    TYPEIDENT IDENT '=' IDENT {
+        printf("IDENT\n");
     }
 
 print_statement:
-    TOKPRINT '(' TOKSTRING ')'
-    {
+    TOKPRINT '(' TOKSTRING ')' {
         printf("%s\n", $3);
     }
     |
-    TOKPRINT '(' TOKINTEGER ')'
-    {
-        printf("%d\n", $3);
+    TOKPRINT '(' TOKINTEGER ')' {
+        printf("%s\n", $3);
     }
     |
-    TOKPRINT '(' TOKFLOAT ')'
-    {
-        printf("%f\n", $3);
+    TOKPRINT '(' TOKFLOAT ')' {
+        // printf("%f\n", $3);
     }
     |
-    TOKPRINT '(' IDENT ')'
-    {
+    TOKPRINT '(' IDENT ')' {
         std::string ident = std::string($3);
         printf("PRINT IDENT");
     }

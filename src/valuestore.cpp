@@ -60,6 +60,7 @@ class ValueStore {
         TYPE_ID type;
         bool constant = false;
         bool assigned = true;
+        bool isFunc = false;
         int int_value;
         float float_value;
         char *string_value;
@@ -169,11 +170,12 @@ ValueStore makeEmptyVariable(std::string ident, TYPE_ID type) {
 };
 
 
-ValueStore makeValue(std::string ident, bool constant, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value, char *identifier) {
+ValueStore makeValue(std::string ident, bool constant, bool isFunc, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value, char *identifier) {
     ValueStore value = ValueStore();
     value.ident = ident;
     value.type = type;
     value.constant = constant;
+    value.isFunc = isFunc;
 
     switch(type) {
         case INT:
@@ -224,20 +226,20 @@ void checkConstand(std::string ident) {
 
 void addConstant(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value) {
     checkConstand(ident);
-    ValueStore new_constant = makeValue(ident, true, type, int_value, float_value, string_value, bool_value, NULL);
+    ValueStore new_constant = makeValue(ident, true, false, type, int_value, float_value, string_value, bool_value, NULL);
     Scope *scope = getScopeHead();
     scope->values[ident] = new_constant;
 };
 
 
-void addVariable(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value, char *identifier) {
+void addVariable(std::string ident, TYPE_ID type, bool isFunc, int int_value, float float_value, char *string_value, char *bool_value, char *identifier) {
         checkConstand(ident);
-        ValueStore new_variable = makeValue(ident, false, type, int_value, float_value, string_value, bool_value, identifier);
+        ValueStore new_variable = makeValue(ident, false, isFunc, type, int_value, float_value, string_value, bool_value, identifier);
         Scope *scope = getScopeHead();
         scope->values[ident] = new_variable;
 };
 
-void updateVariable(std::string ident, TYPE_ID type, int int_value, float float_value, char *string_value, char *bool_value, char *identifier) {
+void updateVariable(std::string ident, TYPE_ID type, bool isFunc, int int_value, float float_value, char *string_value, char *bool_value, char *identifier) {
     Scope *scope = getScopeHead();
     ValueStore variable = getValue(scope, ident);
 

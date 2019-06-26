@@ -2,52 +2,138 @@
 #include "exceptions.h"
 
 
-enum typeId {INT, FLOAT, STR, BOOL, VOID, ARRAY, IDENTIFIER};
+enum nodeTypeId {ROOT, INT, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
+
+
+nodeTypeId getNodeTypeByName(char *name) {
+        if (!strcmp(name, "+")) {
+            return ADD;
+        }
+        if (!strcmp(name, "-")) {
+            return SUB;
+            }
+        if (!strcmp(name, "*")) {
+            return MUL;
+        }
+        if (!strcmp(name, "/")) {
+            return DIV;
+    }
+}
+
+int maxId = 0;
+
 
 class AstNode {
-};
-
-
-class Constant {
 public:
-    typeId type;
-    std::string ident;
+    AstNode *childListHead = NULL;
+    AstNode *next = NULL;
+    AstNode *parent = NULL;
+    nodeTypeId nodeType;
+    int id;
+    char *value;
 
-    int intValue;
-    float floatValue;
-    char *stringValue;
-    char *boolValue;
+    AstNode(nodeTypeId nodeType) {
+        this->id = maxId;
+        this->nodeType = nodeType;
+        maxId++;
+    }
 
-    void repr() {
-        switch (this->type) {
-            case INT:
-                printf("%d\n", intValue);
-                break;
-
-            case FLOAT:
-                printf("%f\n", floatValue);
-                break;
-
-            case STR:
-                printf("%s\n", stringValue);
-                break;
-
-            case BOOL:
-                printf("%s\n", boolValue);
-                break;
-        };
+    void addToChildList(AstNode *newNode) {
+        newNode->parent = this;
+        if (childListHead == NULL) {
+            childListHead = newNode;
+        }
+        else {
+            AstNode *current = childListHead;
+            while (current->next != NULL) {
+                current = current->next;
+            }
+            current->next = newNode;
+        }
     };
+
+    void execute() {
+        if (this->nodeType == ADD) {
+            int lval = atoi(this->childListHead->value);
+            int rval = atoi(this->childListHead->next->value);
+            printf("%i\n", lval + rval);
+        }
+
+        if (this->nodeType == SUB) {
+            int lval = atoi(this->childListHead->value);
+            int rval = atoi(this->childListHead->next->value);
+            printf("%i\n", lval - rval);
+        }
+
+        if (this->nodeType == MUL) {
+            int lval = atoi(this->childListHead->value);
+            int rval = atoi(this->childListHead->next->value);
+            printf("%i\n", lval * rval);
+        }
+
+        if (this->nodeType == DIV) {
+            int lval = atoi(this->childListHead->value);
+            int rval = atoi(this->childListHead->next->value);
+            printf("%i\n", lval / rval);
+        }
+
+        if (this->nodeType == DECLARATION) {
+            printf("Assigned the value %s to the identifier %s of type %s\n", this->childListHead->next->next->value, this->childListHead->next->value, this->childListHead->value);
+        }
+    }
 };
 
-class Identifier: public AstNode {};
+AstNode *rootNode = new AstNode(ROOT);
+AstNode *currentHeadNode = rootNode;
 
-class Expression: public AstNode {
-    AstNode leftValue;
-    AstNode rightValue;
-};
+AstNode *curNode = currentHeadNode;
 
-class Assignment: public AstNode {
-public:
-    Identifier leftValue;
-    Expression rightValue;
-};
+void runNodes(AstNode *curNode) {
+    if (curNode == NULL) {
+        return;
+    }
+
+    else{
+        curNode->execute();
+
+        if (curNode->next != NULL) {
+            runNodes(curNode->next);
+        }
+        else {
+            runNodes(curNode->childListHead);
+        }
+    }
+}
+
+void runProgram() {
+    runNodes(curNode);
+}
+
+
+
+
+
+
+
+// Helpers
+
+void declareLit(char *typeValue, char *identValue, char *rValValue, const char *typeName) {
+    if (strcmp(typeValue, typeName)) {
+        throw ParserError("Type error in literal assignment: " + std::string(typeValue) + " " + std::string(identValue) + " != " + std::string(typeName));
+    }
+
+    AstNode *decl = new AstNode(DECLARATION);
+    currentHeadNode->addToChildList(decl);
+
+    AstNode *type = new AstNode(TYPE);
+    type->value = typeValue;
+    decl->addToChildList(type);
+
+    AstNode *ident = new AstNode(IDENTIFIER);
+    ident->value = identValue;
+    decl->addToChildList(ident);
+
+    AstNode *rVal = new AstNode(INT);
+    rVal->value = rValValue;
+    decl->addToChildList(rVal);
+}
