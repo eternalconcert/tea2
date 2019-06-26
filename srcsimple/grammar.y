@@ -134,11 +134,10 @@ print_statement:
     }
     |
     TOKPRINT '(' TOKFLOAT ')' {
-        // printf("%f\n", $3);
+        printf("%s\n", $3);
     }
     |
     TOKPRINT '(' IDENT ')' {
-        std::string ident = std::string($3);
-        printf("PRINT IDENT");
+        printf("PRINT IDENT\n");
     }
     ;

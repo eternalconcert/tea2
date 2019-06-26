@@ -2,6 +2,15 @@
 #include "exceptions.h"
 
 
+class ValueStore {
+    public:
+        char *rawValue;
+
+};
+
+std::map <std::string, ValueStore> values;
+
+
 enum nodeTypeId {ROOT, INT, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
 
 
@@ -79,6 +88,9 @@ public:
 
         if (this->nodeType == DECLARATION) {
             printf("Assigned the value %s to the identifier %s of type %s\n", this->childListHead->next->next->value, this->childListHead->next->value, this->childListHead->value);
+            ValueStore newValue = ValueStore();
+            newValue.rawValue = this->childListHead->next->next->value;
+            values[std::string(this->childListHead->next->value)] = newValue;
         }
     }
 };
@@ -107,6 +119,7 @@ void runNodes(AstNode *curNode) {
 
 void runProgram() {
     runNodes(curNode);
+    printf("%s\n", values["a"].rawValue);
 }
 
 
