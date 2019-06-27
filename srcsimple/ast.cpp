@@ -1,6 +1,12 @@
 #include <map>
 #include "exceptions.h"
 
+std::map <std::string, int(*)> functions;
+
+int intAddInt(int lval, int rval) {
+    return lval + rval;
+};
+
 
 class ValueStore {
     public:
@@ -11,7 +17,7 @@ class ValueStore {
 std::map <std::string, ValueStore> values;
 
 
-enum nodeTypeId {ROOT, INT, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
+enum nodeTypeId {ROOT, INT, FLOAT, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
 
 
 nodeTypeId getNodeTypeByName(char *name) {
@@ -65,7 +71,7 @@ public:
         if (this->nodeType == ADD) {
             int lval = atoi(this->childListHead->value);
             int rval = atoi(this->childListHead->next->value);
-            printf("%i\n", lval + rval);
+            printf("%i\n", intAddInt(lval, rval));
         }
 
         if (this->nodeType == SUB) {
@@ -94,6 +100,7 @@ public:
         }
     }
 };
+
 
 AstNode *rootNode = new AstNode(ROOT);
 AstNode *currentHeadNode = rootNode;
