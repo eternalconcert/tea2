@@ -1,9 +1,12 @@
 #include <map>
 #include "exceptions.h"
 
-std::map <std::string, int(*)> functions;
 
 int intAddInt(int lval, int rval) {
+    return lval + rval;
+};
+
+std::string strAddStr(std::string lval, std::string rval) {
     return lval + rval;
 };
 
@@ -17,7 +20,7 @@ class ValueStore {
 std::map <std::string, ValueStore> values;
 
 
-enum nodeTypeId {ROOT, INT, FLOAT, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
+enum nodeTypeId {ROOT, INT, FLOAT, STR, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
 
 
 nodeTypeId getNodeTypeByName(char *name) {
@@ -69,9 +72,18 @@ public:
 
     void execute() {
         if (this->nodeType == ADD) {
-            int lval = atoi(this->childListHead->value);
-            int rval = atoi(this->childListHead->next->value);
-            printf("%i\n", intAddInt(lval, rval));
+            if (this->childListHead->nodeType == INT and this->childListHead->next->nodeType == INT) {
+                int lval = atoi(this->childListHead->value);
+                int rval = atoi(this->childListHead->next->value);
+                printf("%i\n", intAddInt(lval, rval));
+            }
+            else if (this->childListHead->nodeType == STR and this->childListHead->next->nodeType == STR) {
+                printf("%s\n", "GOGOG");
+                int lval = atoi(this->childListHead->value);
+                int rval = atoi(this->childListHead->next->value);
+                printf("%i---------\n", intAddInt(lval, rval));
+            }
+
         }
 
         if (this->nodeType == SUB) {

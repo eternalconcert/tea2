@@ -59,6 +59,10 @@ main(int argc, char *argv[0]) {
     int ival;
     char *sval;
     float fval;
+
+    struct {
+        char *rawValue;
+    } value;
 }
 
 %token <sval> TYPEIDENT
@@ -69,7 +73,7 @@ main(int argc, char *argv[0]) {
 %token <sval> TOKFLOAT
 %token <sval> TOKBOOL
 
-%type <sval> literal
+%type <value> literal
 
 %%
 
@@ -95,13 +99,21 @@ statement:
     ;
 
 literal:
-    TOKSTRING
+    TOKSTRING {
+        $$.rawValue = $1;
+    }
     |
-    TOKINTEGER
+    TOKINTEGER {
+        $$.rawValue = $1;
+    }
     |
-    TOKFLOAT
+    TOKFLOAT {
+        $$.rawValue = $1;
+    }
     |
-    TOKBOOL
+    TOKBOOL {
+        $$.rawValue = $1;
+    }
 
 expression:
     TOKSTRING
@@ -120,11 +132,11 @@ expression:
         currentHeadNode->addToChildList(op);
 
         AstNode *lOperand = new AstNode(INT);
-        lOperand->value = $1;
+        lOperand->value = $1.rawValue;
         op->addToChildList(lOperand);
 
         AstNode *rOperand = new AstNode(INT);
-        rOperand->value = $3;
+        rOperand->value = $3.rawValue;
         op->addToChildList(rOperand);
     }
     ;
