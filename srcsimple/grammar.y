@@ -61,6 +61,7 @@ main(int argc, char *argv[0]) {
     float fval;
 
     struct {
+        const char *typeName;
         char *rawValue;
     } value;
 }
@@ -101,18 +102,22 @@ statement:
 literal:
     TOKSTRING {
         $$.rawValue = $1;
+        $$.typeName = "STR";
     }
     |
     TOKINTEGER {
         $$.rawValue = $1;
+        $$.typeName = "INT";
     }
     |
     TOKFLOAT {
         $$.rawValue = $1;
+        $$.typeName = "FLOAT";
     }
     |
     TOKBOOL {
         $$.rawValue = $1;
+        $$.typeName = "BOOL";
     }
 
 expression:
@@ -131,11 +136,11 @@ expression:
         AstNode *op = new AstNode(nodeType);
         currentHeadNode->addToChildList(op);
 
-        AstNode *lOperand = new AstNode(INT);
+        AstNode *lOperand = new AstNode(getNodeTypeByName($1.typeName));
         lOperand->value = $1.rawValue;
         op->addToChildList(lOperand);
 
-        AstNode *rOperand = new AstNode(INT);
+        AstNode *rOperand = new AstNode(getNodeTypeByName($3.typeName));
         rOperand->value = $3.rawValue;
         op->addToChildList(rOperand);
     }

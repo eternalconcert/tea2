@@ -1,7 +1,13 @@
 #include <map>
 #include "exceptions.h"
 
+// Helpers
+std::string cleanStrLit(std::string lit) {
+    return lit.substr(1, lit.size() -2);
+}
 
+
+// Should be a table
 int intAddInt(int lval, int rval) {
     return lval + rval;
 };
@@ -20,10 +26,10 @@ class ValueStore {
 std::map <std::string, ValueStore> values;
 
 
-enum nodeTypeId {ROOT, INT, FLOAT, STR, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
+enum nodeTypeId {ROOT, INT, FLOAT, STR, BOOL, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
 
 
-nodeTypeId getNodeTypeByName(char *name) {
+nodeTypeId getNodeTypeByName(const char *name) {
         if (!strcmp(name, "+")) {
             return ADD;
         }
@@ -35,7 +41,20 @@ nodeTypeId getNodeTypeByName(char *name) {
         }
         if (!strcmp(name, "/")) {
             return DIV;
-    }
+        }
+        if (!strcmp(name, "INT")) {
+            return INT;
+        }
+        if (!strcmp(name, "FLOAT")) {
+            return FLOAT;
+        }
+        if (!strcmp(name, "STR")) {
+            return STR;
+        }
+        if (!strcmp(name, "BOOL")) {
+            return BOOL;
+        }
+
 }
 
 int maxId = 0;
@@ -78,10 +97,9 @@ public:
                 printf("%i\n", intAddInt(lval, rval));
             }
             else if (this->childListHead->nodeType == STR and this->childListHead->next->nodeType == STR) {
-                printf("%s\n", "GOGOG");
-                int lval = atoi(this->childListHead->value);
-                int rval = atoi(this->childListHead->next->value);
-                printf("%i---------\n", intAddInt(lval, rval));
+                std::string lval = cleanStrLit(this->childListHead->value);
+                std::string rval = cleanStrLit(this->childListHead->next->value);
+                printf("%s\n", strAddStr(lval, rval).c_str());
             }
 
         }
