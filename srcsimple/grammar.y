@@ -67,14 +67,16 @@ main(int argc, char *argv[0]) {
 }
 
 %token <sval> TYPEIDENT
-%token <sval> IDENT
 %token <sval> ARITH_OP
 %token <sval> TOKSTRING
 %token <sval> TOKINTEGER
 %token <sval> TOKFLOAT
 %token <sval> TOKBOOL
+%token <sval> IDENT
 
 %type <value> literal
+%type <value> expression
+%type <value> identifier
 
 %%
 
@@ -120,18 +122,20 @@ literal:
         $$.typeName = "BOOL";
     }
 
+identifier:
+    IDENT {
+        $$.rawValue = $1;
+        $$.typeName = "IDENT";
+    }
+
+
+
 expression:
-    TOKSTRING
+    literal
     |
-    TOKINTEGER
+    identifier
     |
-    TOKFLOAT
-    |
-    TOKBOOL
-    |
-    IDENT
-    |
-    literal ARITH_OP literal {
+    expression ARITH_OP literal {
         nodeTypeId nodeType = getNodeTypeByName($2);
         AstNode *op = new AstNode(nodeType);
         currentHeadNode->addToChildList(op);
@@ -147,23 +151,23 @@ expression:
     ;
 
 declaration:
-    TYPEIDENT IDENT '=' TOKSTRING {
-        declareLit($1, $2, $4, "STR");
+    TYPEIDENT identifier '=' TOKSTRING {
+        declareLit($1, $2.rawValue, $4, "STR");
     }
     |
-    TYPEIDENT IDENT '=' TOKINTEGER {
-        declareLit($1, $2, $4, "INT");
+    TYPEIDENT identifier '=' TOKINTEGER {
+        declareLit($1, $2.rawValue, $4, "INT");
     }
     |
-    TYPEIDENT IDENT '=' TOKFLOAT {
-        declareLit($1, $2, $4, "FLOAT");
+    TYPEIDENT identifier '=' TOKFLOAT {
+        declareLit($1, $2.rawValue, $4, "FLOAT");
     }
     |
-    TYPEIDENT IDENT '=' TOKBOOL {
-        declareLit($1, $2, $4, "BOOL");
+    TYPEIDENT identifier '=' TOKBOOL {
+        declareLit($1, $2.rawValue, $4, "BOOL");
     }
     |
-    TYPEIDENT IDENT '=' IDENT {
+    TYPEIDENT identifier '=' identifier {
         printf("IDENT\n");
     }
 
@@ -180,7 +184,7 @@ print_statement:
         printf("%s\n", $3);
     }
     |
-    TOKPRINT '(' IDENT ')' {
+    TOKPRINT '(' identifier ')' {
         printf("PRINT IDENT\n");
     }
     ;
