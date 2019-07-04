@@ -78,6 +78,8 @@ main(int argc, char *argv[0]) {
 %type <value> expression
 %type <value> identifier
 
+%left ARITH_OP
+
 %%
 
 program: {
