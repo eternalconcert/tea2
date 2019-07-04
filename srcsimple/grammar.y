@@ -83,19 +83,16 @@ main(int argc, char *argv[0]) {
 program: {
         AstNode *currentHeadNode = rootNode;
     }
-    items
+    statements
     ;
 
-items: /* empty */
-        | items item ';'
+statements: /* empty */
+        | statements statement ';'
         ;
 
-item:
-    statement
-    |
-    expression
-
 statement:
+    expression
+    |
     declaration
     |
     print_statement
@@ -128,14 +125,12 @@ identifier:
         $$.typeName = "IDENT";
     }
 
-
-
 expression:
     literal
     |
     identifier
     |
-    expression ARITH_OP literal {
+    expression ARITH_OP expression {
         nodeTypeId nodeType = getNodeTypeByName($2);
         AstNode *op = new AstNode(nodeType);
         currentHeadNode->addToChildList(op);
