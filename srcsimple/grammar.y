@@ -170,18 +170,18 @@ declaration:
 
 print_statement:
     TOKPRINT '(' TOKSTRING ')' {
-        printf("%s\n", $3);
+
     }
     |
     TOKPRINT '(' TOKINTEGER ')' {
-        printf("%s\n", $3);
+
     }
     |
     TOKPRINT '(' TOKFLOAT ')' {
-        printf("%s\n", $3);
+
     }
     |
     TOKPRINT '(' identifier ')' {
-        printf("PRINT IDENT\n");
+
     }
     ;

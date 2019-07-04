@@ -156,7 +156,7 @@ void runNodes(AstNode *curNode) {
 
 void runProgram() {
     runNodes(curNode);
-    printf("%s\n", values["a"].rawValue);
+    // printf("%s\n", values["a"].rawValue);
 }
 
 
