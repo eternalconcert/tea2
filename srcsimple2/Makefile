@@ -5,7 +5,8 @@ tea:
 	# lex --debug patterns.l
 	lex patterns.l
 	yacc -d grammar.y # --verbose
-	g++ lex.yy.c y.tab.c ast.cpp -o tea -lfl
+	gcc -c lex.yy.c -o lex.yy.o
+	g++ lex.yy.o y.tab.c -o tea
 
 clean:
 	rm parser lex.yy.c y.tab.c y.tab.h lex.yy.o

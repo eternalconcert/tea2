@@ -1,6 +1,3 @@
-info:
-	@echo Tutorial at: https://www.deezer.com/en/album/42333411
-
 tea:
 	lex src/patterns.l
 	yacc -d src/grammar.y

@@ -1,14 +1,13 @@
 %{
     #include <stdio.h>
-    #include <stdlib.h>
-    #include "ast.h"
     #include <string.h>
 
-    AstNode *root;
+    #include "ast.cpp"
 
     extern FILE *yyin;
     extern int yylineno;
     extern char *yytext;
+    extern "C" {
         int yyparse(void);
         int yylex(void);
         int yy_scan_string(const char* instream);
@@ -16,11 +15,13 @@
         int yywrap() {
             return 1;
         }
+    }
 
     void yyerror(const char *str) {
         fprintf(stderr, "Error: %s: %s on line %d\n", str, yytext, yylineno);
         exit(1);
     }
+
 
 main(int argc, char *argv[0]) {
     if (argc <= 1) {
@@ -46,27 +47,24 @@ main(int argc, char *argv[0]) {
     }
 
     yyparse();
+    runProgram();
 }
 
-
-
 %}
+
+%token TOKPRINT
 
 %union
 {
     int ival;
     char *sval;
     float fval;
-    AstNode *prog;
 
     struct {
         const char *typeName;
         char *rawValue;
     } value;
 }
-
-
-%token TOKPRINT
 
 %token <sval> TYPEIDENT
 %token <sval> ARITH_OP
@@ -79,18 +77,16 @@ main(int argc, char *argv[0]) {
 %type <value> literal
 %type <value> expression
 %type <value> identifier
-%type <prog> program
 
 %right '='
 %left ARITH_OP
 
 %%
 
-program:
-    statements {
-        $$ = new AstNode(ROOT); root = $$;
-        printf("%s\n", getNodeTypeName(BOOL).c_str());
+program: {
+        AstNode *currentHeadNode = rootNode;
     }
+    statements
     ;
 
 statements: /* empty */
@@ -138,24 +134,35 @@ expression:
     identifier
     |
     expression ARITH_OP expression {
+        nodeTypeId nodeType = getNodeTypeByName($2);
+        AstNode *op = new AstNode(nodeType);
+        currentHeadNode->addToChildList(op);
+
+        AstNode *lOperand = new AstNode(getNodeTypeByName($1.typeName));
+        lOperand->value = $1.rawValue;
+        op->addToChildList(lOperand);
+
+        AstNode *rOperand = new AstNode(getNodeTypeByName($3.typeName));
+        rOperand->value = $3.rawValue;
+        op->addToChildList(rOperand);
     }
     ;
 
 declaration:
     TYPEIDENT identifier '=' TOKSTRING {
-
+        declareLit($1, $2.rawValue, $4, "STR");
     }
     |
     TYPEIDENT identifier '=' TOKINTEGER {
-
+        declareLit($1, $2.rawValue, $4, "INT");
     }
     |
     TYPEIDENT identifier '=' TOKFLOAT {
-
+        declareLit($1, $2.rawValue, $4, "FLOAT");
     }
     |
     TYPEIDENT identifier '=' TOKBOOL {
-
+        declareLit($1, $2.rawValue, $4, "BOOL");
     }
     |
     TYPEIDENT identifier '=' identifier {
@@ -179,4 +186,3 @@ print_statement:
 
     }
     ;
-%%
