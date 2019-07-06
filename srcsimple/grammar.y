@@ -2,6 +2,7 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "ast.h"
+    #include "exceptions.h"
     #include <string.h>
 
     AstNode *root;
@@ -54,13 +55,11 @@ main(int argc, char *argv[0]) {
 
 %union
 {
-    int ival;
     char *sval;
-    float fval;
     AstNode *prog;
 
     struct {
-        const char *typeName;
+        nodeType type;
         char *rawValue;
     } value;
 }
@@ -108,28 +107,28 @@ statement:
 literal:
     TOKSTRING {
         $$.rawValue = $1;
-        $$.typeName = "STR";
+        $$.type = STR;
     }
     |
     TOKINTEGER {
         $$.rawValue = $1;
-        $$.typeName = "INT";
+        $$.type = INT;
     }
     |
     TOKFLOAT {
         $$.rawValue = $1;
-        $$.typeName = "FLOAT";
+        $$.type = FLOAT;
     }
     |
     TOKBOOL {
         $$.rawValue = $1;
-        $$.typeName = "BOOL";
+        $$.type = BOOL;
     }
 
 identifier:
     IDENT {
         $$.rawValue = $1;
-        $$.typeName = "IDENT";
+        $$.type = IDENTIFIER;
     }
 
 expression:
