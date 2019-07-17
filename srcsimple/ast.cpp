@@ -2,6 +2,8 @@
 #include "ast.h"
 
 
+int maxId = 0;
+
 std::string getNodeTypeName(nodeType type) {
     switch(type) {
         case ADD:
@@ -23,7 +25,25 @@ std::string getNodeTypeName(nodeType type) {
     }
 };
 
-AstNode::AstNode(nodeType type) {
-    this->type = type;
-    printf("nodeType: %i\n", this->type);
+AstNode::AstNode() {
+    this->id = maxId;
+    maxId++;
+
+    printf("nodeType: %i\n");
+};
+
+
+
+void AstNode::addToChildList(AstNode *newNode) {
+    newNode->parent = this;
+    if (childListHead == NULL) {
+        childListHead = newNode;
+    }
+    else {
+        AstNode *current = childListHead;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
 };

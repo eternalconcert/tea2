@@ -5,7 +5,7 @@
     #include "exceptions.h"
     #include <string.h>
 
-    AstNode *root;
+    RootNode *root;
 
     extern FILE *yyin;
     extern int yylineno;
@@ -47,6 +47,8 @@ main(int argc, char *argv[0]) {
     }
 
     yyparse();
+
+    root->run();
 }
 
 
@@ -87,14 +89,14 @@ main(int argc, char *argv[0]) {
 
 program:
     statements {
-        $$ = new AstNode(ROOT); root = $$;
+        root = new RootNode();
         printf("%s\n", getNodeTypeName(BOOL).c_str());
     }
     ;
 
 statements: /* empty */
-        | statements statement ';'
-        ;
+    | statements statement ';'
+    ;
 
 statement:
     expression
@@ -137,6 +139,8 @@ expression:
     identifier
     |
     expression ARITH_OP expression {
+        printf("%s\n", $2);
+        printf("%s\n", $3.rawValue);
     }
     ;
 

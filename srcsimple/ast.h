@@ -8,8 +8,20 @@ std::string getNodeTypeName(nodeType type);
 
 class AstNode {
 public:
-    nodeType type;
+    int id;
     char *value;
+    AstNode *childListHead;
+    AstNode *next;
+    AstNode *parent;
+    void addToChildList(AstNode *newNode);
 
-    AstNode(nodeType type);
+    AstNode();
+};
+
+
+class RootNode: public AstNode {
+public:
+    void run() {
+        printf("Gooooo!\n");
+    }
 };
