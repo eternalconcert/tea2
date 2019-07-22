@@ -31,12 +31,13 @@ AstNode::AstNode() {
 };
 
 
-void AstNode::evaluate() {
+AstNode* AstNode::evaluate() {
     AstNode *cur = this->childListHead;
     while (cur != NULL) {
         cur->evaluate();
         cur = cur->next;
     }
+    return cur;
 }
 
 
@@ -46,8 +47,8 @@ ActParamNode::ActParamNode() {
 }
 
 
-void ActParamNode::evaluate() {
-    printf("%s", this->value);
+AstNode* ActParamNode::evaluate() {
+    return this;
 }
 
 
@@ -58,13 +59,15 @@ PrintNode::PrintNode(AstNode *paramsHead) {
 }
 
 
-void PrintNode::evaluate() {
+AstNode* PrintNode::evaluate() {
     AstNode *cur = this->childListHead->childListHead;
     while (cur != NULL) {
-        cur->evaluate();
+        ActParamNode *eval = (ActParamNode*)cur->evaluate();
+        printf("%s", eval->value);
         cur = cur->next;
     }
     printf("\n");
+    return this;
 }
 
 

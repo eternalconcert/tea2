@@ -13,7 +13,7 @@ public:
     AstNode *next = NULL;
     AstNode *parent = NULL;
     void addToChildList(AstNode *newNode);
-    virtual void evaluate();
+    virtual AstNode* evaluate();
     AstNode();
 };
 
@@ -21,13 +21,13 @@ public:
 class ActParamNode: public AstNode {
 public:
     char *value;
-    void evaluate();
+    AstNode* evaluate();
     ActParamNode();
 };
 
 class PrintNode: public AstNode {
 public:
-    void evaluate();
+    AstNode* evaluate();
     PrintNode(AstNode *paramsHead);
 };
 
