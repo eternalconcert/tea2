@@ -9,19 +9,26 @@ std::string getNodeTypeName(nodeType type);
 class AstNode {
 public:
     int id;
-    char *value;
-    AstNode *childListHead;
-    AstNode *next;
-    AstNode *parent;
+    AstNode *childListHead = NULL;
+    AstNode *next = NULL;
+    AstNode *parent = NULL;
     void addToChildList(AstNode *newNode);
-
+    virtual void evaluate();
     AstNode();
 };
 
 
-class RootNode: public AstNode {
+class ActParamNode: public AstNode {
 public:
-    void run() {
-        printf("Gooooo!\n");
-    }
+    char *value;
+    void evaluate();
+    ActParamNode();
 };
+
+class PrintNode: public AstNode {
+public:
+    void evaluate();
+    PrintNode(AstNode *paramsHead);
+};
+
+

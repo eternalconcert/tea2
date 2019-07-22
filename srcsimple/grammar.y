@@ -5,7 +5,8 @@
     #include "exceptions.h"
     #include <string.h>
 
-    RootNode *root;
+    AstNode *root = new AstNode();
+    AstNode *curNode = root;
 
     extern FILE *yyin;
     extern int yylineno;
@@ -47,50 +48,38 @@ main(int argc, char *argv[0]) {
     }
 
     yyparse();
-
-    root->run();
+    root->evaluate();
 }
-
-
 
 %}
 
 %union
 {
     char *sval;
-    AstNode *prog;
-
-    struct {
-        nodeType type;
-        char *rawValue;
-    } value;
+    AstNode *node;
 }
 
 
-%token TOKPRINT
+%token TOKPRINT PLUS MINUS TIMES DIVIDE
 
 %token <sval> TYPEIDENT
-%token <sval> ARITH_OP
 %token <sval> TOKSTRING
 %token <sval> TOKINTEGER
 %token <sval> TOKFLOAT
 %token <sval> TOKBOOL
 %token <sval> IDENT
 
-%type <value> literal
-%type <value> expression
-%type <value> identifier
-%type <prog> program
 
-%right '='
-%left ARITH_OP
+%type <sval> act_param
+%type <node> program
+%type <node> print_statement act_params
+
 
 %%
 
 program:
     statements {
-        root = new RootNode();
-        printf("%s\n", getNodeTypeName(BOOL).c_str());
+        $$ = root;
     }
     ;
 
@@ -99,87 +88,39 @@ statements: /* empty */
     ;
 
 statement:
-    expression
-    |
-    declaration
-    |
     print_statement
     ;
 
-literal:
-    TOKSTRING {
-        $$.rawValue = $1;
-        $$.type = STR;
+act_params: /* empty */ {
+        $$ = new AstNode();
+    };
+    | act_param {
+        ActParamNode *param = new ActParamNode();
+        param->value = $1;
+        $$->addToChildList(param);
     }
-    |
-    TOKINTEGER {
-        $$.rawValue = $1;
-        $$.type = INT;
-    }
-    |
-    TOKFLOAT {
-        $$.rawValue = $1;
-        $$.type = FLOAT;
-    }
-    |
-    TOKBOOL {
-        $$.rawValue = $1;
-        $$.type = BOOL;
-    }
-
-identifier:
-    IDENT {
-        $$.rawValue = $1;
-        $$.type = IDENTIFIER;
-    }
-
-expression:
-    literal
-    |
-    identifier
-    |
-    expression ARITH_OP expression {
-        printf("%s\n", $2);
-        printf("%s\n", $3.rawValue);
+    | act_params ',' act_param {
+        ActParamNode *param = new ActParamNode();
+        param->value = $3;
+        $$->addToChildList(param);
     }
     ;
 
-declaration:
-    TYPEIDENT identifier '=' TOKSTRING {
-
-    }
+act_param:
+    TOKSTRING
     |
-    TYPEIDENT identifier '=' TOKINTEGER {
-
-    }
+    TOKINTEGER
     |
-    TYPEIDENT identifier '=' TOKFLOAT {
-
-    }
+    TOKFLOAT
     |
-    TYPEIDENT identifier '=' TOKBOOL {
+    TOKBOOL
+    ;
 
-    }
-    |
-    TYPEIDENT identifier '=' identifier {
-        printf("IDENT\n");
-    }
 
 print_statement:
-    TOKPRINT '(' TOKSTRING ')' {
-
-    }
-    |
-    TOKPRINT '(' TOKINTEGER ')' {
-
-    }
-    |
-    TOKPRINT '(' TOKFLOAT ')' {
-
-    }
-    |
-    TOKPRINT '(' identifier ')' {
-
+    TOKPRINT '(' act_params ')' {
+        PrintNode *print = new PrintNode($3);
+        root->addToChildList(print);
     }
     ;
 %%

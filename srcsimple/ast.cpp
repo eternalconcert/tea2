@@ -28,22 +28,57 @@ std::string getNodeTypeName(nodeType type) {
 AstNode::AstNode() {
     this->id = maxId;
     maxId++;
-
-    printf("nodeType: %i\n");
 };
 
+
+void AstNode::evaluate() {
+    AstNode *cur = this->childListHead;
+    while (cur != NULL) {
+        cur->evaluate();
+        cur = cur->next;
+    }
+}
+
+
+ActParamNode::ActParamNode() {
+    this->id = maxId;
+    maxId++;
+}
+
+
+void ActParamNode::evaluate() {
+    printf("%s", this->value);
+}
+
+
+PrintNode::PrintNode(AstNode *paramsHead) {
+    this->childListHead = paramsHead;
+    this->id = maxId;
+    maxId++;
+}
+
+
+void PrintNode::evaluate() {
+    AstNode *cur = this->childListHead->childListHead;
+    while (cur != NULL) {
+        cur->evaluate();
+        cur = cur->next;
+    }
+    printf("\n");
+}
 
 
 void AstNode::addToChildList(AstNode *newNode) {
     newNode->parent = this;
-    if (childListHead == NULL) {
-        childListHead = newNode;
+    if (this->childListHead == NULL) {
+        this->childListHead = newNode;
     }
     else {
-        AstNode *current = childListHead;
+        AstNode *current = this->childListHead;
         while (current->next != NULL) {
             current = current->next;
         }
         current->next = newNode;
     }
 };
+
