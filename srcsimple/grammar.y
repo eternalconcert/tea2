@@ -2,11 +2,15 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include "ast.h"
+    #include "commons.h"
     #include "exceptions.h"
+    #include "value.h"
     #include <string.h>
 
     AstNode *root = new AstNode();
     AstNode *curNode = root;
+    std::map <char*, Value*> constants;
+
 
     extern FILE *yyin;
     extern int yylineno;
@@ -56,21 +60,27 @@ main(int argc, char *argv[0]) {
 %union
 {
     char *sval;
+    int ival;
+    float fval;
+    bool bval;
+    typeId tval;
     AstNode *node;
+    Value *valueObj;
 }
 
 
-%token TOKPRINT PLUS MINUS TIMES DIVIDE
+%token TOKPRINT TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKCONST
 
-%token <sval> TYPEIDENT
+%token <tval> TYPEIDENT
 %token <sval> TOKSTRING
-%token <sval> TOKINTEGER
-%token <sval> TOKFLOAT
-%token <sval> TOKBOOL
+%token <ival> TOKINTEGER
+%token <fval> TOKFLOAT
+%token <bval> TOKBOOL
 %token <sval> IDENT
 
 
-%type <sval> act_param
+%type <valueObj> literal
+%type <valueObj> act_param
 %type <node> program
 %type <node> print_statement act_params
 
@@ -89,6 +99,7 @@ statements: /* empty */
 
 statement:
     print_statement
+    | const_declaration
     ;
 
 act_params: /* empty */ {
@@ -107,15 +118,36 @@ act_params: /* empty */ {
     ;
 
 act_param:
-    TOKSTRING
-    |
-    TOKINTEGER
-    |
-    TOKFLOAT
-    |
-    TOKBOOL
+    literal {
+        $$ = $1;
+    }
     ;
 
+literal:
+    TOKSTRING {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
+    }
+    |
+    TOKINTEGER {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
+    }
+    |
+    TOKFLOAT {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
+    }
+    |
+    TOKBOOL {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
+    }
+    ;
 
 print_statement:
     TOKPRINT '(' act_params ')' {
@@ -123,4 +155,11 @@ print_statement:
         root->addToChildList(print);
     }
     ;
+
+const_declaration:
+    TOKCONST TYPEIDENT IDENT '=' literal {
+    ConstNode *constant = new ConstNode($2, $3, $5);
+    root->addToChildList(constant);
+    }
+
 %%

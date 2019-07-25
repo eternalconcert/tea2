@@ -1,10 +1,6 @@
 #include <string>
-
-
-enum nodeType {ROOT, INT, FLOAT, STR, BOOL, DECLARATION, ADD, SUB, MUL, DIV, IDENTIFIER, TYPE};
-
-
-std::string getNodeTypeName(nodeType type);
+#include "commons.h"
+#include "value.h"
 
 class AstNode {
 public:
@@ -20,15 +16,22 @@ public:
 
 class ActParamNode: public AstNode {
 public:
-    char *value;
+    Value *value;
     AstNode* evaluate();
     ActParamNode();
 };
 
 class PrintNode: public AstNode {
 public:
-    AstNode* evaluate();
+    AstNode *evaluate();
     PrintNode(AstNode *paramsHead);
 };
 
 
+class ConstNode: public AstNode {
+public:
+    ConstNode(typeId type, char *identifier, Value *value);
+    char *identifier;
+    Value *value;
+    AstNode *evaluate();
+};

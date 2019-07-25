@@ -1,29 +1,8 @@
-#include <string>
 #include "ast.h"
-
+#include "value.h"
 
 int maxId = 0;
 
-std::string getNodeTypeName(nodeType type) {
-    switch(type) {
-        case ADD:
-            return "ADD";
-        case SUB:
-            return "SUB";
-        case MUL:
-            return "MUL";
-        case DIV:
-            return "DIV";
-        case INT:
-            return "INT";
-        case FLOAT:
-            return "FLOAT";
-        case STR:
-            return "STR";
-        case BOOL:
-            return "BOOL";
-    }
-};
 
 AstNode::AstNode() {
     this->id = maxId;
@@ -63,7 +42,7 @@ AstNode* PrintNode::evaluate() {
     AstNode *cur = this->childListHead->childListHead;
     while (cur != NULL) {
         ActParamNode *eval = (ActParamNode*)cur->evaluate();
-        printf("%s", eval->value);
+        eval->value->repr();
         cur = cur->next;
     }
     printf("\n");
@@ -85,3 +64,16 @@ void AstNode::addToChildList(AstNode *newNode) {
     }
 };
 
+
+ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
+    this->id = maxId;
+    maxId++;
+    this->identifier = identifier;
+    this->value = value;
+};
+
+
+AstNode* ConstNode::evaluate() {
+    constants[this->identifier] = this->value;
+    return this;
+}
