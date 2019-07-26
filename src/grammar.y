@@ -1,13 +1,20 @@
 %{
     #include <stdio.h>
+    #include <stdlib.h>
+    #include "src/ast.h"
+    #include "src/commons.h"
+    #include "src/exceptions.h"
+    #include "src/value.h"
     #include <string.h>
 
-    #include "src/valuestore.cpp"
+    AstNode *root = new AstNode();
+    AstNode *curNode = root;
+    std::map <char*, Value*> constants;
+
 
     extern FILE *yyin;
     extern int yylineno;
     extern char *yytext;
-    extern "C" {
         int yyparse(void);
         int yylex(void);
         int yy_scan_string(const char* instream);
@@ -15,12 +22,11 @@
         int yywrap() {
             return 1;
         }
-    }
 
     void yyerror(const char *str) {
         fprintf(stderr, "Error: %s: %s on line %d\n", str, yytext, yylineno);
+        exit(1);
     }
-
 
 main(int argc, char *argv[0]) {
     if (argc <= 1) {
@@ -46,415 +52,114 @@ main(int argc, char *argv[0]) {
     }
 
     yyparse();
+    root->evaluate();
 }
 
 %}
 
-%token TOKCONST TOKFUNC TOKFOR TOKRETURN TOKIF TOKELSE OCBRACE CCBRACE TOKPRINT TOKCMD
-
 %union
 {
-    int ival;
     char *sval;
+    int ival;
     float fval;
-
-    struct {
-        const char *type;
-        int integerVal;
-        char *stringVal;
-        float floatVal;
-        char *booleanVal;
-        char *identifier;
-    } var;
+    bool bval;
+    typeId tval;
+    AstNode *node;
+    Value *valueObj;
 }
 
-%token <sval> TYPEIDENT
-%token <sval> IDENT
-%token <ival> STATE
-%token <sval> STRING_LIT
-%token <ival> INTEGER_LIT
-%token <fval> FLOAT_LIT
-%token <sval> BOOL_LIT
-%token <sval> ARITH_OP
-%token <sval> TOKIN
-%token <sval> TOKNOTIN
-%token <sval> TOKOR
-%token <sval> TOKXOR
-%token <sval> TOKNOT
-%token <sval> TOKAND
-%token <sval> TOKEQ
-%token <sval> TOKNEQ
-%token <sval> TOKLT
-%token <sval> TOKGT
-%token <sval> TOKLTE
-%token <sval> TOKGTE
 
-%type <sval> logic_op
-%type <var> literal
+%token TOKPRINT TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKCONST
+
+%token <tval> TYPEIDENT
+%token <sval> TOKSTRING
+%token <ival> TOKINTEGER
+%token <fval> TOKFLOAT
+%token <bval> TOKBOOL
+%token <sval> IDENT
+
+
+%type <valueObj> literal
+%type <valueObj> act_param
+%type <node> program
+%type <node> print_statement act_params
+
 
 %%
 
 program:
-    statements
+    statements {
+        $$ = root;
+    }
+    ;
 
 statements: /* empty */
-        | statements statement ';'
-        ;
+    | statements statement ';'
+    ;
 
 statement:
-    |
-    literal
-    |
-    IDENT
-    |
-    expression
-    |
-    const_declaration
-    |
-    var_declaration
-    |
-    var_assignment
-    |
-    func_declaration
-    |
-    func_call
-    |
-    for_loop
-    |
-    if_statement
-    |
-    return
-    |
     print_statement
-    |
-    cmd_statement
+    | const_declaration
     ;
 
-list_elems:
-    |
-    IDENT
-    |
-    literal
-    |
-    IDENT ',' list_elems
-    |
-    literal ',' list_elems
+act_params: /* empty */ {
+        $$ = new AstNode();
+    };
+    | act_param {
+        ActParamNode *param = new ActParamNode();
+        param->value = $1;
+        $$->addToChildList(param);
+    }
+    | act_params ',' act_param {
+        ActParamNode *param = new ActParamNode();
+        param->value = $3;
+        $$->addToChildList(param);
+    }
     ;
 
-array_lit:
-    '[' list_elems ']'
+act_param:
+    literal {
+        $$ = $1;
+    }
+    ;
 
 literal:
-    STRING_LIT
-    {
-        std::string res = std::string($1);
-        res = cleanStrLit(res);
-
-        char *stripped = new char[res.size() + 1];
-        std::copy(res.begin(), res.end(), stripped);
-        stripped[res.size()] = '\0';
-
-        $$.stringVal = stripped;
-        $$.type = "STR";
+    TOKSTRING {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
     }
     |
-    INTEGER_LIT
-    {
-        $$.integerVal = $1;
-        $$.type = "INT";
+    TOKINTEGER {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
     }
     |
-    FLOAT_LIT
-    {
-        $$.floatVal = $1;
-        $$.type = "FLOAT";
+    TOKFLOAT {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
     }
     |
-    BOOL_LIT
-    {
-        $$.booleanVal = $1;
-        $$.type = "BOOL";
+    TOKBOOL {
+        Value *valueObj = new Value();
+        valueObj->set($1);
+        $$ = valueObj;
     }
-    ;
-
-expression:
-    expression ARITH_OP literal
-    |
-    expression ARITH_OP IDENT
-    |
-    literal ARITH_OP literal
-    {
-        // TODO: Here we need to work with tables
-        TYPE_ID lType = getTypeIdByName($1.type);
-        ValueStore *lVal = new ValueStore;
-        switch (lType) {
-            case INT:
-                lVal->type = INT;
-                lVal->int_value = $1.integerVal;
-                break;
-        }
-
-        TYPE_ID rType = getTypeIdByName($3.type);
-        ValueStore *rVal = new ValueStore;
-        switch (rType) {
-            case INT:
-                rVal->type = INT;
-                rVal->int_value = $3.integerVal;
-                break;
-        }
-
-        if (!strcmp($2, "+")) {
-            printf("[Debug] addition: %i + %i = %i\n", lVal->int_value , rVal->int_value, (lVal->int_value + rVal->int_value));
-        }
-
-        if (!strcmp($2, "-")) {
-            printf("[Debug] substraction: %i - %i = %i\n", lVal->int_value, rVal->int_value, (lVal->int_value - rVal->int_value));
-        }
-    }
-    |
-    IDENT ARITH_OP IDENT
-    |
-    literal ARITH_OP IDENT
-    |
-    IDENT ARITH_OP literal
-    ;
-
-const_declaration:
-    TOKCONST TYPEIDENT IDENT '=' literal
-    {
-        TYPE_ID id = getTypeIdByName($2);
-        std::string typeName = std::string($5.type);
-        if (strcmp($5.type, $2)) {
-            throw RuntimeError("Type mismatch: Cannot assign " + typeName + " to constant of type " + $2);
-        };
-
-        switch(id) {
-            case INT:
-                addConstant(std::string($3), INT, $5.integerVal, 0, NULL, NULL);
-                break;
-
-            case FLOAT:
-                addConstant(std::string($3), FLOAT, 0, $5.floatVal, NULL, NULL);
-                break;
-
-            case STR:
-                addConstant(std::string($3), STR, 0, 0, $5.stringVal, NULL);
-                break;
-
-            case BOOL:
-                addConstant(std::string($3), BOOL, 0, 0, NULL, $5.booleanVal);
-                break;
-            };
-        };
-
-
-var_declaration:
-    TYPEIDENT IDENT
-    {
-        makeEmptyVariable($2, getTypeIdByName($1));
-    }
-    ;
-
-var_assignment:
-    TYPEIDENT IDENT '=' literal
-    {
-        std::string typeName = std::string($4.type);
-        if (strcmp($4.type, $1)) {
-            throw RuntimeError("Type mismatch: Cannot assign " + typeName + " to variable " + "(" + ($2) + ")" + " of type " + $1);
-        };
-        TYPE_ID typeId = getTypeIdByName($1);
-        addVariable($2, typeId, false, $4.integerVal, $4.floatVal, $4.stringVal, $4.booleanVal, NULL);
-    }
-    |
-    TYPEIDENT IDENT '=' IDENT
-    {
-        addVariable($2, IDENTIFIER, false, 0, 0, NULL, NULL, $4);
-    };
-    |
-
-    TYPEIDENT IDENT '=' array_lit
-    {
-        printf("Array assignment not yet implemented: %s\n", $2);
-    }
-    |
-    TYPEIDENT IDENT '=' expression
-    |
-    TYPEIDENT IDENT '=' func_call
-    |
-
-    IDENT '=' INTEGER_LIT
-    {
-        updateVariable($1, INT, false, $3, 0, NULL, NULL, NULL);
-    }
-    |
-    IDENT '=' FLOAT_LIT
-    {
-        updateVariable($1, FLOAT, false, 0, $3, NULL, NULL, NULL);
-    };
-    |
-    IDENT '=' STRING_LIT
-    {
-        std::string res = std::string($3);
-        res = cleanStrLit(res);
-
-        char *stripped = new char[res.size() + 1];
-        std::copy(res.begin(), res.end(), stripped);
-        stripped[res.size()] = '\0';
-
-        updateVariable($1, STR, false, 0, 0, stripped, NULL, NULL);
-    };
-    |
-    IDENT '=' BOOL_LIT
-    {
-        updateVariable($1, BOOL, false, 0, 0, NULL, $3, NULL);
-    };
-
-    |
-    IDENT '=' IDENT
-    {
-        updateVariable($1, IDENTIFIER, false, 0, 0, NULL, NULL, $3);
-    };
-    |
-    IDENT '=' expression
-    |
-    IDENT '=' func_call
-    ;
-
-return:
-    TOKRETURN |
-    TOKRETURN IDENT |
-    TOKRETURN literal
-    ;
-
-formal_arguments_list:
-    |
-    TYPEIDENT IDENT |
-    TYPEIDENT IDENT '=' literal |
-    TYPEIDENT IDENT ',' formal_arguments_list |
-    TYPEIDENT IDENT '=' literal ',' formal_arguments_list
-    ;
-
-actual_arguments_list:
-    |
-    IDENT
-    |
-    IDENT ',' actual_arguments_list
-    |
-    literal
-    |
-    literal ',' actual_arguments_list
-    ;
-
-ccbrace:
-    OCBRACE
-    {
-        pushScope();
-    };
-
-ocbrace:
-    CCBRACE
-    {
-        popScope();
-    };
-
-func_declaration:
-    TOKFUNC TYPEIDENT IDENT '(' formal_arguments_list ')' ccbrace statements ocbrace
-    ;
-
-func_call:
-    IDENT '(' actual_arguments_list ')';
-
-for_loop:
-    TOKFOR IDENT TOKIN IDENT OCBRACE statements CCBRACE;
-
-logic_op:
-    TOKIN
-    |
-    TOKNOTIN
-    |
-    TOKOR
-    |
-    TOKXOR
-    |
-    TOKNOT
-    |
-    TOKAND
-    |
-    TOKEQ
-    |
-    TOKNEQ
-    |
-    TOKLT
-    |
-    TOKGT
-    |
-    TOKLTE
-    |
-    TOKGTE
-    ;
-
-comparison:
-    comparison logic_op literal
-    |
-    comparison logic_op IDENT
-    |
-    literal logic_op literal
-    |
-    IDENT logic_op IDENT
-    |
-    literal logic_op IDENT
-    |
-    IDENT logic_op literal
-    ;
-
-if_statement:
-    TOKIF comparison OCBRACE statements CCBRACE
-    |
-    TOKIF comparison OCBRACE statements CCBRACE TOKELSE OCBRACE statements CCBRACE
     ;
 
 print_statement:
-    TOKPRINT '(' STRING_LIT ')'
-    {
-        std::string lit = cleanStrLit(std::string($3));
-        printf("%s\n", lit.c_str());
-    }
-    |
-    TOKPRINT '(' INTEGER_LIT ')'
-    {
-        printf("%d\n", $3);
-    }
-    |
-    TOKPRINT '(' FLOAT_LIT ')'
-    {
-        printf("%f\n", $3);
-    }
-    |
-    TOKPRINT '(' BOOL_LIT ')'
-    {
-        printf("%s\n", $3);
-    }
-    |
-    TOKPRINT '(' IDENT ')'
-    {
-        std::string ident = std::string($3);
-        ValueStore item = getFromValueStore(ident);
-        item.repr();
+    TOKPRINT '(' act_params ')' {
+        PrintNode *print = new PrintNode($3);
+        root->addToChildList(print);
     }
     ;
 
-cmd_statement:
-    TOKCMD '(' STRING_LIT ')'
-    {
-        std::string command = std::string($3);
-        command = cleanStrLit(command);
-        std::system(command.c_str());
-    }
-    |
-    TOKCMD '(' IDENT ')'
-    {
-        std::string ident = std::string($3);
-        ValueStore item = getFromValueStore(ident);
-        std::system(item.string_value);
+const_declaration:
+    TOKCONST TYPEIDENT IDENT '=' literal {
+    ConstNode *constant = new ConstNode($2, $3, $5);
+    root->addToChildList(constant);
     }
 
+%%

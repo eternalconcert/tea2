@@ -1,17 +1,14 @@
+CPPSOURCES = $(shell find src/ -name "*.cpp")
+
 tea:
 	lex src/patterns.l
-	yacc -d src/grammar.y
-	gcc -c lex.yy.c -o lex.yy.o
-	g++ lex.yy.o y.tab.c -o tea
+	yacc -d src/grammar.y # --verbose
+	g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea -lfl
 
-pythonenv:
-	virtualenv --python=python3 pythonenv
-	pythonenv/bin/pip install robotframework
-
-robottests:
-	pythonenv/bin/robot robottests
+run:
+	./tea test.t
 
 clean:
-	rm parser lex.yy.c y.tab.c y.tab.h lex.yy.o
+	rm tea lex.yy.c y.tab.c y.tab.h
 
-.PHONY: tea robottests
+.PHONY: tea
