@@ -1,8 +1,8 @@
 #include "ast.h"
+#include "exceptions.h"
 #include "value.h"
 
 int maxId = 0;
-
 
 AstNode::AstNode() {
     this->id = maxId;
@@ -66,6 +66,10 @@ void AstNode::addToChildList(AstNode *newNode) {
 
 
 ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
+    if (value->type != type) {
+        throw (TypeError());
+    }
+
     this->id = maxId;
     maxId++;
     this->identifier = identifier;
@@ -74,6 +78,9 @@ ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
 
 
 AstNode* ConstNode::evaluate() {
-    constants[this->identifier] = this->value;
+    if (global->constants.find(this->identifier) != global->constants.end()) {
+        throw (ConstError());
+    }
+    global->constants[this->identifier] = this->value;
     return this;
-}
+};

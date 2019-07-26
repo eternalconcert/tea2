@@ -2,7 +2,6 @@
 #include "commons.h"
 
 
-
 typeId getTypeIdByName(std::string name) {
 
     if (name == "INT"){

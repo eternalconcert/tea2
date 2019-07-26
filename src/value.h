@@ -6,54 +6,29 @@
 
 class Value {
 public:
-    std::string ident;
+    std::string unused;
     typeId type;
     int intValue;
     float floatValue;
     char *stringValue;
     bool boolValue;
+    char *identValue;
 
-    void set(char *value) {
-        this->type = STR;
-        this->stringValue = value; // Undefined reference in linker when implemendet in .cpp
-    };
-
-    void set(int value) {
-        this->type = INT;
-        this->intValue = value;
-    };
-
-    void set(float value) {
-        this->type = FLOAT;
-        this->floatValue = value;
-    };
-
-    void set(bool value) {
-        this->type = BOOL;
-        this->boolValue = value;
-    };
-
-    void repr() {
-        switch (this->type) {
-            case STR:
-                printf("%s", this->stringValue);
-                break;
-            case INT:
-                printf("%i", this->intValue);
-                break;
-            case FLOAT:
-                printf("%f", this->floatValue);
-                break;
-            case BOOL:
-                printf("%s", this->boolValue ? "true" : "false");
-                break;
-        }
-
-    }
-
-
+    void set(char *value);
+    void set(int value);
+    void set(float value);
+    void set(bool value);
+    void setIdent(char *value);
+    void repr();
 };
 
-extern std::map <char*, Value*> constants;
+
+class Scope {
+    public:
+        std::map <std::string, Value*> constants;
+};
+
+extern Scope *global;
+
 
 #endif

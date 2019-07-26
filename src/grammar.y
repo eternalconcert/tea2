@@ -4,13 +4,10 @@
     #include "src/ast.h"
     #include "src/commons.h"
     #include "src/exceptions.h"
-    #include "src/value.h"
     #include <string.h>
 
     AstNode *root = new AstNode();
     AstNode *curNode = root;
-    std::map <char*, Value*> constants;
-
 
     extern FILE *yyin;
     extern int yylineno;
@@ -76,7 +73,7 @@ main(int argc, char *argv[0]) {
 %token <ival> TOKINTEGER
 %token <fval> TOKFLOAT
 %token <bval> TOKBOOL
-%token <sval> IDENT
+%token <sval> TOKIDENT
 
 
 %type <valueObj> literal
@@ -121,6 +118,11 @@ act_param:
     literal {
         $$ = $1;
     }
+    | TOKIDENT {
+        Value *valueObj = new Value();
+        valueObj->setIdent($1);
+        $$ = valueObj;
+    }
     ;
 
 literal:
@@ -157,7 +159,7 @@ print_statement:
     ;
 
 const_declaration:
-    TOKCONST TYPEIDENT IDENT '=' literal {
+    TOKCONST TYPEIDENT TOKIDENT '=' literal {
     ConstNode *constant = new ConstNode($2, $3, $5);
     root->addToChildList(constant);
     }

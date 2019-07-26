@@ -42,22 +42,22 @@ Print concatenated integers
 Print single float
     [Tags]    printing
     ${result}  Given tea has been called with inline command: 'print(1.2);'
-    Then the result should be  "1.2"  ${result}
+    Then the result should be  "1.200000"  ${result}
 
 Print negative float
     [Tags]    printing
     ${result}  Given tea has been called with inline command: 'print(-23.0);'
-    Then the result should be  "-23.0"  ${result}
+    Then the result should be  "-23.000000"  ${result}
 
 Print concatenated negative and positive float
     [Tags]    printing
     ${result}  Given tea has been called with inline command: 'print(-23.0, 123);'
-    Then the result should be  "-23.0123"  ${result}
+    Then the result should be  "-23.000000123"  ${result}
 
 Print concatenated floats
     [Tags]    printing
     ${result}  Given tea has been called with inline command: 'print(1.2, 3.4);'
-    Then the result should be  "1.23.4"  ${result}
+    Then the result should be  "1.2000003.400000"  ${result}
 
 Print boolean
     [Tags]    printing
@@ -72,7 +72,7 @@ Print concatenated booleans
 Print concatenated mixed type
     [Tags]    printing
     ${result}  Given tea has been called with inline command: 'print(true, "hello", 1, 2.3);'
-    Then the result should be  "truehello12.3"  ${result}
+    Then the result should be  "truehello12.300000"  ${result}
 
 Print without param
     [Tags]    printing

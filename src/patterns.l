@@ -26,7 +26,7 @@ false                                   yylval.bval=false; return TOKBOOL;
 print                                   return TOKPRINT;
 "("                                     return '(';
 ")"                                     return ')';
-[A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return IDENT;
+[A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return TOKIDENT;
 \"(\\.|[^"\\])*\"                       yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);return TOKSTRING;
 [+-]?[0-9]+                             yylval.ival=atoi(yytext); return TOKINTEGER;
 [+-]?[0-9]+\.[0-9]+                     yylval.fval=atof(yytext); return TOKFLOAT;
