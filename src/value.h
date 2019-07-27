@@ -6,11 +6,10 @@
 
 class Value {
 public:
-    std::string unused;
+    std::string *stringValue;
     typeId type;
     int intValue;
     float floatValue;
-    char *stringValue;
     bool boolValue;
     char *identValue;
 
