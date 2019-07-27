@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "exceptions.h"
+#include "scope.h"
 #include "value.h"
 
 int maxId = 0;
@@ -78,9 +79,9 @@ ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
 
 
 AstNode* ConstNode::evaluate() {
-    if (global->constants.find(this->identifier) != global->constants.end()) {
+    if (constGlobal->valueStore.find(this->identifier) != constGlobal->valueStore.end()) {
         throw (ConstError());
     }
-    global->constants[this->identifier] = this->value;
+    constGlobal->valueStore[this->identifier] = this->value;
     return this;
 };

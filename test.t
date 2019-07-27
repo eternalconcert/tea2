@@ -1,4 +1,4 @@
 print("Hello ", "world!");
-CONST BOOL TEXT = true;
+CONST STR TEXT = "Go! ";
 print(TEXT, TEXT, TEXT, "!");
 print(TEXT, TEXT, TEXT, "!");

@@ -22,13 +22,4 @@ public:
     void repr();
 };
 
-
-class Scope {
-    public:
-        std::map <std::string, Value*> constants;
-};
-
-extern Scope *global;
-
-
 #endif

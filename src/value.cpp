@@ -1,4 +1,5 @@
 #include "exceptions.h"
+#include "scope.h"
 #include "value.h"
 
 
@@ -42,8 +43,8 @@ void Value::repr() {
             printf("%s", this->boolValue ? "true" : "false");
             break;
         case IDENTIFIER:
-            if (global->constants.find(this->identValue) != global->constants.end()) {
-                global->constants[this->identValue]->repr();
+            if (constGlobal->valueStore.find(this->identValue) != constGlobal->valueStore.end()) {
+                constGlobal->valueStore[this->identValue]->repr();
             }
             else {
                 throw (UnknownIdentifierError());
@@ -51,5 +52,3 @@ void Value::repr() {
             break;
     }
 }
-
-Scope *global = new Scope();
