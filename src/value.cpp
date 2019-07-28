@@ -5,7 +5,7 @@
 
 void Value::set(char *value) {
     this->type = STR;
-    this->stringValue = new std::string(value);
+    this->stringValue = value;
 };
 
 void Value::set(int value) {
@@ -31,7 +31,7 @@ void Value::setIdent(char *value) {
 void Value::repr() {
     switch (this->type) {
         case STR:
-            printf("%s", this->stringValue->c_str());
+            printf("%s", this->stringValue);
             break;
         case INT:
             printf("%i", this->intValue);
