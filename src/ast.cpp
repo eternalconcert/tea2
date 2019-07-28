@@ -85,3 +85,12 @@ AstNode* ConstNode::evaluate() {
     constGlobal->valueStore[this->identifier] = this->value;
     return this;
 };
+
+
+ExpressionNode::ExpressionNode(Value *value) {
+};
+
+AstNode* ExpressionNode::evaluate() {
+    printf("%s\n", "Eval");
+    return this;
+};

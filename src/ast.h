@@ -36,3 +36,21 @@ public:
     Value *value;
     AstNode *evaluate();
 };
+
+
+class ExpressionNode: public AstNode {
+public:
+    ExpressionNode(Value *lvalue);
+    AstNode *evaluate();
+};
+
+
+class OperatorNode: public AstNode {
+public:
+    char *op;
+    OperatorNode(char *op) {
+        this->op = op;
+    };
+    AstNode *evaluate() {};
+
+};

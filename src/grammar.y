@@ -66,7 +66,7 @@ main(int argc, char *argv[0]) {
 }
 
 
-%token TOKPRINT TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKCONST
+%token <sval> TOKPRINT TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKCONST
 
 %token <tval> TYPEIDENT
 %token <sval> TOKSTRING
@@ -75,11 +75,10 @@ main(int argc, char *argv[0]) {
 %token <bval> TOKBOOL
 %token <sval> TOKIDENT
 
-
 %type <valueObj> literal
-%type <valueObj> act_param
+%type <valueObj> act_param expression
 %type <node> program
-%type <node> print_statement act_params
+%type <node> statement const_declaration print_statement act_params expressions operator
 
 
 %%
@@ -95,19 +94,77 @@ statements: /* empty */
     ;
 
 statement:
-    print_statement
-    | const_declaration
+    print_statement {
+        root->addToChildList($$);
+    }
+    | const_declaration {
+        root->addToChildList($$);
+    }
+    | expressions {
+        root->addToChildList($$);
+    }
     ;
 
-act_params: /* empty */ {
+expressions:
+    expression {
+        ExpressionNode *expNode = new ExpressionNode($1);
+        // $$->addToChildList(expNode);
+        $$ = expNode;
+    }
+    |
+    expressions operator expression {
+        ExpressionNode *expNode = new ExpressionNode($3);
+        // $$->addToChildList($2);
+        // $$->addToChildList(expNode);
+        $$ = expNode;
+    }
+    ;
+
+expression:
+    literal {
+        $$ = $1;
+    }
+    // |
+    // TOKIDENT {
+        // Value *valueObj = new Value();
+        // valueObj->setIdent($1);
+        // $$ = valueObj;
+    // }
+    ;
+
+operator:
+    TOKPLUS {
+        OperatorNode *op = new OperatorNode($1);
+        $$ = op;
+    }
+    |
+    TOKMINUS {
+        OperatorNode *op = new OperatorNode($1);
+        $$ = op;
+    }
+    |
+    TOKTIMES {
+        OperatorNode *op = new OperatorNode($1);
+        $$ = op;
+    }
+    |
+    TOKDIVIDE {
+        OperatorNode *op = new OperatorNode($1);
+        $$ = op;
+    }
+    ;
+
+act_params: {
         $$ = new AstNode();
     };
-    | act_param {
+    |
+    act_param {
         ActParamNode *param = new ActParamNode();
         param->value = $1;
         $$->addToChildList(param);
     }
-    | act_params ',' act_param {
+    |
+    act_params ',' act_param {
         ActParamNode *param = new ActParamNode();
         param->value = $3;
         $$->addToChildList(param);
@@ -118,7 +175,8 @@ act_param:
     literal {
         $$ = $1;
     }
-    | TOKIDENT {
+    |
+    TOKIDENT {
         Value *valueObj = new Value();
         valueObj->setIdent($1);
         $$ = valueObj;
@@ -154,14 +212,14 @@ literal:
 print_statement:
     TOKPRINT '(' act_params ')' {
         PrintNode *print = new PrintNode($3);
-        root->addToChildList(print);
+        $$ = print;
     }
     ;
 
 const_declaration:
     TOKCONST TYPEIDENT TOKIDENT '=' literal {
     ConstNode *constant = new ConstNode($2, $3, $5);
-    root->addToChildList(constant);
+    $$ = constant;
     }
 
 %%

@@ -11,10 +11,10 @@
 "="                                     return '=';
 ";"                                     return ';';
 ","                                     return ',';
-"+"                                     return TOKPLUS;
-"-"                                     return TOKMINUS;
-"*"                                     return TOKTIMES;
-"\/"                                    return TOKDIVIDE;
+"+"                                     yylval.sval=strdup(yytext); return TOKPLUS;
+"-"                                     yylval.sval=strdup(yytext); return TOKMINUS;
+"*"                                     yylval.sval=strdup(yytext); return TOKTIMES;
+"\/"                                    yylval.sval=strdup(yytext); return TOKDIVIDE;
 CONST                                   return TOKCONST;
 INT                                     yylval.tval=INT; return TYPEIDENT;
 FLOAT                                   yylval.tval=FLOAT; return TYPEIDENT;
