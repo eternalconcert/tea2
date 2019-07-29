@@ -75,10 +75,10 @@ main(int argc, char *argv[0]) {
 %token <bval> TOKBOOL
 %token <sval> TOKIDENT
 
+
 %type <valueObj> literal
 %type <valueObj> act_param expression
-%type <node> program
-%type <node> statement const_declaration print_statement act_params expressions operator
+%type <node> program statement const_declaration print_statement act_params expressions operator
 
 
 %%
@@ -107,16 +107,18 @@ statement:
 
 expressions:
     expression {
-        ExpressionNode *expNode = new ExpressionNode($1);
-        // $$->addToChildList(expNode);
+        ExpressionNode *expNode = new ExpressionNode();
+        OperantNode *operant = new OperantNode();
+        operant->value = $1;
+        expNode->addToChildList(operant);
         $$ = expNode;
     }
     |
     expressions operator expression {
-        ExpressionNode *expNode = new ExpressionNode($3);
-        // $$->addToChildList($2);
-        // $$->addToChildList(expNode);
-        $$ = expNode;
+        $$->addToChildList($2);
+        OperantNode *operant = new OperantNode();
+        operant->value = $3;
+        $$->addToChildList(operant);
     }
     ;
 
@@ -134,23 +136,19 @@ expression:
 
 operator:
     TOKPLUS {
-        OperatorNode *op = new OperatorNode($1);
-        $$ = op;
+        $$ = new PlusNode();
     }
     |
     TOKMINUS {
-        OperatorNode *op = new OperatorNode($1);
-        $$ = op;
+        $$ = new MinusNode();
     }
     |
     TOKTIMES {
-        OperatorNode *op = new OperatorNode($1);
-        $$ = op;
+        $$ = new TimesNode();
     }
     |
     TOKDIVIDE {
-        OperatorNode *op = new OperatorNode($1);
-        $$ = op;
+        $$ = new DivideNode();
     }
     ;
 

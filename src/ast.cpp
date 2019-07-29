@@ -87,10 +87,14 @@ AstNode* ConstNode::evaluate() {
 };
 
 
-ExpressionNode::ExpressionNode(Value *value) {
-};
+ExpressionNode::ExpressionNode() {};
 
 AstNode* ExpressionNode::evaluate() {
-    printf("%s\n", "Eval");
+    Value *result = new Value();
+    AstNode *cur = this->childListHead;
+    while (cur != NULL) {
+        cur->evaluate();
+        cur = cur->next;
+    }
     return this;
 };

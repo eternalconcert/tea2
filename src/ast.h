@@ -38,19 +38,53 @@ public:
 };
 
 
-class ExpressionNode: public AstNode {
+class OperantNode: public AstNode {
 public:
-    ExpressionNode(Value *lvalue);
-    AstNode *evaluate();
+    Value *value;
+    AstNode* evaluate() {
+        printf("%i\n", this->value->intValue);
+    };
+    OperantNode() {};
 };
 
 
 class OperatorNode: public AstNode {
-public:
-    char *op;
-    OperatorNode(char *op) {
-        this->op = op;
-    };
-    AstNode *evaluate() {};
+};
 
+class PlusNode: public OperatorNode {
+public:
+    AstNode *evaluate() {
+        printf("%s\n", "PlusNode");
+    }
+};
+
+class MinusNode: public OperatorNode {
+public:
+    AstNode *evaluate() {
+        printf("%s\n", "MinusNode");
+    }
+};
+
+class TimesNode: public OperatorNode {
+public:
+    AstNode *evaluate() {
+        printf("%s\n", "TimesNode");
+    }
+};
+
+class DivideNode: public OperatorNode {
+public:
+    AstNode *evaluate() {
+        printf("%s\n", "DivideNode");
+    }
+};
+
+
+
+class ExpressionNode: public AstNode {
+public:
+    Value *value;  // evaluated value
+    char *op;
+    ExpressionNode();
+    AstNode *evaluate();
 };
