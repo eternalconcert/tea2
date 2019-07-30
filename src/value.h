@@ -22,4 +22,6 @@ public:
     void repr();
 };
 
+Value* operator+(Value &lVal, Value *rVal);
+
 #endif

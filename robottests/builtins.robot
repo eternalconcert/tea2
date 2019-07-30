@@ -94,18 +94,6 @@ Print concatendated blank with string
     ${result}  Given tea has been called with inline command: 'print("", "hello");'
     Then the result should be  "hello"  ${result}
 
-Command
-    ${result}  Given tea has been called with inline command: 'cmd("echo hello world");'
-    Then the result should be  "hello world"  ${result}
-
-Command without param
-    ${result}  Given tea has been called with inline command: 'cmd();'
-    Then the result should be  ""  ${result}
-
-Command blank
-    ${result}  Given tea has been called with inline command: 'cmd("");'
-    Then the result should be  ""  ${result}
-
 *** Keywords ***
 Tea has been called with inline command: ${command}
     ${ret}  run process  ./tea -c ${command}  shell=True

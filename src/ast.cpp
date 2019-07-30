@@ -96,7 +96,11 @@ ExpressionNode* ExpressionNode::run(Value *currentResult) {
     else  { // (this->childListHead != NULL)
             ExpressionNode *cur = (ExpressionNode*)this->childListHead;
             while (cur != NULL) {
-                this->value->intValue += cur->value->intValue;
+                Value& lVal = *this->value;
+                this->value = lVal + cur->value;
+                if (cur->value->type == IDENTIFIER) {
+                    this->value->intValue += constGlobal->valueStore[cur->value->identValue]->intValue;
+                }
                 cur = (ExpressionNode*)cur->next;
             }
         return this;

@@ -76,8 +76,7 @@ main(int argc, char *argv[0]) {
 %token <sval> TOKIDENT
 
 %type <sval> operator
-%type <valueObj> literal
-%type <valueObj> act_param expression
+%type <valueObj> act_param expression literal
 %type <node> program statement const_declaration print_statement act_params expressions
 
 
@@ -124,12 +123,12 @@ expression:
     literal {
         $$ = $1;
     }
-    // |
-    // TOKIDENT {
-        // Value *valueObj = new Value();
-        // valueObj->setIdent($1);
-        // $$ = valueObj;
-    // }
+    |
+    TOKIDENT {
+        Value *valueObj = new Value();
+        valueObj->setIdent($1);
+        $$ = valueObj;
+    }
     ;
 
 operator:

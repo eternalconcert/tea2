@@ -52,3 +52,9 @@ void Value::repr() {
             break;
     }
 }
+
+Value* operator+(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    nVal->intValue = lVal.intValue + rVal->intValue;
+    return nVal;
+};
