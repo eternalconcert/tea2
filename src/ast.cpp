@@ -87,14 +87,18 @@ AstNode* ConstNode::evaluate() {
 };
 
 
-ExpressionNode::ExpressionNode() {};
-
-AstNode* ExpressionNode::evaluate() {
-    Value *result = new Value();
-    AstNode *cur = this->childListHead;
-    while (cur != NULL) {
-        cur->evaluate();
-        cur = cur->next;
+ExpressionNode* ExpressionNode::run(Value *currentResult) {
+    if (this->childListHead == NULL and this->op == NULL) {
+        this->value = currentResult;
+        return this;
     }
-    return this;
+
+    else  { // (this->childListHead != NULL)
+            ExpressionNode *cur = (ExpressionNode*)this->childListHead;
+            while (cur != NULL) {
+                this->value->intValue += cur->value->intValue;
+                cur = (ExpressionNode*)cur->next;
+            }
+        return this;
+    }
 };

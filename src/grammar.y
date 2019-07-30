@@ -75,10 +75,10 @@ main(int argc, char *argv[0]) {
 %token <bval> TOKBOOL
 %token <sval> TOKIDENT
 
-
+%type <sval> operator
 %type <valueObj> literal
 %type <valueObj> act_param expression
-%type <node> program statement const_declaration print_statement act_params expressions operator
+%type <node> program statement const_declaration print_statement act_params expressions
 
 
 %%
@@ -108,17 +108,15 @@ statement:
 expressions:
     expression {
         ExpressionNode *expNode = new ExpressionNode();
-        OperantNode *operant = new OperantNode();
-        operant->value = $1;
-        expNode->addToChildList(operant);
+        expNode->value = $1;
         $$ = expNode;
     }
     |
     expressions operator expression {
-        $$->addToChildList($2);
-        OperantNode *operant = new OperantNode();
-        operant->value = $3;
-        $$->addToChildList(operant);
+        ExpressionNode *child = new ExpressionNode();
+        child->op = $2;
+        child->value = $3;
+        $$->addToChildList(child);
     }
     ;
 
@@ -135,21 +133,13 @@ expression:
     ;
 
 operator:
-    TOKPLUS {
-        $$ = new PlusNode();
-    }
+    TOKPLUS
     |
-    TOKMINUS {
-        $$ = new MinusNode();
-    }
+    TOKMINUS
     |
-    TOKTIMES {
-        $$ = new TimesNode();
-    }
+    TOKTIMES
     |
-    TOKDIVIDE {
-        $$ = new DivideNode();
-    }
+    TOKDIVIDE
     ;
 
 act_params: {
