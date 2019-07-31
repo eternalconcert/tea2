@@ -133,8 +133,6 @@ Value* operator+(Value &lVal, Value *rVal) {
         throw (TypeError("Addition is not implemented for BOOL"));
 
     }
-
-
     return nVal;
 };
 
@@ -174,9 +172,15 @@ Value* operator-(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "Hello" - 1 = "Hell"
-
-        lVal.stringValue[strlen(lVal.stringValue) - rVal->intValue] = 0;
-        nVal->set(lVal.stringValue);
+        if(strlen(lVal.stringValue) <= rVal->intValue) {
+            for (int i = 0; i <= strlen(lVal.stringValue); i++) {
+                lVal.stringValue[i] = 0;
+            }
+        }
+        else {
+            lVal.stringValue[strlen(lVal.stringValue) - rVal->intValue] = 0;
+        }
+            nVal->set(lVal.stringValue);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
@@ -194,7 +198,130 @@ Value* operator-(Value &lVal, Value *rVal) {
         throw (TypeError("Substraction is not implemented for BOOL"));
 
     }
+    return nVal;
+};
 
 
+Value* operator*(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
+        // 3 * 3 = 9
+        nVal->set(lVal.intValue * rVal->intValue);
+
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
+        // 3 + 3.0 = 9.0
+        nVal->set(lVal.intValue * rVal->floatValue);
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
+        // 3 + "A" = "AAA"
+        char* cStr = new char[(sizeof(rVal->stringValue) * lVal.intValue)];
+
+        for (int i=1; i <= lVal.intValue; i++) {
+            strcat(cStr, rVal->stringValue);
+        }
+        nVal->set(cStr);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
+        // 3.0 * 2 = 6.0
+        nVal->set(lVal.floatValue * rVal->intValue);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == FLOAT) {
+        // 2.0 * 1.0 = 2.0
+        nVal->set(lVal.floatValue * rVal->floatValue);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
+        // 2.0 * "A" = XXX
+        throw (TypeError("Multiplication is not implemented for FLOAT and STR"));
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
+        // "A" * 3 = "AAA"
+        char* cStr = new char[(sizeof(lVal.stringValue) * rVal->intValue)];
+
+        for (int i=1; i <= rVal->intValue; i++) {
+            strcat(cStr, lVal.stringValue);
+        }
+        nVal->set(cStr);
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
+        // "A" * 2.0 = XXX
+        throw (TypeError("Multiplication is not implemented for STR and FLOAT"));
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
+        // "A" * "B" = XXX
+        throw (TypeError("Multiplication is not implemented for STR and STR"));
+    }
+
+    if (lVal.getTrueType() == BOOL or rVal->getTrueType() == BOOL) {
+        // true * false = XXX
+        throw (TypeError("Multiplication is not implemented for BOOL"));
+
+    }
+    return nVal;
+};
+
+Value* operator/(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
+        // 9 / 2 = 4
+        nVal->set(lVal.intValue / rVal->intValue);
+
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
+        // 9 / 2.0 = 4.5
+        nVal->set(lVal.intValue / rVal->floatValue);
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
+        // 2 / "A" = XXX
+        throw (TypeError("Division is not implemented for INT and STR"));
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
+        // 9.0 / 2 = 4.5
+        nVal->set(lVal.floatValue / rVal->intValue);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == FLOAT) {
+        // 2.0 + 2.0 = 1.0
+        nVal->set(lVal.floatValue / rVal->floatValue);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
+        // 1.0 / "A" = XXX
+        throw (TypeError("Division is not implemented for FLOAT and STR"));
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
+        // "Hello" / 2 = "Hel"
+
+        lVal.stringValue[(strlen(lVal.stringValue) / rVal->intValue) + 1] = 0;
+        nVal->set(lVal.stringValue);
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
+        // "A" / 1.0 = XXX
+        throw (TypeError("Division is not implemented for STR and FLOAT"));
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
+        // "A" / "B" = XXX
+        throw (TypeError("Division is not implemented for STR and STR"));
+    }
+
+    if (lVal.getTrueType() == BOOL or rVal->getTrueType() == BOOL) {
+        // true / false = XXX
+        throw (TypeError("Division is not implemented for BOOL"));
+
+    }
     return nVal;
 };
