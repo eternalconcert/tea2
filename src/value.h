@@ -8,6 +8,7 @@ class Value {
 public:
     std::string unused;
     typeId type;
+    typeId getTrueType();
     int intValue;
     float floatValue;
     char *stringValue;
@@ -23,5 +24,6 @@ public:
 };
 
 Value* operator+(Value &lVal, Value *rVal);
+Value* operator-(Value &lVal, Value *rVal);
 
 #endif

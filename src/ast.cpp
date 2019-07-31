@@ -1,3 +1,4 @@
+#include <string.h>
 #include "ast.h"
 #include "exceptions.h"
 #include "scope.h"
@@ -68,7 +69,7 @@ void AstNode::addToChildList(AstNode *newNode) {
 
 ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
     if (value->type != type) {
-        throw (TypeError());
+        throw (TypeError("Types did not match"));
     }
 
     this->id = maxId;
@@ -96,11 +97,25 @@ ExpressionNode* ExpressionNode::run(Value *currentResult) {
     else  { // (this->childListHead != NULL)
             ExpressionNode *cur = (ExpressionNode*)this->childListHead;
             while (cur != NULL) {
+
                 Value& lVal = *this->value;
-                this->value = lVal + cur->value;
-                if (cur->value->type == IDENTIFIER) {
-                    this->value->intValue += constGlobal->valueStore[cur->value->identValue]->intValue;
+                Value *rVal = cur->value;
+
+                if (this->value->type == IDENTIFIER) {
+                    lVal = *constGlobal->valueStore[this->value->identValue];
                 }
+
+                if (cur->value->type == IDENTIFIER) {
+                    rVal = constGlobal->valueStore[cur->value->identValue];
+                }
+                if (!strcmp(cur->op, "+")) {
+                    this->value = lVal + rVal;
+                }
+
+                if (!strcmp(cur->op, "-")) {
+                    this->value = lVal - rVal;
+                }
+
                 cur = (ExpressionNode*)cur->next;
             }
         return this;

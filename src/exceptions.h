@@ -21,8 +21,8 @@ public:
 
 class TypeError: public std::exception {
 public:
-    TypeError() {
-        printf("TypeError!\n");
+    TypeError(std::string message) {
+        printf("TypeError! %s\n", message.c_str());
         exit(1);
     };
 };

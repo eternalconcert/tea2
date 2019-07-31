@@ -46,7 +46,9 @@ public:
     AstNode* evaluate() {
         Value *result = new Value();
         this->run(this->value);
-        printf("Evaluated %i\n", this->value->intValue);
+        printf("Evaluated ");
+        this->value->repr();
+        printf("\n");
     };
     ExpressionNode *run(Value *currentResult);
 };
