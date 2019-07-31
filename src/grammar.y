@@ -66,7 +66,7 @@ main(int argc, char *argv[0]) {
 }
 
 
-%token <sval> TOKPRINT TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKCONST
+%token <sval> TOKPRINT TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKEQUAL TOKNEQUAL TOKCONST
 
 %token <tval> TYPEIDENT
 %token <sval> TOKSTRING
@@ -139,6 +139,10 @@ operator:
     TOKTIMES
     |
     TOKDIVIDE
+    |
+    TOKEQUAL
+    |
+    TOKNEQUAL
     ;
 
 act_params: {

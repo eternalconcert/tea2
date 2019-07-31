@@ -27,5 +27,7 @@ Value* operator+(Value &lVal, Value *rVal);
 Value* operator-(Value &lVal, Value *rVal);
 Value* operator*(Value &lVal, Value *rVal);
 Value* operator/(Value &lVal, Value *rVal);
+Value* operator==(Value &lVal, Value *rVal);
+Value* operator!=(Value &lVal, Value *rVal);
 
 #endif

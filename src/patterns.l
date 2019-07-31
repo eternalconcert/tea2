@@ -15,6 +15,8 @@
 "-"                                     yylval.sval=strdup(yytext); return TOKMINUS;
 "*"                                     yylval.sval=strdup(yytext); return TOKTIMES;
 "\/"                                    yylval.sval=strdup(yytext); return TOKDIVIDE;
+"=="                                    yylval.sval=strdup(yytext); return TOKEQUAL;
+"!="                                    yylval.sval=strdup(yytext); return TOKNEQUAL;
 CONST                                   return TOKCONST;
 INT                                     yylval.tval=INT; return TYPEIDENT;
 FLOAT                                   yylval.tval=FLOAT; return TYPEIDENT;

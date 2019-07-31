@@ -325,3 +325,80 @@ Value* operator/(Value &lVal, Value *rVal) {
     }
     return nVal;
 };
+
+
+Value* operator==(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
+        // 1 == 1 = true
+        nVal->set(lVal.intValue == rVal->intValue);
+
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
+        // 1 == 1.0 = true
+        nVal->set(lVal.intValue == rVal->floatValue);
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
+        // 1 == "1" = true
+        std::string tempStr = std::to_string(lVal.intValue);
+        nVal->set(strcmp(tempStr.c_str(), rVal->stringValue) == 0);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
+        // 1.0 == 1 = true
+        nVal->set(lVal.floatValue == rVal->intValue);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == FLOAT) {
+        // 1.0 == 1.0 = true
+        nVal->set(lVal.floatValue == rVal->floatValue);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
+        // 1.0 == "1.0" = true
+        std::string tempStr = std::to_string(lVal.floatValue);
+        nVal->set(strcmp(tempStr.c_str(), rVal->stringValue) == 0);
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
+        // "1" == 1 = true
+        std::string tempStr = std::to_string(rVal->intValue);
+        nVal->set(strcmp(tempStr.c_str(), lVal.stringValue) == 0);
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
+        // "1.0" == 1.0 = true
+        std::string tempStr = std::to_string(rVal->floatValue);
+        nVal->set(strcmp(tempStr.c_str(), lVal.stringValue) == 0);
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
+        // "A" == "A" = true
+        nVal->set(strcmp(lVal.stringValue, rVal->stringValue) == 0);
+    }
+
+    if (lVal.getTrueType() == BOOL or rVal->getTrueType() == INT) {
+        // true == 1 = true
+        // true == 2 = true
+        // true == 0 = false
+        // true == -1 = false
+        nVal->set(bool(lVal.boolValue == (rVal->intValue > 0)));
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == BOOL or rVal->getTrueType() == BOOL) {
+        // true == true = true
+        nVal->set(lVal.boolValue == rVal->boolValue);
+
+    }
+    return nVal;
+};
+
+
+Value* operator!=(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    printf("%s\n", "Not implemented!");
+    return nVal;
+};

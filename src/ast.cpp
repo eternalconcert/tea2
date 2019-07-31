@@ -124,6 +124,14 @@ ExpressionNode* ExpressionNode::run(Value *currentResult) {
                     this->value = lVal / rVal;
                 }
 
+                if (!strcmp(cur->op, "==")) {
+                    this->value = lVal == rVal;
+                }
+
+                if (!strcmp(cur->op, "!=")) {
+                    this->value = lVal != rVal;
+                }
+
                 cur = (ExpressionNode*)cur->next;
             }
         return this;
