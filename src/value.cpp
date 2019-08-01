@@ -332,54 +332,63 @@ Value* operator==(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
         // 1 == 1 = true
         nVal->set(lVal.intValue == rVal->intValue);
+        return nVal;
 
     }
 
     if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
         // 1 == 1.0 = true
         nVal->set(lVal.intValue == rVal->floatValue);
+        return nVal;
     }
 
     if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
         // 1 == "1" = true
         std::string tempStr = std::to_string(lVal.intValue);
         nVal->set(strcmp(tempStr.c_str(), rVal->stringValue) == 0);
+        return nVal;
     }
 
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
         // 1.0 == 1 = true
         nVal->set(lVal.floatValue == rVal->intValue);
+        return nVal;
     }
 
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == FLOAT) {
         // 1.0 == 1.0 = true
         nVal->set(lVal.floatValue == rVal->floatValue);
+        return nVal;
     }
 
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
         // 1.0 == "1.0" = true
         std::string tempStr = std::to_string(lVal.floatValue);
         nVal->set(strcmp(tempStr.c_str(), rVal->stringValue) == 0);
+        return nVal;
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "1" == 1 = true
         std::string tempStr = std::to_string(rVal->intValue);
         nVal->set(strcmp(tempStr.c_str(), lVal.stringValue) == 0);
+        return nVal;
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
         // "1.0" == 1.0 = true
         std::string tempStr = std::to_string(rVal->floatValue);
         nVal->set(strcmp(tempStr.c_str(), lVal.stringValue) == 0);
+        return nVal;
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
         // "A" == "A" = true
         nVal->set(strcmp(lVal.stringValue, rVal->stringValue) == 0);
+        return nVal;
     }
 
-    if (lVal.getTrueType() == BOOL or rVal->getTrueType() == INT) {
+    if (lVal.getTrueType() == BOOL and rVal->getTrueType() == INT) {
         // true == 1 = true
         // true == 2 = true
         // true == 0 = false
@@ -388,17 +397,137 @@ Value* operator==(Value &lVal, Value *rVal) {
         return nVal;
     }
 
-    if (lVal.getTrueType() == BOOL or rVal->getTrueType() == BOOL) {
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == BOOL) {
+        //  1 == true = true
+        //  2 == true = true
+        //  0 == true = false
+        // -1 == true = false
+        nVal->set(bool((lVal.intValue > 0) == rVal->boolValue));
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == BOOL and rVal->getTrueType() == BOOL) {
         // true == true = true
         nVal->set(lVal.boolValue == rVal->boolValue);
-
+        return nVal;
     }
-    return nVal;
 };
 
 
 Value* operator!=(Value &lVal, Value *rVal) {
-    Value *nVal = new Value();
-    printf("%s\n", "Not implemented!");
+    Value *nVal = operator==(lVal, rVal);
+    nVal->boolValue = !(nVal->boolValue);
     return nVal;
+};
+
+Value* operator>(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
+        // 2 > 1 = true
+        nVal->set(lVal.intValue > rVal->intValue);
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
+        // 2 > 1.0 = true
+        nVal->set(lVal.intValue > rVal->floatValue);
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
+        // 1 > "AA" = false
+        nVal->set(lVal.intValue > strlen(rVal->stringValue));
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
+        // 2.0 > 1 = true
+        nVal->set(lVal.floatValue > rVal->intValue);
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == FLOAT) {
+        // 2.0 > 1.0 = true
+        nVal->set(lVal.floatValue > rVal->floatValue);
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
+        // 2.0 > "A" = true
+        nVal->set(lVal.floatValue > strlen(rVal->stringValue));
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
+        // "A" > 3 = false
+        nVal->set(strlen(lVal.stringValue) > rVal->intValue);
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
+        // "A" > 3.0 = false
+        nVal->set(strlen(lVal.stringValue) > rVal->floatValue);
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
+        // "AB" > "C" = true
+        nVal->set(strlen(lVal.stringValue) > strlen(rVal->stringValue));
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == BOOL and rVal->getTrueType() == INT) {
+        throw (TypeError("Size comparisons are not implemented for BOOL and INT"));
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == BOOL) {
+        throw (TypeError("Size comparisons are not implemented for INT and BOOL"));
+    }
+
+    if (lVal.getTrueType() == BOOL and rVal->getTrueType() == BOOL) {
+        // true > false = true
+        nVal->set(lVal.boolValue > rVal->boolValue);
+        return nVal;
+    }
+};
+
+
+Value* operator<(Value &lVal, Value *rVal) {
+    Value *nVal = operator==(lVal, rVal);
+    if (nVal->boolValue == true) {
+        nVal->set(false);
+        return nVal;
+    }
+    else {
+        nVal = operator>(lVal, rVal);
+        nVal->set(!(nVal->boolValue));
+        return nVal;
+    }
+};
+
+
+Value* operator>=(Value &lVal, Value *rVal) {
+    Value *nVal = operator==(lVal, rVal);
+    if (nVal->boolValue == true) {
+        nVal->set(true);
+        return nVal;
+    }
+    else {
+        nVal = operator>(lVal, rVal);
+        nVal->set(nVal->boolValue);
+        return nVal;
+    }
+};
+
+Value* operator<=(Value &lVal, Value *rVal) {
+    Value *nVal = operator==(lVal, rVal);
+    if (nVal->boolValue == true) {
+        nVal->set(true);
+        return nVal;
+    }
+    else {
+        nVal = operator<(lVal, rVal);
+        nVal->set(nVal->boolValue);
+        return nVal;
+    }
 };

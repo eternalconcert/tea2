@@ -17,6 +17,10 @@
 "\/"                                    yylval.sval=strdup(yytext); return TOKDIVIDE;
 "=="                                    yylval.sval=strdup(yytext); return TOKEQUAL;
 "!="                                    yylval.sval=strdup(yytext); return TOKNEQUAL;
+">"                                     yylval.sval=strdup(yytext); return TOKGT;
+">="                                    yylval.sval=strdup(yytext); return TOKGTE;
+"<"                                     yylval.sval=strdup(yytext); return TOKLT;
+"<="                                    yylval.sval=strdup(yytext); return TOKLTE;
 CONST                                   return TOKCONST;
 INT                                     yylval.tval=INT; return TYPEIDENT;
 FLOAT                                   yylval.tval=FLOAT; return TYPEIDENT;
