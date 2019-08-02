@@ -8,21 +8,31 @@ contexts:
   main:
     - match: \b(CONST|FN|return|for|if|else)\b
       scope: keyword.control
+
     - match: \b(INT|FLOAT|STR|BOOL|ARRAY|VOID|)\b
       scope: storage.type
 
     - match: \b(true|false|[0-9]+.[0-9]+|[0-9]+)\b
       scope: constant.language
+
+    - match: (\/\*)
+      push: multilineComment
+
     - match: (\+|\-|\=|\*|\/)
       scope: keyword.operator.assignment
+
     - match: (>|>=|<|<=|==|!=)
       scope: keyword.operator.assignment
+
     - match: ( in | and | or | xor | not )
       scope: keyword.operator.word
+
     - match: '(\w+)\s*(?=\()'
       scope: entity.name.type
+
     - match: '"'
       push: string
+
     - match: '#'
       push: comment
 
@@ -34,4 +44,9 @@ contexts:
   comment:
     - meta_scope: comment.line
     - match: \n
+      pop: true
+
+  multilineComment:
+    - meta_scope: comment.line
+    - match: (\*\/)
       pop: true

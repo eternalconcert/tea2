@@ -1,7 +1,6 @@
 *** Settings ***
-Documentation    Theses test cases are intended to check various situations during
-...              the start prpcess of the Tea interpreter.
-Resource           common.robot
+Documentation    Theses test cases are intended to check the printing function
+Resource           common.resource
 
 *** Test Cases ***
 Print string
@@ -94,7 +93,38 @@ Print concatendated blank with string
     ${result}  Given tea has been called with inline command: 'print("", "hello");'
     Then the result should be  "hello"  ${result}
 
-*** Keywords ***
-Tea has been called with inline command: ${command}
-    ${ret}  run process  ./tea -c ${command}  shell=True
-    [Return]  ${ret.stdout}
+Print simple expression
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'print(1 + 1);'
+    Then the result should be  "2"  ${result}
+
+Print simple expression with three operants
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'print(1 + 1 - 1);'
+    Then the result should be  "1"  ${result}
+
+Print expression with mixed operants
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'print(1 + "a");'
+    Then the result should be  "1a"  ${result}
+
+Print expression with mixed operants reverse
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'print("a" + 1);'
+    Then the result should be  "a1"  ${result}
+
+Print expression and other arguments
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'print(1 - 2, "hello" + " world", "!");'
+    Then the result should be  "-1hello world!"  ${result}
+
+Print constant
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'CONST STR hello = "Hello world!"; print(hello);'
+    Then the result should be  "Hello world!"  ${result}
+
+Print constant as expression operant
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'CONST INT a = 12; print(a * "x");'
+    Then the result should be  "xxxxxxxxxxxx"  ${result}
+

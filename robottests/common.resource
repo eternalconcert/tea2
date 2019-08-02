@@ -9,3 +9,7 @@ Tea has been called with paramters: ${paramters}
 Then the result should be
     [Arguments]     ${Expected}     ${Current}
     Should be equal  ${Expected}     "${Current}"
+
+Tea has been called with inline command: ${command}
+    ${ret}  run process  ./tea -c ${command}  shell=True
+    [Return]  ${ret.stdout}

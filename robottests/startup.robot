@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation    Theses test cases are intended to check various situations during
 ...              the start prpcess of the Tea interpreter.
-Resource           common.robot
+Resource           common.resource
 
 *** Test Cases ***
 No params

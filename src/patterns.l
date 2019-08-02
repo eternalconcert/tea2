@@ -3,11 +3,21 @@
     #include <stdlib.h>
     #include "src/ast.h"
     #include "y.tab.h"
+    std::string strbuf;
+
+
+//\"(\\.|[^"\\])*\"                       yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);return TOKSTRING; // Simple string.
+// <string>\\[0-7]*                       { strbuf += strtol(yytext+1, 0, 8); } // No idea..
 %}
 %option yylineno
-
+%x string
+%x multiLineComment
 %%
 "#".*                                   /* ignore comments TODO: Think about enforcing a blank after the # */;
+"/*"                                    { BEGIN multiLineComment; }
+<multiLineComment>[^*\n]+
+<multiLineComment>\n
+<multiLineComment>"*/"                  { BEGIN 0; }
 "="                                     return '=';
 ";"                                     return ';';
 ","                                     return ',';
@@ -33,7 +43,14 @@ print                                   return TOKPRINT;
 "("                                     return '(';
 ")"                                     return ')';
 [A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return TOKIDENT;
-\"(\\.|[^"\\])*\"                       yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);return TOKSTRING;
+
+\"                                      { BEGIN string; strbuf = ""; }
+<string>[^\\"\n]*                       { strbuf += yytext; }
+<string>\\n                             { strbuf += '\n'; }
+<string>\\t                             { strbuf += '\t'; }
+<string>\\[\\"]                         { strbuf += yytext[1]; }
+<string>\n                              { strbuf += '\n'; }
+<string>\"                              { yylval.sval = strdup(strbuf.c_str()); BEGIN 0; return TOKSTRING; }
 [+-]?[0-9]+                             yylval.ival=atoi(yytext); return TOKINTEGER;
 [+-]?[0-9]+\.[0-9]+                     yylval.fval=atof(yytext); return TOKFLOAT;
 \n                                      /* ignore EOL */;
