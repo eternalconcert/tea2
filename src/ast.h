@@ -40,15 +40,12 @@ public:
 
 class ExpressionNode: public AstNode {
 public:
-    Value *value;  // evaluated value
+    Value *value = new Value();  // evaluated value
     char *op;
-    ExpressionNode() {};
+
     AstNode* evaluate() {
-        Value *result = new Value();
         this->run(this->value);
-        printf("Evaluated ");
-        this->value->repr();
-        printf("\n");
+        return this;
     };
     ExpressionNode *run(Value *currentResult);
 };

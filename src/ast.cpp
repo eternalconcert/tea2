@@ -13,10 +13,10 @@ AstNode::AstNode() {
 
 
 AstNode* AstNode::evaluate() {
-    AstNode *cur = this->childListHead;
+    ExpressionNode *cur = (ExpressionNode*)this->childListHead;
     while (cur != NULL) {
         cur->evaluate();
-        cur = cur->next;
+        cur = (ExpressionNode*)cur->next;
     }
     return cur;
 }
@@ -41,7 +41,7 @@ PrintNode::PrintNode(AstNode *paramsHead) {
 
 
 AstNode* PrintNode::evaluate() {
-    AstNode *cur = this->childListHead->childListHead;
+    AstNode *cur = this->childListHead;
     while (cur != NULL) {
         ActParamNode *eval = (ActParamNode*)cur->evaluate();
         eval->value->repr();

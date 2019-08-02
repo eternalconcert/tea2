@@ -76,8 +76,8 @@ main(int argc, char *argv[0]) {
 %token <sval> TOKIDENT
 
 %type <sval> operator
-%type <valueObj> act_param expression literal
-%type <node> program statement const_declaration print_statement act_params expressions
+%type <valueObj> expression literal
+%type <node> program statement const_declaration print_statement act_params expressions act_param
 
 
 %%
@@ -154,31 +154,21 @@ operator:
     ;
 
 act_params: {
-        $$ = new AstNode();
+        $$ = new ActParamNode();
     };
     |
     act_param {
-        ActParamNode *param = new ActParamNode();
-        param->value = $1;
-        $$->addToChildList(param);
+        $$->addToChildList($1);
     }
     |
     act_params ',' act_param {
-        ActParamNode *param = new ActParamNode();
-        param->value = $3;
-        $$->addToChildList(param);
+        $$->addToChildList($3);
     }
     ;
 
 act_param:
-    literal {
+    expressions {
         $$ = $1;
-    }
-    |
-    TOKIDENT {
-        Value *valueObj = new Value();
-        valueObj->setIdent($1);
-        $$ = valueObj;
     }
     ;
 
