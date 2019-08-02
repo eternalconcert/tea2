@@ -44,8 +44,8 @@ public:
     char *op;
 
     AstNode* evaluate() {
-        this->run(this->value);
+        this->run();
         return this;
     };
-    ExpressionNode *run(Value *currentResult);
+    ExpressionNode *run();
 };

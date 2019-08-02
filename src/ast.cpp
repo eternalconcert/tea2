@@ -88,68 +88,64 @@ AstNode* ConstNode::evaluate() {
 };
 
 
-ExpressionNode* ExpressionNode::run(Value *currentResult) {
-    if (this->childListHead == NULL and this->op == NULL) {
-        this->value = currentResult;
-        return this;
+ExpressionNode* ExpressionNode::run() {
+    ExpressionNode *cur = (ExpressionNode*)this->childListHead;
+    while (cur != NULL) {
+        if (cur->op == NULL) {
+            return this;
+        }
+
+        Value& lVal = *this->value;
+        Value *rVal = cur->value;
+
+        if (this->value->type == IDENTIFIER) {
+            lVal = *constGlobal->valueStore[this->value->identValue];
+        }
+
+        if (cur->value->type == IDENTIFIER) {
+            rVal = constGlobal->valueStore[cur->value->identValue];
+        }
+        if (!strcmp(cur->op, "+")) {
+            this->value = lVal + rVal;
+        }
+
+        if (!strcmp(cur->op, "-")) {
+            this->value = lVal - rVal;
+        }
+
+        if (!strcmp(cur->op, "*")) {
+            this->value = lVal * rVal;
+        }
+
+        if (!strcmp(cur->op, "/")) {
+            this->value = lVal / rVal;
+        }
+
+        if (!strcmp(cur->op, "==")) {
+            this->value = lVal == rVal;
+        }
+
+        if (!strcmp(cur->op, "!=")) {
+            this->value = lVal != rVal;
+        }
+
+        if (!strcmp(cur->op, ">")) {
+            this->value = lVal > rVal;
+        }
+
+        if (!strcmp(cur->op, "<")) {
+            this->value = lVal < rVal;
+        }
+
+        if (!strcmp(cur->op, ">=")) {
+            this->value = lVal >= rVal;
+        }
+
+        if (!strcmp(cur->op, "<=")) {
+            this->value = lVal <= rVal;
+        }
+
+        cur = (ExpressionNode*)cur->next;
     }
-
-    else  { // (this->childListHead != NULL)
-            ExpressionNode *cur = (ExpressionNode*)this->childListHead;
-            while (cur != NULL) {
-
-                Value& lVal = *this->value;
-                Value *rVal = cur->value;
-
-                if (this->value->type == IDENTIFIER) {
-                    lVal = *constGlobal->valueStore[this->value->identValue];
-                }
-
-                if (cur->value->type == IDENTIFIER) {
-                    rVal = constGlobal->valueStore[cur->value->identValue];
-                }
-                if (!strcmp(cur->op, "+")) {
-                    this->value = lVal + rVal;
-                }
-
-                if (!strcmp(cur->op, "-")) {
-                    this->value = lVal - rVal;
-                }
-
-                if (!strcmp(cur->op, "*")) {
-                    this->value = lVal * rVal;
-                }
-
-                if (!strcmp(cur->op, "/")) {
-                    this->value = lVal / rVal;
-                }
-
-                if (!strcmp(cur->op, "==")) {
-                    this->value = lVal == rVal;
-                }
-
-                if (!strcmp(cur->op, "!=")) {
-                    this->value = lVal != rVal;
-                }
-
-                if (!strcmp(cur->op, ">")) {
-                    this->value = lVal > rVal;
-                }
-
-                if (!strcmp(cur->op, "<")) {
-                    this->value = lVal < rVal;
-                }
-
-                if (!strcmp(cur->op, ">=")) {
-                    this->value = lVal >= rVal;
-                }
-
-                if (!strcmp(cur->op, "<=")) {
-                    this->value = lVal <= rVal;
-                }
-
-                cur = (ExpressionNode*)cur->next;
-            }
-        return this;
-    }
+    return this;
 };

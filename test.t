@@ -1,1 +1,2 @@
-print(4 + 1, 5, "TEST");
+CONST INT a = 5;
+print(2 * a + 3);

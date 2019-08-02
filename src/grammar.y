@@ -167,17 +167,8 @@ act_params: {
     ;
 
 act_param:
-    expression {
-        ExpressionNode *expNode = new ExpressionNode();
-        expNode->value = $1;
-        $$ = expNode;
-    }
-    |
-    expressions operator expression {
-        ExpressionNode *child = new ExpressionNode();
-        child->op = $2;
-        child->value = $3;
-        $$->addToChildList(child);
+    expressions {
+        $$ = $1;
     }
     ;
 
