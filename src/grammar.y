@@ -65,10 +65,11 @@ main(int argc, char *argv[0]) {
     Value *valueObj;
 }
 
-%token <sval> TOKCONST
+
+%token TOKIF TOKCONST
+%token TOKPRINT TOKQUIT
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE
 %token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE
-%token <sval> TOKPRINT TOKQUIT
 
 %token <tval> TYPEIDENT
 %token <sval> TOKSTRING
@@ -79,32 +80,46 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> program statement const_declaration act_params expressions act_param builtin_function
+%type <node> program block statement statements if_statement const_declaration act_params expressions act_param builtin_function
 %type <node> print quit
 
 %%
 
 program:
-    statements {
-        $$ = root;
-    }
+    statements
     ;
 
-statements: /* empty */
-    | statements statement ';'
+statements: {
+        $$ = root;
+
+    }
+    | statements statement ';' {
+        $$->addToChildList($2);
+    }
     ;
 
 statement:
     builtin_function {
-        root->addToChildList($$);
+        $$ = $1;
     }
     | const_declaration {
-        root->addToChildList($$);
+        $$ = $1;
     }
     | expressions {
-        root->addToChildList($$);
+        $$ = $1;
+    }
+    |
+    if_statement {
+
     }
     ;
+
+block:
+    '{' statements '}' {
+        printf("%s\n", "Jojojko");
+    }
+    ;
+
 
 expressions:
     expression {
@@ -205,6 +220,12 @@ const_declaration:
     ConstNode *constant = new ConstNode($2, $3, $5);
     $$ = constant;
     }
+
+
+if_statement:
+    TOKIF '(' expressions ')' block {
+        $$ = $3;
+    };
 
 builtin_function:
     print
