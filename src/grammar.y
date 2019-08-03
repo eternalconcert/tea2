@@ -86,13 +86,13 @@ main(int argc, char *argv[0]) {
 %%
 
 program:
-    statements
-    ;
-
-statements: {
+    statements {
         $$ = root;
 
     }
+    ;
+
+statements:
     | statements statement ';' {
         $$->addToChildList($2);
     }
