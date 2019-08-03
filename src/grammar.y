@@ -65,8 +65,10 @@ main(int argc, char *argv[0]) {
     Value *valueObj;
 }
 
-
-%token <sval> TOKPRINT TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE TOKCONST
+%token <sval> TOKCONST
+%token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE
+%token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE
+%token <sval> TOKPRINT TOKQUIT
 
 %token <tval> TYPEIDENT
 %token <sval> TOKSTRING
@@ -77,8 +79,8 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> program statement const_declaration print_statement act_params expressions act_param
-
+%type <node> program statement const_declaration act_params expressions act_param builtin_function
+%type <node> print quit
 
 %%
 
@@ -93,7 +95,7 @@ statements: /* empty */
     ;
 
 statement:
-    print_statement {
+    builtin_function {
         root->addToChildList($$);
     }
     | const_declaration {
@@ -198,17 +200,33 @@ literal:
     }
     ;
 
-print_statement:
+const_declaration:
+    TOKCONST TYPEIDENT TOKIDENT '=' literal {
+    ConstNode *constant = new ConstNode($2, $3, $5);
+    $$ = constant;
+    }
+
+builtin_function:
+    print
+    |
+    quit
+
+print:
     TOKPRINT '(' act_params ')' {
         PrintNode *print = new PrintNode($3);
         $$ = print;
     }
     ;
 
-const_declaration:
-    TOKCONST TYPEIDENT TOKIDENT '=' literal {
-    ConstNode *constant = new ConstNode($2, $3, $5);
-    $$ = constant;
+quit:
+    TOKQUIT '(' TOKINTEGER ')' {
+        QuitNode *quit = new QuitNode($3);
+        $$ = quit;
+    }
+    |
+    TOKQUIT '('  ')' {
+        QuitNode *quit = new QuitNode(0);
+        $$ = quit;
     }
 
 %%

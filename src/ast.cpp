@@ -51,6 +51,16 @@ AstNode* PrintNode::evaluate() {
     return this;
 }
 
+QuitNode::QuitNode(int rc) {
+    this->rc = rc;
+    this->id = maxId;
+    maxId++;
+};
+
+
+AstNode* QuitNode::evaluate() {
+    exit(this->rc);
+};
 
 void AstNode::addToChildList(AstNode *newNode) {
     newNode->parent = this;

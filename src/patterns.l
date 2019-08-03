@@ -40,6 +40,7 @@ VOID                                    yylval.tval=VOID; return TYPEIDENT;
 true                                    yylval.bval=true; return TOKBOOL;
 false                                   yylval.bval=false; return TOKBOOL;
 print                                   return TOKPRINT;
+quit                                    return TOKQUIT;
 "("                                     return '(';
 ")"                                     return ')';
 [A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return TOKIDENT;

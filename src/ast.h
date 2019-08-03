@@ -28,6 +28,12 @@ public:
     PrintNode(AstNode *paramsHead);
 };
 
+class QuitNode: public AstNode {
+public:
+    int rc;
+    AstNode *evaluate();
+    QuitNode(int);
+};
 
 class ConstNode: public AstNode {
 public:
