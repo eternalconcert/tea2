@@ -51,15 +51,27 @@ AstNode* PrintNode::evaluate() {
     return this;
 }
 
-QuitNode::QuitNode(int rc) {
-    this->rc = rc;
+QuitNode::QuitNode(Value *rcValue) {
+    this->rcValue = rcValue;
     this->id = maxId;
     maxId++;
 };
 
 
 AstNode* QuitNode::evaluate() {
-    exit(this->rc);
+    switch (this->rcValue->type) {
+        case INT:
+            exit(this->rcValue->intValue);
+            break;
+        case IDENTIFIER:
+            Value *val = constGlobal->valueStore[this->rcValue->identValue];
+            if (val->getTrueType() != INT) {
+                throw (TypeError("Wrong type for exit function"));
+            }
+            exit(val->intValue);
+            break;
+    }
+
 };
 
 void AstNode::addToChildList(AstNode *newNode) {

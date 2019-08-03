@@ -30,9 +30,9 @@ public:
 
 class QuitNode: public AstNode {
 public:
-    int rc;
+    Value *rcValue;
     AstNode *evaluate();
-    QuitNode(int);
+    QuitNode(Value *rcValue);
 };
 
 class ConstNode: public AstNode {

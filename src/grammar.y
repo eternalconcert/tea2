@@ -220,13 +220,28 @@ print:
 
 quit:
     TOKQUIT '(' TOKINTEGER ')' {
-        QuitNode *quit = new QuitNode($3);
+        Value *valueObj = new Value();
+        valueObj->set($3);
+
+        QuitNode *quit = new QuitNode(valueObj);
+        $$ = quit;
+    }
+    |
+    TOKQUIT '(' TOKIDENT ')' {
+        Value *valueObj = new Value();
+        valueObj->setIdent($3);
+
+        QuitNode *quit = new QuitNode(valueObj);
         $$ = quit;
     }
     |
     TOKQUIT '('  ')' {
-        QuitNode *quit = new QuitNode(0);
+        Value *valueObj = new Value();
+        valueObj->set(0);
+
+        QuitNode *quit = new QuitNode(valueObj);
         $$ = quit;
     }
 
 %%
+
