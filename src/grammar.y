@@ -7,7 +7,7 @@
     #include <string.h>
 
     AstNode *root = new AstNode();
-    AstNode *curNode = root;
+    AstNode *curScope = root;
 
     extern FILE *yyin;
     extern int yylineno;
@@ -50,6 +50,8 @@ main(int argc, char *argv[0]) {
 
     yyparse();
     root->evaluate();
+    // curScope->evaluate();
+
 }
 
 %}
@@ -80,21 +82,18 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> program block statement statements if_statement const_declaration act_params expressions act_param builtin_function
+%type <node> block statement statements if_statement const_declaration act_params expressions act_param builtin_function
 %type <node> print quit
+
+%start statements
 
 %%
 
-program:
-    statements {
-        $$ = root;
-
+statements: {
+        $$ = curScope;
     }
-    ;
-
-statements:
     | statements statement ';' {
-        $$->addToChildList($2);
+        curScope->addToChildList($2);
     }
     ;
 
@@ -114,9 +113,11 @@ statement:
     }
     ;
 
-block:
+block:{
+        AstNode *n = new AstNode();
+        curScope = n;
+    }
     '{' statements '}' {
-        printf("%s\n", "Jojojko");
     }
     ;
 

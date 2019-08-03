@@ -4,6 +4,6 @@ print("Da");
 #quit(errorCode);
 print("Nicht da" + "!" * 2);
 
-# if (1 == 1) {
-#     print("yes");
-# };
+if (1) {
+    print("yes");
+};
