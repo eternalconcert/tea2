@@ -110,7 +110,7 @@ statement:
     }
     |
     if_statement {
-
+        $$ = $1;
     }
     ;
 
