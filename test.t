@@ -1,15 +1,11 @@
 CONST INT errorCode = 14;
 
 print("Da");
-#quit(errorCode);
 
-if (true) {
-    print("Nicht da" + "!");
-    print("Das auch noch!");
-    if (true) {
-        print("Verschachtelt!");
-    };
+CONST BOOL condition = true;
+
+if (1) {
+    print("Condition met!");
+} else {
+    print("Condition not met!");
 };
-
-
-print("Wieder da.");

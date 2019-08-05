@@ -38,6 +38,7 @@ STR                                     yylval.tval=STR; return TYPEIDENT;
 BOOL                                    yylval.tval=BOOL; return TYPEIDENT;
 VOID                                    yylval.tval=VOID; return TYPEIDENT;
 if                                      return TOKIF;
+else                                        return TOKELSE;
 true                                    yylval.bval=true; return TOKBOOL;
 false                                   yylval.bval=false; return TOKBOOL;
 print                                   return TOKPRINT;

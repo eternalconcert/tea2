@@ -113,10 +113,6 @@ AstNode* ConstNode::evaluate() {
 ExpressionNode* ExpressionNode::run() {
     ExpressionNode *cur = (ExpressionNode*)this->childListHead;
     while (cur != NULL) {
-        if (cur->op == NULL) {
-            return this;
-        }
-
         Value& lVal = *this->value;
         Value *rVal = cur->value;
 
@@ -127,6 +123,11 @@ ExpressionNode* ExpressionNode::run() {
         if (cur->value->type == IDENTIFIER) {
             rVal = constGlobal->valueStore[cur->value->identValue];
         }
+
+        if (cur->op == NULL) {
+            return this;
+        }
+
         if (!strcmp(cur->op, "+")) {
             this->value = lVal + rVal;
         }

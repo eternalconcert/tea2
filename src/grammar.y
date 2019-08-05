@@ -78,7 +78,7 @@ main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKCONST
+%token TOKIF TOKELSE TOKCONST
 %token TOKPRINT TOKQUIT
 %token TOKLBRACE TOKRBRACE
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE
@@ -241,6 +241,15 @@ if_statement:
         $$ = ifNode;
         ifNode->addToChildList($3);
         ifNode->addToChildList($6);
+    }
+    |
+    TOKIF '(' expressions ')' lbrace statements rbrace TOKELSE lbrace statements rbrace {
+        IfNode *ifNode = new IfNode();
+        $$ = ifNode;
+        ifNode->addToChildList($3);
+        ifNode->addToChildList($6);
+
+        ifNode->elseBlock = ($10);
     };
 
 builtin_function:

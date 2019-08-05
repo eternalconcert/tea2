@@ -59,11 +59,15 @@ public:
 
 class IfNode: public AstNode {
 public:
+    AstNode *elseBlock;
     AstNode *evaluate() {
         ExpressionNode *condition = (ExpressionNode*)this->childListHead->evaluate();
         if (condition->value->boolValue) {
             this->childListHead->next->evaluate();
         }
-        // return this;
+        else if (this->elseBlock != NULL) {
+            elseBlock->evaluate();
+        }
+        return this;
     };
 };

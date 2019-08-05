@@ -6,16 +6,19 @@
 
 void Value::set(char *value) {
     this->type = STR;
+    this->boolValue = strlen(value) > 0;
     this->stringValue = value;
 };
 
 void Value::set(int value) {
     this->type = INT;
+    this->boolValue = value > 0;
     this->intValue = value;
 };
 
 void Value::set(float value) {
     this->type = FLOAT;
+    this->boolValue = value > 0;
     this->floatValue = value;
 };
 
