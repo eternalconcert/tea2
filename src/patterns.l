@@ -44,8 +44,8 @@ print                                   return TOKPRINT;
 quit                                    return TOKQUIT;
 "("                                     return '(';
 ")"                                     return ')';
-"{"                                     return '{';
-"}"                                     return '}';
+"{"                                     return TOKLBRACE;
+"}"                                     return TOKRBRACE;
 [A-Za-z_][A-Za-z0-9_]*                  yylval.sval=strdup(yytext); return TOKIDENT;
 
 \"                                      { BEGIN string; strbuf = ""; }

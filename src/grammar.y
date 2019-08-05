@@ -9,6 +9,16 @@
     AstNode *root = new AstNode();
     AstNode *curScope = root;
 
+    void pushScope() {
+        AstNode *newScope =  new AstNode();
+        newScope->parent = curScope;
+        curScope = newScope;
+    };
+
+    void popScope() {
+        curScope = curScope->parent;
+    };
+
     extern FILE *yyin;
     extern int yylineno;
     extern char *yytext;
@@ -70,6 +80,7 @@ main(int argc, char *argv[0]) {
 
 %token TOKIF TOKCONST
 %token TOKPRINT TOKQUIT
+%token TOKLBRACE TOKRBRACE
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE
 %token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE
 
@@ -82,12 +93,22 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> block statement statements if_statement const_declaration act_params expressions act_param builtin_function
+%type <node> statement statements if_statement const_declaration act_params expressions act_param builtin_function
 %type <node> print quit
 
 %start statements
 
 %%
+
+lbrace:
+    TOKLBRACE {
+    pushScope();
+}
+
+rbrace:
+    TOKRBRACE {
+    popScope();
+}
 
 statements: {
         $$ = curScope;
@@ -112,20 +133,6 @@ statement:
         $$ = $1;
     }
     ;
-
-block: {
-        AstNode *n = new AstNode();
-        AstNode *o = new AstNode();
-        o = curScope;
-        n->parent = o;
-        curScope = n;
-    }
-    '{' statements '}' {
-        curScope->evaluate();
-        curScope = curScope->parent;
-    }
-    ;
-
 
 expressions:
     expression {
@@ -229,8 +236,10 @@ const_declaration:
 
 
 if_statement:
-    TOKIF '(' expressions ')' block {
-        $$ = $3;
+    TOKIF '(' expressions ')' lbrace statements rbrace {
+        IfNode *ifNode = new IfNode();
+        $$ = ifNode;
+        ifNode->addToChildList($6);
     };
 
 builtin_function:

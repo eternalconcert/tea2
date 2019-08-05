@@ -55,3 +55,12 @@ public:
     };
     ExpressionNode *run();
 };
+
+
+class IfNode: public AstNode {
+public:
+    AstNode *evaluate() {
+        printf("%s\n", "TEST");
+        // return this;
+    };
+};
