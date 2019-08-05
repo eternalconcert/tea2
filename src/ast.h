@@ -60,7 +60,8 @@ public:
 class IfNode: public AstNode {
 public:
     AstNode *evaluate() {
-        printf("%s\n", "TEST");
+        ExpressionNode *condition = (ExpressionNode*)this->childListHead->evaluate();
+        printf("%s\n", condition->value->boolValue);
         // return this;
     };
 };
