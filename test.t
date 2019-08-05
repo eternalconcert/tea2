@@ -3,8 +3,12 @@ CONST INT errorCode = 14;
 print("Da");
 #quit(errorCode);
 
-if (1) {
+if (true) {
     print("Nicht da" + "!");
+    print("Das auch noch!");
+    if (true) {
+        print("Verschachtelt!");
+    };
 };
 
 

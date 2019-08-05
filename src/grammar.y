@@ -239,6 +239,7 @@ if_statement:
     TOKIF '(' expressions ')' lbrace statements rbrace {
         IfNode *ifNode = new IfNode();
         $$ = ifNode;
+        ifNode->addToChildList($3);
         ifNode->addToChildList($6);
     };
 
