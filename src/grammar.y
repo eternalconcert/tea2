@@ -79,7 +79,7 @@ main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKCONST
-%token TOKPRINT TOKQUIT
+%token TOKPRINT TOKREADFILE TOKQUIT
 %token TOKLBRACE TOKRBRACE
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE
 %token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE
@@ -94,7 +94,7 @@ main(int argc, char *argv[0]) {
 %type <sval> operator
 %type <valueObj> expression literal
 %type <node> statement statements if_statement const_declaration act_params expressions act_param builtin_function
-%type <node> print quit
+%type <node> print readFile quit
 
 %start statements
 
@@ -255,6 +255,8 @@ if_statement:
 builtin_function:
     print
     |
+    readFile
+    |
     quit
 
 print:
@@ -263,6 +265,12 @@ print:
         $$ = print;
     }
     ;
+
+readFile:
+    TOKREADFILE '(' act_params ')' {
+        printf("%s\n", "readFile");
+        $$ = $3;
+    }
 
 quit:
     TOKQUIT '(' TOKINTEGER ')' {

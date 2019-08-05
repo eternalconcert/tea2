@@ -4,6 +4,8 @@ print("Da");
 
 CONST BOOL condition = true;
 
+readFile("test");
+
 if (1) {
     print("Condition met!");
 } else {
