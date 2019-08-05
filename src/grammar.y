@@ -113,11 +113,16 @@ statement:
     }
     ;
 
-block:{
+block: {
         AstNode *n = new AstNode();
+        AstNode *o = new AstNode();
+        o = curScope;
+        n->parent = o;
         curScope = n;
     }
     '{' statements '}' {
+        curScope->evaluate();
+        curScope = curScope->parent;
     }
     ;
 
