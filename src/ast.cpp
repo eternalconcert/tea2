@@ -65,7 +65,7 @@ AstNode* QuitNode::evaluate() {
             exit(this->rcValue->intValue);
             break;
         case IDENTIFIER:
-            // Value *val = constGlobal->valueStore[this->rcValue->identValue];
+            // Value *val = constGlobal->values[this->rcValue->identValue];
             Value *val = this->scope->valueStore->get(this->rcValue->identValue);
             if (val->getTrueType() != INT) {
                 throw (TypeError("Wrong type for exit function"));
@@ -104,10 +104,10 @@ ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
 
 
 AstNode* ConstNode::evaluate() {
-    if (constGlobal->valueStore.find(this->identifier) != constGlobal->valueStore.end()) {
+    if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError());
     }
-    constGlobal->valueStore[this->identifier] = this->value;
+    constGlobal->values[this->identifier] = this->value;
     return this;
 };
 
@@ -126,7 +126,7 @@ VarNode::VarNode(typeId type, char *identifier, Value *value, AstNode *scope) {
 
 
 AstNode* VarNode::evaluate() {
-    if (constGlobal->valueStore.find(this->identifier) != constGlobal->valueStore.end()) {
+    if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError());
     }
     this->scope->valueStore->set(this->identifier, this->value);
@@ -140,13 +140,14 @@ ExpressionNode* ExpressionNode::run() {
         Value& lVal = *this->value;
         Value *rVal = cur->value;
         if (this->value->type == IDENTIFIER) {
-            // lVal = *constGlobal->valueStore[this->value->identValue];
-            lVal = *this->scope->valueStore->get(this->value->identValue);
+            // lVal = *constGlobal->values[this->value->identValue];
+            lVal = *getFromValueStore(this->scope, this->value->identValue);
+            //lVal = *this->scope->valueStore->get(this->value->identValue);
         }
 
         if (cur->value->type == IDENTIFIER) {
-            // rVal = constGlobal->valueStore[cur->value->identValue];
-            rVal = this->scope->valueStore->get(cur->value->identValue);
+            // rVal = constGlobal->values[cur->value->identValue];
+            rVal = getFromValueStore(this->scope, cur->value->identValue);
         }
 
         if (cur->op == NULL) {
@@ -196,4 +197,21 @@ ExpressionNode* ExpressionNode::run() {
         cur = (ExpressionNode*)cur->next;
     }
     return this;
+};
+
+
+Value *getFromValueStore(AstNode *scope, char* ident) {
+    if (constGlobal->values[ident] != NULL) {
+        return constGlobal->values[ident];
+    }
+    Value *val = scope->valueStore->values[ident];
+    scope = scope->parent;
+    while (val == 0 and scope != NULL) {
+        val = scope->valueStore->values[ident];
+        scope = scope->parent;
+    }
+    if (!val) {
+        throw UnknownIdentifierError();
+    }
+    return val;
 };

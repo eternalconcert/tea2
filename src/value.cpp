@@ -54,7 +54,7 @@ typeId Value::getTrueType() {
         return (this->type);
     }
         printf("%s\n", "===");
-    return constGlobal->valueStore[this->identValue]->type;
+    return constGlobal->values[this->identValue]->type;
 }
 
 Value* operator+(Value &lVal, Value *rVal) {

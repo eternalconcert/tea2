@@ -88,3 +88,6 @@ public:
         return this;
     };
 };
+
+
+Value *getFromValueStore(AstNode *scope, char* ident);

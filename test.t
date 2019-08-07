@@ -3,6 +3,15 @@
 
 # readFile("test");
 
-INT t = 23;
+CONST STR a = "TEST";
+print(a);
 
-quit(t);
+
+
+if (true) {
+    if (true) {
+        INT t = 23;
+
+    };
+    print(a);
+};

@@ -6,18 +6,17 @@
 
 class ValueStore {
     public:
-        std::map <std::string, Value*> valueStore;
+        std::map <std::string, Value*> values;
 
         void set(std::string ident, Value* val) {
-            this->valueStore[ident] = val;
+            this->values[ident] = val;
         }
 
         Value* get(std::string ident) {
-            return this->valueStore[ident];
+            return this->values[ident];
         }
 };
 
 extern ValueStore *constGlobal;
-
 
 #endif
