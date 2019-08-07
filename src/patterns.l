@@ -1,7 +1,7 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include "src/ast.h"
+    #include "src/ast/ast.h"
     #include "y.tab.h"
     std::string strbuf;
 
@@ -13,7 +13,7 @@
 %x string
 %x multiLineComment
 %%
-"#".*                                   /* ignore comments TODO: Think about enforcing a blank after the # */;
+"//".*                                   /* ignore comments TODO: Think about enforcing a blank after the # */;
 "/*"                                    { BEGIN multiLineComment; }
 <multiLineComment>[^*\n]+
 <multiLineComment>\n

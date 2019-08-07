@@ -9,6 +9,7 @@ run:
 	./tea test.t
 
 clean:
+	find . -name "*.o" -delete
 	rm tea lex.yy.c y.tab.c y.tab.h
 
 .PHONY: tea

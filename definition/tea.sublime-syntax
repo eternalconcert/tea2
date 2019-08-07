@@ -18,6 +18,9 @@ contexts:
     - match: (\/\*)
       push: multilineComment
 
+    - match: (\/\/)
+      push: inlineComment
+
     - match: (\+|\-|\=|\*|\/)
       scope: keyword.operator.assignment
 
@@ -33,8 +36,6 @@ contexts:
     - match: '"'
       push: string
 
-    - match: '#'
-      push: comment
 
   string:
     - meta_scope: string.quoted.double.tea
@@ -44,6 +45,11 @@ contexts:
   comment:
     - meta_scope: comment.line
     - match: \n
+      pop: true
+
+  inlineComment:
+    - meta_scope: comment.line
+    - match: (\n)
       pop: true
 
   multilineComment:

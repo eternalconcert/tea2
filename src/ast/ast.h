@@ -1,7 +1,7 @@
 #include <string>
-#include "commons.h"
-#include "valuestore.h"
-#include "value.h"
+#include "../commons.h"
+#include "../valuestore.h"
+#include "../value.h"
 
 
 class AstNode {
@@ -20,8 +20,6 @@ public:
 class ActParamNode: public AstNode {
 public:
     Value *value;
-    AstNode* evaluate();
-    ActParamNode();
 };
 
 class PrintNode: public AstNode {
@@ -30,6 +28,7 @@ public:
     PrintNode(AstNode *paramsHead);
 };
 
+
 class QuitNode: public AstNode {
 public:
     Value *rcValue;
@@ -37,6 +36,7 @@ public:
     AstNode *scope;
     QuitNode(Value *rcValue, AstNode *scope);
 };
+
 
 class ConstNode: public AstNode {
 public:
@@ -62,14 +62,10 @@ public:
     Value *value = new Value();  // evaluated value
     char *op;
     AstNode *scope;
+    ExpressionNode(AstNode *scope);
+    AstNode* evaluate();
 
-    AstNode* evaluate() {
-        this->run();
-        return this;
-    };
-    ExpressionNode(AstNode *scope) {
-        this->scope = scope;
-    }
+private:
     ExpressionNode *run();
 };
 
@@ -77,16 +73,7 @@ public:
 class IfNode: public AstNode {
 public:
     AstNode *elseBlock;
-    AstNode *evaluate() {
-        ExpressionNode *condition = (ExpressionNode*)this->childListHead->evaluate();
-        if (condition->value->boolValue) {
-            this->childListHead->next->evaluate();
-        }
-        else if (this->elseBlock != NULL) {
-            elseBlock->evaluate();
-        }
-        return this;
-    };
+    AstNode *evaluate();
 };
 
 
