@@ -128,3 +128,12 @@ Print constant as expression operant
     ${result}  Given tea has been called with inline command: 'CONST INT a = 12; print(a * "x");'
     Then the result should be  "xxxxxxxxxxxx"  ${result}
 
+Print variable
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'STR hello = "Hello world!"; print(hello);'
+    Then the result should be  "Hello world!"  ${result}
+
+Print variable as expression operant
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'INT a = 12; print(a * "x");'
+    Then the result should be  "xxxxxxxxxxxx"  ${result}

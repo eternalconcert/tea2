@@ -1,13 +1,8 @@
-CONST INT errorCode = 14;
+# CONST INT errorCode = 14;
+# CONST BOOL condition = true;
 
-print("Da");
+# readFile("test");
 
-CONST BOOL condition = true;
+INT t = 23;
 
-readFile("test");
-
-if (1) {
-    print("Condition met!");
-} else {
-    print("Condition not met!");
-};
+quit(t);

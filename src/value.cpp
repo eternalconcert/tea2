@@ -1,6 +1,6 @@
 #include <string.h>
 #include "exceptions.h"
-#include "scope.h"
+#include "valuestore.h"
 #include "value.h"
 
 
@@ -46,14 +46,6 @@ void Value::repr() {
         case BOOL:
             printf("%s", this->boolValue ? "true" : "false");
             break;
-        case IDENTIFIER:
-            if (constGlobal->valueStore.find(this->identValue) != constGlobal->valueStore.end()) {
-                constGlobal->valueStore[this->identValue]->repr();
-            }
-            else {
-                throw (UnknownIdentifierError());
-            }
-            break;
     }
 }
 
@@ -61,6 +53,7 @@ typeId Value::getTrueType() {
     if (this->type != IDENTIFIER) {
         return (this->type);
     }
+        printf("%s\n", "===");
     return constGlobal->valueStore[this->identValue]->type;
 }
 

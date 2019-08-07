@@ -1,5 +1,6 @@
 #include <string>
 #include "commons.h"
+#include "valuestore.h"
 #include "value.h"
 
 
@@ -9,6 +10,7 @@ public:
     AstNode *childListHead = NULL;
     AstNode *next = NULL;
     AstNode *parent = NULL;
+    ValueStore *valueStore;
     void addToChildList(AstNode *newNode);
     virtual AstNode* evaluate();
     AstNode();
@@ -32,7 +34,8 @@ class QuitNode: public AstNode {
 public:
     Value *rcValue;
     AstNode *evaluate();
-    QuitNode(Value *rcValue);
+    AstNode *scope;
+    QuitNode(Value *rcValue, AstNode *scope);
 };
 
 class ConstNode: public AstNode {
@@ -44,15 +47,29 @@ public:
 };
 
 
+class VarNode: public AstNode {
+public:
+    VarNode(typeId type, char *identifier, Value *value, AstNode *scope);
+    char *identifier;
+    Value *value;
+    AstNode *scope;
+    AstNode *evaluate();
+};
+
+
 class ExpressionNode: public AstNode {
 public:
     Value *value = new Value();  // evaluated value
     char *op;
+    AstNode *scope;
 
     AstNode* evaluate() {
         this->run();
         return this;
     };
+    ExpressionNode(AstNode *scope) {
+        this->scope = scope;
+    }
     ExpressionNode *run();
 };
 

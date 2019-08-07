@@ -1,13 +1,13 @@
 #include <string.h>
 #include "ast.h"
 #include "exceptions.h"
-#include "scope.h"
 #include "value.h"
 
 int maxId = 0;
 
 AstNode::AstNode() {
     this->id = maxId;
+    this->valueStore = new ValueStore();
     maxId++;
 };
 
@@ -51,9 +51,10 @@ AstNode* PrintNode::evaluate() {
     return this;
 }
 
-QuitNode::QuitNode(Value *rcValue) {
+QuitNode::QuitNode(Value *rcValue, AstNode *scope) {
     this->rcValue = rcValue;
     this->id = maxId;
+    this->scope = scope;
     maxId++;
 };
 
@@ -64,7 +65,8 @@ AstNode* QuitNode::evaluate() {
             exit(this->rcValue->intValue);
             break;
         case IDENTIFIER:
-            Value *val = constGlobal->valueStore[this->rcValue->identValue];
+            // Value *val = constGlobal->valueStore[this->rcValue->identValue];
+            Value *val = this->scope->valueStore->get(this->rcValue->identValue);
             if (val->getTrueType() != INT) {
                 throw (TypeError("Wrong type for exit function"));
             }
@@ -110,18 +112,41 @@ AstNode* ConstNode::evaluate() {
 };
 
 
+VarNode::VarNode(typeId type, char *identifier, Value *value, AstNode *scope) {
+    if (value->type != type) {
+        throw (TypeError("Types did not match"));
+    }
+
+    this->id = maxId;
+    maxId++;
+    this->scope = scope;
+    this->identifier = identifier;
+    this->value = value;
+};
+
+
+AstNode* VarNode::evaluate() {
+    if (constGlobal->valueStore.find(this->identifier) != constGlobal->valueStore.end()) {
+        throw (ConstError());
+    }
+    this->scope->valueStore->set(this->identifier, this->value);
+    return this;
+};
+
+
 ExpressionNode* ExpressionNode::run() {
     ExpressionNode *cur = (ExpressionNode*)this->childListHead;
     while (cur != NULL) {
         Value& lVal = *this->value;
         Value *rVal = cur->value;
-
         if (this->value->type == IDENTIFIER) {
-            lVal = *constGlobal->valueStore[this->value->identValue];
+            // lVal = *constGlobal->valueStore[this->value->identValue];
+            lVal = *this->scope->valueStore->get(this->value->identValue);
         }
 
         if (cur->value->type == IDENTIFIER) {
-            rVal = constGlobal->valueStore[cur->value->identValue];
+            // rVal = constGlobal->valueStore[cur->value->identValue];
+            rVal = this->scope->valueStore->get(cur->value->identValue);
         }
 
         if (cur->op == NULL) {

@@ -93,7 +93,7 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> statement statements if_statement const_declaration act_params expressions act_param builtin_function
+%type <node> statement statements if_statement const_declaration var_declaration act_params expressions act_param builtin_function
 %type <node> print readFile quit
 
 %start statements
@@ -125,6 +125,9 @@ statement:
     | const_declaration {
         $$ = $1;
     }
+    | var_declaration {
+        $$ = $1;
+    }
     | expressions {
         $$ = $1;
     }
@@ -136,13 +139,13 @@ statement:
 
 expressions:
     expression {
-        ExpressionNode *expNode = new ExpressionNode();
+        ExpressionNode *expNode = new ExpressionNode(curScope);
         expNode->value = $1;
         $$ = expNode;
     }
     |
     expressions operator expression {
-        ExpressionNode *child = new ExpressionNode();
+        ExpressionNode *child = new ExpressionNode(curScope);
         child->op = $2;
         child->value = $3;
         $$->addToChildList(child);
@@ -234,6 +237,11 @@ const_declaration:
     $$ = constant;
     }
 
+var_declaration:
+    TYPEIDENT TOKIDENT '=' literal {
+    VarNode *variable = new VarNode($1, $2, $4, curScope);
+    $$ = variable;
+    }
 
 if_statement:
     TOKIF '(' expressions ')' lbrace statements rbrace {
@@ -277,7 +285,7 @@ quit:
         Value *valueObj = new Value();
         valueObj->set($3);
 
-        QuitNode *quit = new QuitNode(valueObj);
+        QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;
     }
     |
@@ -285,7 +293,7 @@ quit:
         Value *valueObj = new Value();
         valueObj->setIdent($3);
 
-        QuitNode *quit = new QuitNode(valueObj);
+        QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;
     }
     |
@@ -293,7 +301,7 @@ quit:
         Value *valueObj = new Value();
         valueObj->set(0);
 
-        QuitNode *quit = new QuitNode(valueObj);
+        QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;
     }
 
