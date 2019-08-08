@@ -4,20 +4,24 @@
 
 typeId getTypeIdByName(std::string name) {
 
-    if (name == "INT"){
+    if (name == "INT") {
         return INT;
     }
 
-    if (name == "FLOAT"){
+    if (name == "FLOAT") {
         return FLOAT;
     }
 
-    if (name == "STR"){
+    if (name == "STR") {
         return STR;
     }
 
-    if (name == "BOOL"){
+    if (name == "BOOL") {
         return BOOL;
+    }
+
+    if (name == "VOID") {
+        return VOID:
     }
 
     if (name == "IDENTIFIER") {

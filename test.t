@@ -1,3 +1,4 @@
+CONST STR TEXT = "454545 ";
 STR a = "Hallo";
 STR b = " Welt!";
 STR c = a + b;
