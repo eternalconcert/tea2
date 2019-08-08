@@ -1,3 +1,4 @@
-INT a = 1;
-INT b = 2;
-print(a, b);
+STR a = "Hallo";
+STR b = " Welt!";
+STR c = a + b;
+print(c + "\n" + c);

@@ -140,5 +140,5 @@ Print variable as expression operant
 
 Print multiple variables
     [Tags]    printing
-    ${result}  Given tea has been called with inline command: 'INT a = 1; INT b = 2; print(a, b);'
-    Then the result should be  "12"  ${result}
+    ${result}  Given tea has been called with inline command: 'INT a = 4; INT b = 2; print(a, b);'
+    Then the result should be  "42"  ${result}

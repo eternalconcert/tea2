@@ -162,7 +162,7 @@ expression:
     |
     TOKIDENT {
         Value *valueObj = new Value();
-        valueObj->setIdent($1);
+        valueObj->setIdent($1, curScope);
         $$ = valueObj;
     }
     ;
@@ -302,7 +302,7 @@ quit:
     |
     TOKQUIT '(' TOKIDENT ')' {
         Value *valueObj = new Value();
-        valueObj->setIdent($3);
+        valueObj->setIdent($3, curScope);
 
         QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;

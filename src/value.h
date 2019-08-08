@@ -4,9 +4,13 @@
 #include <string>
 #include "commons.h"
 
+class AstNode;
+
+
 class Value {
 public:
     std::string unused;
+    AstNode *scope;
     typeId type;
     typeId getTrueType();
     int intValue;
@@ -19,7 +23,7 @@ public:
     void set(int value);
     void set(float value);
     void set(bool value);
-    void setIdent(char *value);
+    void setIdent(char *value, AstNode *scope);
     void repr();
 };
 

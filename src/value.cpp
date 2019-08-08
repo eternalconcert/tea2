@@ -1,5 +1,6 @@
 #include <string.h>
 #include "exceptions.h"
+#include "ast/ast.h"
 #include "valuestore.h"
 #include "value.h"
 
@@ -27,7 +28,8 @@ void Value::set(bool value) {
     this->boolValue = value;
 };
 
-void Value::setIdent(char *value) {
+void Value::setIdent(char *value, AstNode *scope) {
+    this->scope = scope;
     this->type = IDENTIFIER;
     this->identValue = value;
 };
@@ -47,7 +49,7 @@ void Value::repr() {
             printf("%s", this->boolValue ? "true" : "false");
             break;
         case IDENTIFIER:
-            printf("%i", this->intValue);
+            getFromValueStore(this->scope, this->identValue)->repr();
             break;
     }
 }
@@ -56,7 +58,8 @@ typeId Value::getTrueType() {
     if (this->type != IDENTIFIER) {
         return (this->type);
     }
-    return constGlobal->values[this->identValue]->type;
+    // else: Identifier
+    return getFromValueStore(this->scope, this->identValue)->type;
 }
 
 Value* operator+(Value &lVal, Value *rVal) {
