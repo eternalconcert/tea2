@@ -93,7 +93,7 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> statement statements if_statement const_declaration var_declaration act_params expressions act_param builtin_function
+%type <node> statement statements if_statement const_declaration var_declaration var_assignment act_params expressions act_param builtin_function
 %type <node> print readFile quit
 
 %start statements
@@ -126,6 +126,9 @@ statement:
         $$ = $1;
     }
     | var_declaration {
+        $$ = $1;
+    }
+    | var_assignment {
         $$ = $1;
     }
     | expressions {
@@ -236,11 +239,19 @@ const_declaration:
     ConstNode *constant = new ConstNode($2, $3, $5);
     $$ = constant;
     }
+    ;
 
 var_declaration:
     TYPEIDENT TOKIDENT '=' literal {
     VarNode *variable = new VarNode($1, $2, $4, curScope);
     $$ = variable;
+    }
+    ;
+
+var_assignment:
+    TOKIDENT '=' literal {
+        VarAssignmentNode *variable = new VarAssignmentNode($1, $3, curScope);
+        $$ = variable;
     }
 
 if_statement:

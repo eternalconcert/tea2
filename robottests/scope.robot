@@ -33,6 +33,25 @@ Scope violation access
     ${result}  Given tea has been called with inline command: ${command}
     Then the result should be  "UnknownIdentifierError: c"  ${result}
 
+Scope violation in assignment
+    [Tags]    scope
+    ${command}    Catenate    '
+        ...    if (true) {
+        ...        INT d = 23;
+        ...    };
+        ...    d = 5;'
+    ${result}  Given tea has been called with inline command: ${command}
+    Then the result should be  "UnknownIdentifierError: d"  ${result}
+
+No scope violation in assignment
+    [Tags]    scope
+    ${command}    Catenate    '
+        ...    STR d = "hello";
+        ...    d = "world!";
+        ...    print(d);'
+    ${result}  Given tea has been called with inline command: ${command}
+    Then the result should be  "world!"  ${result}
+
 No scope violation access for constants
     [Tags]    scope
     ${command}    Catenate    '

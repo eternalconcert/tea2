@@ -1,15 +1,12 @@
-// CONST INT errorCode = 14;
-// CONST BOOL condition = true;
-
-/* readFile("test"); */
-
-CONST STR a = "TEST//adasd";
-
+INT a = 12;
+a = 1;
 print(a);
 
+INT t = 23;
 if (true) {
     if (true) {
-        INT t = 23;
-
     };
+    print(t);
+    t = 12;
 };
+print(t);

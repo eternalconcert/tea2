@@ -64,3 +64,18 @@ Value *getFromValueStore(AstNode *scope, char* ident) {
     }
     return val;
 };
+
+
+AstNode *getValueScope(AstNode *scope, char* ident) {
+    if (scope->valueStore->values[ident]) {
+        return scope;
+    }
+    else {
+        if (scope->parent != NULL) {
+            return getValueScope(scope->parent, ident);
+        }
+        else {
+            throw UnknownIdentifierError(ident);
+        }
+    }
+};

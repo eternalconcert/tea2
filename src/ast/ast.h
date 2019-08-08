@@ -56,6 +56,15 @@ public:
     AstNode *evaluate();
 };
 
+class VarAssignmentNode: public AstNode {
+public:
+    VarAssignmentNode(char *identifier, Value *value, AstNode *scope);
+    char *identifier;
+    Value *value;
+    AstNode *scope;
+    AstNode *evaluate();
+};
+
 
 class ExpressionNode: public AstNode {
 public:
@@ -78,3 +87,4 @@ public:
 
 
 Value *getFromValueStore(AstNode *scope, char* ident);
+AstNode *getValueScope(AstNode *scope, char* ident);
