@@ -242,14 +242,14 @@ const_declaration:
     ;
 
 var_declaration:
-    TYPEIDENT TOKIDENT '=' literal {
+    TYPEIDENT TOKIDENT '=' expressions {
     VarNode *variable = new VarNode($1, $2, $4, curScope);
     $$ = variable;
     }
     ;
 
 var_assignment:
-    TOKIDENT '=' literal {
+    TOKIDENT '=' expressions {
         VarAssignmentNode *variable = new VarAssignmentNode($1, $3, curScope);
         $$ = variable;
     }

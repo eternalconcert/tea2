@@ -19,13 +19,10 @@ ExpressionNode* ExpressionNode::run() {
         Value& lVal = *this->value;
         Value *rVal = cur->value;
         if (this->value->type == IDENTIFIER) {
-            // lVal = *constGlobal->values[this->value->identValue];
             lVal = *getFromValueStore(this->scope, this->value->identValue);
-            //lVal = *this->scope->valueStore->get(this->value->identValue);
         }
 
         if (cur->value->type == IDENTIFIER) {
-            // rVal = constGlobal->values[cur->value->identValue];
             rVal = getFromValueStore(this->scope, cur->value->identValue);
         }
 

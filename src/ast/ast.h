@@ -47,25 +47,6 @@ public:
 };
 
 
-class VarNode: public AstNode {
-public:
-    VarNode(typeId type, char *identifier, Value *value, AstNode *scope);
-    char *identifier;
-    Value *value;
-    AstNode *scope;
-    AstNode *evaluate();
-};
-
-class VarAssignmentNode: public AstNode {
-public:
-    VarAssignmentNode(char *identifier, Value *value, AstNode *scope);
-    char *identifier;
-    Value *value;
-    AstNode *scope;
-    AstNode *evaluate();
-};
-
-
 class ExpressionNode: public AstNode {
 public:
     Value *value = new Value();  // evaluated value
@@ -78,6 +59,25 @@ private:
     ExpressionNode *run();
 };
 
+
+class VarNode: public AstNode {
+public:
+    VarNode(typeId type, char *identifier, AstNode *exp, AstNode *scope);
+    typeId type;
+    char *identifier;
+    ExpressionNode *rExp;
+    AstNode *scope;
+    AstNode *evaluate();
+};
+
+class VarAssignmentNode: public AstNode {
+public:
+    VarAssignmentNode(char *identifier, AstNode *exp, AstNode *scope);
+    char *identifier;
+    ExpressionNode *rExp;
+    AstNode *scope;
+    AstNode *evaluate();
+};
 
 class IfNode: public AstNode {
 public:

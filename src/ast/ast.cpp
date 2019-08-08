@@ -54,8 +54,7 @@ Value *getFromValueStore(AstNode *scope, char* ident) {
         return constGlobal->values[ident];
     }
     Value *val = scope->valueStore->values[ident];
-    scope = scope->parent;
-    while (val == 0 and scope != NULL) {
+    while (val == NULL and scope != NULL) {
         val = scope->valueStore->values[ident];
         scope = scope->parent;
     }

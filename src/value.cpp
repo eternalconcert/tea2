@@ -46,6 +46,9 @@ void Value::repr() {
         case BOOL:
             printf("%s", this->boolValue ? "true" : "false");
             break;
+        case IDENTIFIER:
+            printf("%i", this->intValue);
+            break;
     }
 }
 
@@ -53,7 +56,6 @@ typeId Value::getTrueType() {
     if (this->type != IDENTIFIER) {
         return (this->type);
     }
-        printf("%s\n", "===");
     return constGlobal->values[this->identValue]->type;
 }
 

@@ -137,3 +137,8 @@ Print variable as expression operant
     [Tags]    printing
     ${result}  Given tea has been called with inline command: 'INT a = 12; print(a * "x");'
     Then the result should be  "xxxxxxxxxxxx"  ${result}
+
+Print multiple variables
+    [Tags]    printing
+    ${result}  Given tea has been called with inline command: 'INT a = 1; INT b = 2; print(a, b);'
+    Then the result should be  "12"  ${result}
