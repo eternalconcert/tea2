@@ -14,7 +14,9 @@ AstNode* PrintNode::evaluate() {
     AstNode *cur = this->childListHead;
     while (cur != NULL) {
         ActParamNode *eval = (ActParamNode*)cur->evaluate();
-        eval->value->repr();
+        if (eval) {
+            eval->value->repr();
+        }
         cur = cur->next;
     }
     printf("\n");

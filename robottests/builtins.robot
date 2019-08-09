@@ -75,8 +75,8 @@ Print concatenated mixed type
 
 Print without param
     [Tags]    printing
-    ${result}  Given tea has been called with inline command: 'print();'
-    Then the result should be  ""  ${result}
+    ${result}  Given tea has been called with inline command: 'print(1); print(); print(1);'
+    Then the result should be  "1\n\n1"  ${result}
 
 Print blank
     [Tags]    printing

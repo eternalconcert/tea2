@@ -209,8 +209,8 @@ return_stmt:
     }
     ;
 
-act_params: {
-        $$ = new ActParamNode();
+act_params: /* empty */ {
+        $$ = new AstNode();
     };
     |
     act_param {

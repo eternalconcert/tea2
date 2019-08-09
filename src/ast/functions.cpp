@@ -24,7 +24,7 @@ AstNode *FnNode::evaluate() {
 AstNode *FnNode::run() {
     this->childListHead->evaluate();
     Value *val = new Value();
-    val->set("---");
+    val->set(1);
     this->value = val;
     return this;
 };
