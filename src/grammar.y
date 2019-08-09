@@ -92,7 +92,7 @@ main(int argc, char *argv[0]) {
 %token <sval> TOKIDENT
 
 %type <sval> operator
-%type <valueObj> expression literal
+%type <valueObj> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt const_declaration
 %type <node> var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
 %type <node> print readFile quit
@@ -173,6 +173,10 @@ expression:
         Value *valueObj = new Value();
         valueObj->setIdent($1, curScope);
         $$ = valueObj;
+    }
+    |
+    fn_call {
+        $$ = $1;
     }
     ;
 
@@ -270,6 +274,13 @@ fn_declaration:
         fnNode->addToChildList($7);
         $$ = fnNode;
 };
+
+fn_call:
+    TOKIDENT '(' /* act_params */ ')' {
+        Value *fnCall = new Value();
+        fnCall->setFnCall($1, curScope);
+        $$ = fnCall;
+    }
 
 var_assignment:
     TOKIDENT '=' expressions {

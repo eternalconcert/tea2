@@ -39,9 +39,16 @@ void Value::setIdent(char *value, AstNode *scope) {
     this->identValue = value;
 };
 
-void Value::setFn(char *value, AstNode *scope) {
+void Value::setFn(char *value, AstNode *scope, AstNode *block) {
     this->scope = scope;
+    this->block = block;
     this->type = FUNCTION;
+    this->identValue = value;
+};
+
+void Value::setFnCall(char *value, AstNode *scope) {
+    this->scope = scope;
+    this->type = FUNCTIONCALL;
     this->identValue = value;
 };
 

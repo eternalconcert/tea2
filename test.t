@@ -1,6 +1,6 @@
 INT FN addNumber() {
-    print(12);
-    return 12;
+    print(34556);
+    1;
 };
 
-print(addNumber);
+print();

@@ -19,6 +19,7 @@ public:
     bool boolValue;
     char *identValue;
     bool assigned = true;
+    AstNode *block;
 
     void set(typeId type);  // Set empty
     void set(char *value);
@@ -26,7 +27,8 @@ public:
     void set(float value);
     void set(bool value);
     void setIdent(char *value, AstNode *scope);
-    void setFn(char *value, AstNode *scope);
+    void setFn(char *value, AstNode *scope, AstNode *block);
+    void setFnCall(char *value, AstNode *scope);
     void repr();
 };
 

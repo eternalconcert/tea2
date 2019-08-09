@@ -26,6 +26,13 @@ ExpressionNode* ExpressionNode::run() {
             rVal = getFromValueStore(this->scope, cur->value->identValue);
         }
 
+        if (this->value->type == FUNCTIONCALL) {
+            Value *v = getFromValueStore(this->scope, this->value->identValue);
+            FnNode *eval = (FnNode*)v->block;
+            eval->run();
+            lVal = *eval->value;
+        }
+
         if (cur->op == NULL) {
             return this;
         }

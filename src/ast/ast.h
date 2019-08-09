@@ -102,17 +102,9 @@ public:
     typeId type;
     char *identifier;
     AstNode *scope;
+    Value *value;
     AstNode *evaluate();
-};
-
-
-class FnClNode: public AstNode {
-public:
-    FnClNode(char *identifier, AstNode *scope);
-    char *identifier;
-    AstNode *scope;
-    Value *value = new Value();  // evaluated value
-    AstNode *evaluate();
+    AstNode *run();
 };
 
 

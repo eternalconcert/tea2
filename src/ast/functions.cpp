@@ -15,7 +15,16 @@ AstNode *FnNode::evaluate() {
         throw (ConstError(this->identifier));
     }
     Value *val = new Value();
-    val->setFn(this->identifier, this->scope);
+    val->setFn(this->identifier, this->scope, this->childListHead);
     this->scope->valueStore->set(this->identifier, val);
-    return this->childListHead->evaluate();
+    return this;
+};
+
+
+AstNode *FnNode::run() {
+    this->childListHead->evaluate();
+    Value *val = new Value();
+    val->set("---");
+    this->value = val;
+    return this;
 };

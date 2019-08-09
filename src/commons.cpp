@@ -27,6 +27,15 @@ typeId getTypeIdByName(std::string name) {
     if (name == "IDENTIFIER") {
         return IDENTIFIER;
     }
+
+    if (name == "FUNCTION") {
+        return FUNCTION;
+    }
+
+    if (name == "FUNCTIONCALL") {
+        return FUNCTIONCALL;
+    }
+
 };
 
 std::string getTypeNameById(typeId id) {
@@ -52,5 +61,13 @@ std::string getTypeNameById(typeId id) {
 
         case IDENTIFIER:
             return "IDENTIFIER";
+
+        case FUNCTION:
+            return "FUNCTION";
+
+        case FUNCTIONCALL:
+            return "FUNCTIONCALL";
+
+
     };
 };
