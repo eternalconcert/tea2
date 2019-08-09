@@ -5,6 +5,11 @@
 #include "value.h"
 
 
+void Value::set(typeId type) {
+    this->type = type;
+    this->assigned = false;
+};
+
 void Value::set(char *value) {
     this->type = STR;
     this->boolValue = strlen(value) > 0;

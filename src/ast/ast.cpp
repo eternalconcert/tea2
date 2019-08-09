@@ -61,6 +61,9 @@ Value *getFromValueStore(AstNode *scope, char* ident) {
     if (!val) {
         throw UnknownIdentifierError(ident);
     }
+    if (!val->assigned) {
+        throw UnassignedIdentifierError(ident);
+    }
     return val;
 };
 

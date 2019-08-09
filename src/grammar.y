@@ -93,7 +93,7 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> statement statements if_statement const_declaration var_declaration var_assignment act_params expressions act_param builtin_function
+%type <node> statement statements if_statement const_declaration var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
 %type <node> print readFile quit
 
 %start statements
@@ -129,6 +129,9 @@ statement:
         $$ = $1;
     }
     | var_assignment {
+        $$ = $1;
+    }
+    | var_declaration_assignment {
         $$ = $1;
     }
     | expressions {
@@ -242,8 +245,8 @@ const_declaration:
     ;
 
 var_declaration:
-    TYPEIDENT TOKIDENT '=' expressions {
-    VarNode *variable = new VarNode($1, $2, $4, curScope);
+    TYPEIDENT TOKIDENT {
+    VarDeclarationNode *variable = new VarDeclarationNode($1, $2, curScope);
     $$ = variable;
     }
     ;
@@ -253,6 +256,13 @@ var_assignment:
         VarAssignmentNode *variable = new VarAssignmentNode($1, $3, curScope);
         $$ = variable;
     }
+
+var_declaration_assignment:
+    TYPEIDENT TOKIDENT '=' expressions {
+    VarNode *variable = new VarNode($1, $2, $4, curScope);
+    $$ = variable;
+    }
+    ;
 
 if_statement:
     TOKIF '(' expressions ')' lbrace statements rbrace {

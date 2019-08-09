@@ -70,6 +70,16 @@ public:
     AstNode *evaluate();
 };
 
+
+class VarDeclarationNode: public AstNode {
+public:
+    VarDeclarationNode(typeId type, char *identifier, AstNode *scope);
+    typeId type;
+    char *identifier;
+    AstNode *scope;
+    AstNode *evaluate();
+};
+
 class VarAssignmentNode: public AstNode {
 public:
     VarAssignmentNode(char *identifier, AstNode *exp, AstNode *scope);

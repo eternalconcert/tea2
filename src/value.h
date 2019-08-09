@@ -18,7 +18,9 @@ public:
     char *stringValue;
     bool boolValue;
     char *identValue;
+    bool assigned = true;
 
+    void set(typeId type);  // Set empty
     void set(char *value);
     void set(int value);
     void set(float value);

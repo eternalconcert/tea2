@@ -21,7 +21,7 @@ typeId getTypeIdByName(std::string name) {
     }
 
     if (name == "VOID") {
-        return VOID:
+        return VOID;
     }
 
     if (name == "IDENTIFIER") {

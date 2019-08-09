@@ -32,6 +32,25 @@ AstNode* VarNode::evaluate() {
 };
 
 
+VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *scope) {
+    this->type = type;
+    this->scope = scope;
+    this->identifier = identifier;
+    AstNode();
+};
+
+
+AstNode* VarDeclarationNode::evaluate() {
+    if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
+        throw (ConstError(this->identifier));
+    }
+    Value *val = new Value();
+    val->set(this->type);
+    this->scope->valueStore->set(this->identifier, val);
+    return this;
+};
+
+
 VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *scope) {
     this->rExp = (ExpressionNode*)exp;
     this->scope = scope;
@@ -39,11 +58,19 @@ VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *sc
     AstNode();
 };
 
+
 AstNode* VarAssignmentNode::evaluate() {
     ExpressionNode *evalExp = (ExpressionNode*)this->rExp->evaluate();
     Value *val = evalExp->value;
 
     AstNode *valScope = getValueScope(this->scope, this->identifier);
+
+    typeId ownType = valScope->valueStore->get(this->identifier)->type;
+
+    if (val->type != ownType) {
+        throw (TypeError("Types did not match"));
+    }
+
     valScope->valueStore->set(this->identifier, val);
     return this;
 };
