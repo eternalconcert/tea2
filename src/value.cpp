@@ -39,6 +39,13 @@ void Value::setIdent(char *value, AstNode *scope) {
     this->identValue = value;
 };
 
+void Value::setFn(char *value, AstNode *scope) {
+    this->scope = scope;
+    this->type = FUNCTION;
+    this->identValue = value;
+};
+
+
 void Value::repr() {
     switch (this->type) {
         case STR:
@@ -56,14 +63,17 @@ void Value::repr() {
         case IDENTIFIER:
             getFromValueStore(this->scope, this->identValue)->repr();
             break;
+        case FUNCTION:
+            printf("Function: %s", this->identValue);
+            break;
     }
 }
 
 typeId Value::getTrueType() {
-    if (this->type != IDENTIFIER) {
+    if ((this->type != IDENTIFIER) and (this->type != FUNCTION)) {
         return (this->type);
     }
-    // else: Identifier
+    // else: Identifier or function
     return getFromValueStore(this->scope, this->identValue)->type;
 }
 

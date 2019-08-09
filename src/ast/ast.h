@@ -96,5 +96,25 @@ public:
 };
 
 
+class FnNode: public AstNode {
+public:
+    FnNode(typeId type, char *identifier, AstNode *scope);
+    typeId type;
+    char *identifier;
+    AstNode *scope;
+    AstNode *evaluate();
+};
+
+
+class FnClNode: public AstNode {
+public:
+    FnClNode(char *identifier, AstNode *scope);
+    char *identifier;
+    AstNode *scope;
+    Value *value = new Value();  // evaluated value
+    AstNode *evaluate();
+};
+
+
 Value *getFromValueStore(AstNode *scope, char* ident);
 AstNode *getValueScope(AstNode *scope, char* ident);

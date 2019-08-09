@@ -78,12 +78,12 @@ main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKELSE TOKCONST
+%token TOKIF TOKELSE TOKCONST TOKFN TOKRETURN
 %token TOKPRINT TOKREADFILE TOKQUIT
 %token TOKLBRACE TOKRBRACE
+
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE
 %token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE
-
 %token <tval> TYPEIDENT
 %token <sval> TOKSTRING
 %token <ival> TOKINTEGER
@@ -93,7 +93,8 @@ main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <valueObj> expression literal
-%type <node> statement statements if_statement const_declaration var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
+%type <node> statement statements if_statement fn_declaration return_stmt const_declaration
+%type <node> var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
 %type <node> print readFile quit
 
 %start statements
@@ -137,8 +138,13 @@ statement:
     | expressions {
         $$ = $1;
     }
-    |
-    if_statement {
+    | if_statement {
+        $$ = $1;
+    }
+    | fn_declaration {
+        $$ = $1;
+    }
+    | return_stmt {
         $$ = $1;
     }
     ;
@@ -192,6 +198,13 @@ operator:
     TOKLTE
     ;
 
+return_stmt:
+    TOKRETURN expressions {
+        AstNode *n = new AstNode();
+        $$ = n;
+    }
+    ;
+
 act_params: {
         $$ = new ActParamNode();
     };
@@ -239,17 +252,24 @@ literal:
 
 const_declaration:
     TOKCONST TYPEIDENT TOKIDENT '=' literal {
-    ConstNode *constant = new ConstNode($2, $3, $5);
-    $$ = constant;
+        ConstNode *constant = new ConstNode($2, $3, $5);
+        $$ = constant;
     }
     ;
 
 var_declaration:
     TYPEIDENT TOKIDENT {
-    VarDeclarationNode *variable = new VarDeclarationNode($1, $2, curScope);
-    $$ = variable;
+        VarDeclarationNode *variable = new VarDeclarationNode($1, $2, curScope);
+        $$ = variable;
     }
     ;
+
+fn_declaration:
+    TYPEIDENT TOKFN TOKIDENT '(' /* formal_params */ ')' lbrace statements rbrace {
+        FnNode *fnNode = new FnNode($1, $3, curScope);
+        fnNode->addToChildList($7);
+        $$ = fnNode;
+};
 
 var_assignment:
     TOKIDENT '=' expressions {
@@ -258,9 +278,9 @@ var_assignment:
     }
 
 var_declaration_assignment:
-    TYPEIDENT TOKIDENT '=' expressions {
-    VarNode *variable = new VarNode($1, $2, $4, curScope);
-    $$ = variable;
+        TYPEIDENT TOKIDENT '=' expressions {
+        VarNode *variable = new VarNode($1, $2, $4, curScope);
+        $$ = variable;
     }
     ;
 
@@ -280,6 +300,7 @@ if_statement:
 
         ifNode->elseBlock = ($10);
     };
+
 
 builtin_function:
     print

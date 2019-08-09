@@ -26,6 +26,7 @@ public:
     void set(float value);
     void set(bool value);
     void setIdent(char *value, AstNode *scope);
+    void setFn(char *value, AstNode *scope);
     void repr();
 };
 

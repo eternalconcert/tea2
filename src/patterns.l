@@ -41,6 +41,8 @@ if                                      return TOKIF;
 else                                    return TOKELSE;
 true                                    yylval.bval=true; return TOKBOOL;
 false                                   yylval.bval=false; return TOKBOOL;
+FN                                      return TOKFN;
+return                                  return TOKRETURN;
 print                                   return TOKPRINT;
 readFile                                return TOKREADFILE;
 quit                                    return TOKQUIT;

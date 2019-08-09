@@ -37,18 +37,6 @@ void AstNode::addToChildList(AstNode *newNode) {
 };
 
 
-AstNode *IfNode::evaluate() {
-    ExpressionNode *condition = (ExpressionNode*)this->childListHead->evaluate();
-    if (condition->value->boolValue) {
-        this->childListHead->next->evaluate();
-    }
-    else if (this->elseBlock != NULL) {
-        elseBlock->evaluate();
-    }
-    return this;
-};
-
-
 Value *getFromValueStore(AstNode *scope, char* ident) {
     if (constGlobal->values[ident] != NULL) {
         return constGlobal->values[ident];

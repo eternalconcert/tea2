@@ -1,4 +1,6 @@
-STR a;
-a = "1";
-print(a);
+INT FN addNumber() {
+    print(12);
+    return 12;
+};
 
+print(addNumber);
