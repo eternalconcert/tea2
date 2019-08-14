@@ -57,21 +57,26 @@ void Value::repr() {
     switch (this->type) {
         case STR:
             printf("%s", this->stringValue);
+            fflush(stdout);
             break;
         case INT:
             printf("%i", this->intValue);
+            fflush(stdout);
             break;
         case FLOAT:
             printf("%f", this->floatValue);
+            fflush(stdout);
             break;
         case BOOL:
             printf("%s", this->boolValue ? "true" : "false");
+            fflush(stdout);
             break;
         case IDENTIFIER:
             getFromValueStore(this->scope, this->identValue)->repr();
             break;
         case FUNCTION:
             printf("Function: %s", this->identValue);
+            fflush(stdout);
             break;
     }
 }

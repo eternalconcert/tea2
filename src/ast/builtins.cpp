@@ -20,6 +20,7 @@ AstNode* PrintNode::evaluate() {
         cur = cur->next;
     }
     printf("\n");
+    fflush(stdout);
     return this;
 }
 
