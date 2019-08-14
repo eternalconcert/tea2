@@ -10,6 +10,7 @@
 // <string>\\[0-7]*                       { strbuf += strtol(yytext+1, 0, 8); } // No idea..
 %}
 %option yylineno
+%option noyywrap
 %x string
 %x multiLineComment
 %%
