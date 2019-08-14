@@ -53,6 +53,7 @@ public:
     char *op;
     AstNode *scope;
     ExpressionNode(AstNode *scope);
+    Value *runFunctionAndGetResult();
     AstNode* evaluate();
 
 private:

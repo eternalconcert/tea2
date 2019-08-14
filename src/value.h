@@ -9,7 +9,6 @@ class AstNode;
 
 class Value {
 public:
-    std::string unused;
     AstNode *scope;
     typeId type;
     typeId getTrueType();

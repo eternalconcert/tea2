@@ -13,8 +13,31 @@ AstNode* ExpressionNode::evaluate() {
     return this;
 };
 
+
+Value *ExpressionNode::runFunctionAndGetResult() {
+    Value *startValue = getFromValueStore(this->scope, this->value->identValue);
+    FnNode *eval = (FnNode*)startValue->block;
+    // From here
+    eval->run();
+    Value *a = new Value();
+    a->set(23);
+
+    return a;
+}
+
+
 ExpressionNode* ExpressionNode::run() {
     ExpressionNode *cur = (ExpressionNode*)this->childListHead;
+    if (cur == NULL) {
+        if (this->value->type == IDENTIFIER) {
+            this->value = getFromValueStore(this->scope, this->value->identValue);
+        }
+        if (this->value->type == FUNCTIONCALL) {
+            this->value = this->runFunctionAndGetResult();
+        }
+
+        return this;
+    }
     while (cur != NULL) {
         Value& lVal = *this->value;
         Value *rVal = cur->value;
@@ -27,14 +50,7 @@ ExpressionNode* ExpressionNode::run() {
         }
 
         if (this->value->type == FUNCTIONCALL) {
-            Value *v = getFromValueStore(this->scope, this->value->identValue);
-            FnNode *eval = (FnNode*)v->block;
-            eval->run();
-            printf("%s\n", "Hier auch?");
-            Value *a = new Value();
-            a->set(23);
-            // lVal = *eval->value;
-            lVal = *a;
+            lVal = *this->runFunctionAndGetResult();
         }
 
         if (cur->op == NULL) {
