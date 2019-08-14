@@ -30,7 +30,11 @@ ExpressionNode* ExpressionNode::run() {
             Value *v = getFromValueStore(this->scope, this->value->identValue);
             FnNode *eval = (FnNode*)v->block;
             eval->run();
-            lVal = *eval->value;
+            printf("%s\n", "Hier auch?");
+            Value *a = new Value();
+            a->set(23);
+            // lVal = *eval->value;
+            lVal = *a;
         }
 
         if (cur->op == NULL) {

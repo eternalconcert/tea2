@@ -15,16 +15,18 @@ AstNode *FnNode::evaluate() {
         throw (ConstError(this->identifier));
     }
     Value *val = new Value();
-    val->setFn(this->identifier, this->scope, this->childListHead);
+    val->setFn(this->identifier, this->scope, this);
     this->scope->valueStore->set(this->identifier, val);
+    printf("%s\n", "da");
     return this;
 };
 
 
 AstNode *FnNode::run() {
-    this->childListHead->evaluate();
-    Value *val = new Value();
-    val->set(1);
-    this->value = val;
+    printf("%s\n", "da1");
+    printf("%s\n", this->identifier);
+    Value *val = getFromValueStore(this->scope, this->identifier);
+    val->block->childListHead->evaluate();
+    printf("%s\n", "noch da?");
     return this;
 };
