@@ -61,8 +61,6 @@ main(int argc, char *argv[0]) {
 
     yyparse();
     root->evaluate();
-    // curScope->evaluate();
-
 }
 
 %}
