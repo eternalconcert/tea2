@@ -6,6 +6,7 @@
     #include "src/exceptions.h"
     #include <string.h>
 
+
     AstNode *root = new AstNode();
     AstNode *curScope = root;
 
@@ -36,6 +37,7 @@
     }
 
 main(int argc, char *argv[0]) {
+    setvbuf(stdout, NULL, _IONBF, 0); // Windows sucks..
     if (argc <= 1) {
         printf("%s\n", "No file or command specified");
         exit(1);
