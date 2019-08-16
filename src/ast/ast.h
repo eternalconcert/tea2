@@ -105,9 +105,19 @@ public:
     AstNode *scope;
     Value *value;
     AstNode *evaluate();
-    AstNode *run();
+    AstNode *run(AstNode *returnNode);
 };
 
+
+class ReturnNode: public AstNode {
+public:
+    AstNode *evaluate();
+    Value *value;
+    AstNode *scope;
+    ReturnNode(AstNode *scope) {
+        this->scope = scope;
+    }
+};
 
 Value *getFromValueStore(AstNode *scope, char* ident);
 AstNode *getValueScope(AstNode *scope, char* ident);

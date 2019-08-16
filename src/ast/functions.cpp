@@ -21,8 +21,19 @@ AstNode *FnNode::evaluate() {
 };
 
 
-AstNode *FnNode::run() {
+AstNode *FnNode::run(AstNode *returnNode) {
     Value *val = getFromValueStore(this->scope, this->identifier);
-    val->block->childListHead->evaluate();
+    ExpressionNode *result = (ExpressionNode*)val->block->childListHead;
+    result->evaluate();
     return this;
 };
+
+AstNode *ReturnNode::evaluate() {
+    ExpressionNode *result = (ExpressionNode*)this->childListHead;
+    result->evaluate();
+    this->value = result->value;
+    AstNode *n = new AstNode();
+    this->next = n;
+    return n;
+};
+

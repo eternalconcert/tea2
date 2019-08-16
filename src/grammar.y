@@ -203,7 +203,8 @@ operator:
 
 return_stmt:
     TOKRETURN expressions {
-        AstNode *n = new AstNode();
+        ReturnNode *n = new ReturnNode(curScope);
+        n->addToChildList($2);
         $$ = n;
     }
     ;
