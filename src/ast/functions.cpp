@@ -10,14 +10,13 @@ FnNode::FnNode(typeId type, char *identifier, AstNode *scope) {
     AstNode();
 };
 
-AstNode *FnNode::evaluate() {
+void FnNode::evaluate() {
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }
     Value *val = new Value();
     val->setFn(this->identifier, this->scope, this);
     this->scope->valueStore->set(this->identifier, val);
-    return this;
 };
 
 
@@ -28,12 +27,11 @@ AstNode *FnNode::run(AstNode *returnNode) {
     return this;
 };
 
-AstNode *ReturnNode::evaluate() {
+void ReturnNode::evaluate() {
     ExpressionNode *result = (ExpressionNode*)this->childListHead;
     result->evaluate();
     this->value = result->value;
     AstNode *n = new AstNode();
     this->next = n;
-    return n;
 };
 

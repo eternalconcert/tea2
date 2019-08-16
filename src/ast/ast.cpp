@@ -12,13 +12,13 @@ AstNode::AstNode() {
 };
 
 
-AstNode* AstNode::evaluate() {
+void AstNode::evaluate() {
     ExpressionNode *cur = (ExpressionNode*)this->childListHead;
     while (cur != NULL) {
         cur->evaluate();
-        cur = (ExpressionNode*)cur->next;
+        cur = (ExpressionNode*)cur->getNext();
+        // cur = (ExpressionNode*)cur->next;
     }
-    return cur;
 }
 
 
@@ -34,6 +34,11 @@ void AstNode::addToChildList(AstNode *newNode) {
         }
         current->next = newNode;
     }
+};
+
+
+AstNode *AstNode::getNext() {
+    return this->next;
 };
 
 

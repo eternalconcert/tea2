@@ -12,19 +12,15 @@ public:
     AstNode *parent = NULL;
     ValueStore *valueStore;
     void addToChildList(AstNode *newNode);
-    virtual AstNode* evaluate();
+    virtual void evaluate();
+    virtual AstNode* getNext();
     AstNode();
 };
 
 
-class ActParamNode: public AstNode {
-public:
-    Value *value;
-};
-
 class PrintNode: public AstNode {
 public:
-    AstNode *evaluate();
+    void evaluate();
     PrintNode(AstNode *paramsHead);
 };
 
@@ -32,7 +28,7 @@ public:
 class QuitNode: public AstNode {
 public:
     Value *rcValue;
-    AstNode *evaluate();
+    void evaluate();
     AstNode *scope;
     QuitNode(Value *rcValue, AstNode *scope);
 };
@@ -43,7 +39,7 @@ public:
     ConstNode(typeId type, char *identifier, Value *value);
     char *identifier;
     Value *value;
-    AstNode *evaluate();
+    void evaluate();
 };
 
 
@@ -54,7 +50,7 @@ public:
     AstNode *scope;
     ExpressionNode(AstNode *scope);
     Value *runFunctionAndGetResult();
-    AstNode* evaluate();
+    void evaluate();
 
 private:
     ExpressionNode *run();
@@ -68,7 +64,7 @@ public:
     char *identifier;
     ExpressionNode *rExp;
     AstNode *scope;
-    AstNode *evaluate();
+    void evaluate();
 };
 
 
@@ -78,7 +74,7 @@ public:
     typeId type;
     char *identifier;
     AstNode *scope;
-    AstNode *evaluate();
+    void evaluate();
 };
 
 class VarAssignmentNode: public AstNode {
@@ -87,13 +83,13 @@ public:
     char *identifier;
     ExpressionNode *rExp;
     AstNode *scope;
-    AstNode *evaluate();
+    void evaluate();
 };
 
 class IfNode: public AstNode {
 public:
     AstNode *elseBlock;
-    AstNode *evaluate();
+    void evaluate();
 };
 
 
@@ -104,19 +100,23 @@ public:
     char *identifier;
     AstNode *scope;
     Value *value;
-    AstNode *evaluate();
+    void evaluate();
     AstNode *run(AstNode *returnNode);
 };
 
 
 class ReturnNode: public AstNode {
 public:
-    AstNode *evaluate();
+    void evaluate();
     Value *value;
     AstNode *scope;
     ReturnNode(AstNode *scope) {
         this->scope = scope;
     }
+    AstNode *getNext() {
+        printf("%s\n", "GOgog");
+        return this;
+    };
 };
 
 Value *getFromValueStore(AstNode *scope, char* ident);

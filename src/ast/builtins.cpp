@@ -10,18 +10,18 @@ PrintNode::PrintNode(AstNode *paramsHead) {
 }
 
 
-AstNode* PrintNode::evaluate() {
+void PrintNode::evaluate() {
     AstNode *cur = this->childListHead;
     while (cur != NULL) {
-        ActParamNode *eval = (ActParamNode*)cur->evaluate();
-        if (eval) {
+        ExpressionNode *eval = (ExpressionNode*)cur;
+        eval->evaluate();
+        if (eval->value) {
             eval->value->repr();
         }
         cur = cur->next;
     }
     printf("\n");
     fflush(stdout);
-    return this;
 }
 
 QuitNode::QuitNode(Value *rcValue, AstNode *scope) {
@@ -31,7 +31,7 @@ QuitNode::QuitNode(Value *rcValue, AstNode *scope) {
 };
 
 
-AstNode* QuitNode::evaluate() {
+void QuitNode::evaluate() {
     switch (this->rcValue->type) {
         case INT:
             exit(this->rcValue->intValue);

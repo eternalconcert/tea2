@@ -15,10 +15,9 @@ ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
 };
 
 
-AstNode* ConstNode::evaluate() {
+void ConstNode::evaluate() {
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }
     constGlobal->values[this->identifier] = this->value;
-    return this;
 };

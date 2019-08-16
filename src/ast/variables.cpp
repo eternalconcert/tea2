@@ -13,9 +13,9 @@ VarNode::VarNode(typeId type, char *identifier, AstNode *exp, AstNode *scope) {
 };
 
 
-AstNode* VarNode::evaluate() {
-    ExpressionNode *evalExp = (ExpressionNode*)this->rExp->evaluate();
-    Value *val = evalExp->value;
+void VarNode::evaluate() {
+    this->rExp->evaluate();
+    Value *val = this->rExp->value;
 
     if (val->type == IDENTIFIER) {
         val = this->scope->valueStore->get(val->identValue);
@@ -28,7 +28,6 @@ AstNode* VarNode::evaluate() {
         throw (ConstError(this->identifier));
     }
     this->scope->valueStore->set(this->identifier, val);
-    return this;
 };
 
 
@@ -40,14 +39,13 @@ VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *s
 };
 
 
-AstNode* VarDeclarationNode::evaluate() {
+void VarDeclarationNode::evaluate() {
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }
     Value *val = new Value();
     val->set(this->type);
     this->scope->valueStore->set(this->identifier, val);
-    return this;
 };
 
 
@@ -59,9 +57,9 @@ VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *sc
 };
 
 
-AstNode* VarAssignmentNode::evaluate() {
-    ExpressionNode *evalExp = (ExpressionNode*)this->rExp->evaluate();
-    Value *val = evalExp->value;
+void VarAssignmentNode::evaluate() {
+    this->rExp->evaluate();
+    Value *val = this->rExp->value;
 
     AstNode *valScope = getValueScope(this->scope, this->identifier);
 
@@ -72,5 +70,4 @@ AstNode* VarAssignmentNode::evaluate() {
     }
 
     valScope->valueStore->set(this->identifier, val);
-    return this;
 };

@@ -8,9 +8,8 @@ ExpressionNode::ExpressionNode(AstNode *scope) {
     this->scope = scope;
 };
 
-AstNode* ExpressionNode::evaluate() {
+void ExpressionNode::evaluate() {
     this->run();
-    return this;
 };
 
 
