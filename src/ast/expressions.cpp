@@ -93,6 +93,6 @@ void ExpressionNode::evaluate() {
             this->value = lVal <= rVal;
         }
 
-        cur = (ExpressionNode*)cur->next;
+        cur = (ExpressionNode*)cur->getNext();
     }
 };

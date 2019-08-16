@@ -4,6 +4,6 @@ STR FN i() {
     if (true) {
         return 1;
     };
-    print("TEST");
+    print("TEST--");
 };
 i();

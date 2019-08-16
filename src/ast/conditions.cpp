@@ -6,7 +6,7 @@ void IfNode::evaluate() {
     ExpressionNode *condition = (ExpressionNode*)this->childListHead;
     condition->evaluate();
     if (condition->value->boolValue) {
-        this->childListHead->next->evaluate();
+        this->childListHead->getNext()->evaluate();
     }
     else if (this->elseBlock != NULL) {
         elseBlock->evaluate();

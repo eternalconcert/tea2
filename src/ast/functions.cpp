@@ -34,7 +34,9 @@ ReturnNode::ReturnNode(AstNode *scope) {
 
 
 AstNode *ReturnNode::getNext() {
-    printf("%s\n", "TEST");
+    printf("Das hier ist die falsche Stelle: this->next ist die Expression die das Teil auswertet, also das 1 + 1 in return 1 + 1. Das next der Funktion bleibt davon unberührt.\n");
+    printf("Man müsste also evtl. doch überlegen, ob evaluate() nicht bei jedem Aufruf den Nachfolger zurückgibt und von diesem dann wieder evaluate() aufgerufen wird. Dann könnte man prüfen, ob eine ReturnNode gekommen ist.\n");
+    printf("Da könnte dann sowas drin sein wie jumpToNode, was per default NULL ist aber bei ReturnNodes die Rücksprungadresse hat.\n");
     return NULL;
 };
 
@@ -42,6 +44,7 @@ AstNode *ReturnNode::getNext() {
 void ReturnNode::evaluate() {
     ExpressionNode *result = (ExpressionNode*)this->childListHead;
     result->evaluate();
+    this->setNext(NULL);
     this->value = result->value;
 };
 

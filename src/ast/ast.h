@@ -8,13 +8,16 @@ class AstNode {
 public:
     int id;
     AstNode *childListHead = NULL;
-    AstNode *next = NULL;
     AstNode *parent = NULL;
     ValueStore *valueStore;
     void addToChildList(AstNode *newNode);
     virtual void evaluate();
     virtual AstNode* getNext();
+    void setNext(AstNode *nextNode);
     AstNode();
+
+private:
+    AstNode *next = NULL;
 };
 
 
@@ -107,7 +110,7 @@ public:
     void evaluate();
     Value *value;
     AstNode *scope;
-    AstNode *returnNode;
+    AstNode *rNode;
     ReturnNode(AstNode *scope);
     AstNode *getNext();
 };

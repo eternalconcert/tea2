@@ -18,7 +18,7 @@ void PrintNode::evaluate() {
         if (eval->value) {
             eval->value->repr();
         }
-        cur = cur->next;
+        cur = cur->getNext();
     }
     printf("\n");
     fflush(stdout);
