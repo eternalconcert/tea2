@@ -27,11 +27,21 @@ AstNode *FnNode::run(AstNode *returnNode) {
     return this;
 };
 
+
+ReturnNode::ReturnNode(AstNode *scope) {
+    this->scope = scope;
+};
+
+
+AstNode *ReturnNode::getNext() {
+    printf("%s\n", "TEST");
+    return NULL;
+};
+
+
 void ReturnNode::evaluate() {
     ExpressionNode *result = (ExpressionNode*)this->childListHead;
     result->evaluate();
     this->value = result->value;
-    AstNode *n = new AstNode();
-    this->next = n;
 };
 

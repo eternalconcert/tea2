@@ -51,9 +51,6 @@ public:
     ExpressionNode(AstNode *scope);
     Value *runFunctionAndGetResult();
     void evaluate();
-
-private:
-    ExpressionNode *run();
 };
 
 
@@ -110,13 +107,9 @@ public:
     void evaluate();
     Value *value;
     AstNode *scope;
-    ReturnNode(AstNode *scope) {
-        this->scope = scope;
-    }
-    AstNode *getNext() {
-        printf("%s\n", "GOgog");
-        return this;
-    };
+    AstNode *returnNode;
+    ReturnNode(AstNode *scope);
+    AstNode *getNext();
 };
 
 Value *getFromValueStore(AstNode *scope, char* ident);

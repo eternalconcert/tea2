@@ -8,10 +8,6 @@ ExpressionNode::ExpressionNode(AstNode *scope) {
     this->scope = scope;
 };
 
-void ExpressionNode::evaluate() {
-    this->run();
-};
-
 
 Value *ExpressionNode::runFunctionAndGetResult() {
     Value *startValue = getFromValueStore(this->scope, this->value->identValue);
@@ -25,7 +21,7 @@ Value *ExpressionNode::runFunctionAndGetResult() {
 }
 
 
-ExpressionNode* ExpressionNode::run() {
+void ExpressionNode::evaluate() {
     ExpressionNode *cur = (ExpressionNode*)this->childListHead;
     if (cur == NULL) {
         if (this->value->type == IDENTIFIER) {
@@ -35,8 +31,9 @@ ExpressionNode* ExpressionNode::run() {
             this->value = this->runFunctionAndGetResult();
         }
 
-        return this;
+        return;
     }
+
     while (cur != NULL) {
         Value& lVal = *this->value;
         Value *rVal = cur->value;
@@ -53,7 +50,7 @@ ExpressionNode* ExpressionNode::run() {
         }
 
         if (cur->op == NULL) {
-            return this;
+            return;
         }
 
         if (!strcmp(cur->op, "+")) {
@@ -98,5 +95,4 @@ ExpressionNode* ExpressionNode::run() {
 
         cur = (ExpressionNode*)cur->next;
     }
-    return this;
 };

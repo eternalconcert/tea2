@@ -13,11 +13,10 @@ AstNode::AstNode() {
 
 
 void AstNode::evaluate() {
-    ExpressionNode *cur = (ExpressionNode*)this->childListHead;
+    AstNode *cur = this->childListHead;
     while (cur != NULL) {
         cur->evaluate();
-        cur = (ExpressionNode*)cur->getNext();
-        // cur = (ExpressionNode*)cur->next;
+        cur = cur->getNext();
     }
 }
 
