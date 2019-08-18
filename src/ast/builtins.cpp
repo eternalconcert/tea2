@@ -15,7 +15,7 @@ void PrintNode::evaluate() {
     while (cur != NULL) {
         ExpressionNode *eval = (ExpressionNode*)cur;
         eval->evaluate();
-        if (eval->value) {
+        if (eval->value->type != UNDEFINED) {
             eval->value->repr();
         }
         cur = cur->getNext();

@@ -7,8 +7,10 @@ int maxId = 0;
 
 AstNode::AstNode() {
     this->id = maxId;
-    this->valueStore = new ValueStore();
     maxId++;
+    this->valueStore = new ValueStore();
+    this->value = new Value();  // evaluated value in case of expressions
+
 };
 
 

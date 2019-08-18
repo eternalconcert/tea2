@@ -10,7 +10,7 @@ class AstNode;
 class Value {
 public:
     AstNode *scope;
-    typeId type;
+    typeId type = UNDEFINED; // To check if a Value is present.. Not nice.
     typeId getTrueType();
     int intValue;
     float floatValue;

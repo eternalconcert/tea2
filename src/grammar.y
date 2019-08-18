@@ -211,14 +211,14 @@ return_stmt:
 
 act_params: /* empty */ {
         $$ = new AstNode();
-    };
+    }
     |
     act_param {
-        $$->addToChildList($1);
+        $1->addToChildList($1);
     }
     |
     act_params ',' act_param {
-        $$->addToChildList($3);
+        $1->addToChildList($3);
     }
     ;
 

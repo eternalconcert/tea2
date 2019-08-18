@@ -9,7 +9,9 @@ public:
     int id;
     AstNode *childListHead = NULL;
     AstNode *parent = NULL;
-    ValueStore *valueStore;
+    AstNode *returnNode = NULL;
+    ValueStore *valueStore = NULL;
+    Value *value = NULL;
     void addToChildList(AstNode *newNode);
     virtual void evaluate();
     virtual AstNode* getNext();
@@ -48,7 +50,6 @@ public:
 
 class ExpressionNode: public AstNode {
 public:
-    Value *value = new Value();  // evaluated value
     char *op;
     AstNode *scope;
     ExpressionNode(AstNode *scope);

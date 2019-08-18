@@ -1,9 +1,12 @@
 print();
 
-STR FN i() {
+INT FN test() {
     if (true) {
         return 1;
+        print("-------------------------");
     };
-    print("TEST--");
+    print("Should not be visible");
 };
-i();
+
+test();
+print("Here");

@@ -2,7 +2,7 @@
 #define COMMONS_H
 #include <string>
 
-enum typeId {INT, FLOAT, STR, BOOL, VOID, ARRAY, IDENTIFIER, FUNCTION, FUNCTIONCALL};
+enum typeId {INT, FLOAT, STR, BOOL, VOID, ARRAY, IDENTIFIER, FUNCTION, FUNCTIONCALL, UNDEFINED};
 
 typeId getTypeIdByName(std::string name);
 
