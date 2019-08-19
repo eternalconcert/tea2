@@ -7,11 +7,11 @@
 class AstNode {
 public:
     int id;
-    AstNode *childListHead = NULL;
-    AstNode *parent = NULL;
-    AstNode *jumpToNode = NULL;
-    ValueStore *valueStore = NULL;
-    Value *value = NULL;
+    AstNode *childListHead;
+    AstNode *parent;
+    AstNode *jumpToNode;
+    ValueStore *valueStore;
+    Value *value;
     void addToChildList(AstNode *newNode);
     virtual AstNode* evaluate();
     virtual AstNode* getNext();
@@ -19,7 +19,7 @@ public:
     AstNode();
 
 private:
-    AstNode *next = NULL;
+    AstNode *next;
 };
 
 
