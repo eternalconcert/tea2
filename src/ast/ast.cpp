@@ -14,12 +14,12 @@ AstNode::AstNode() {
 };
 
 
-void AstNode::evaluate() {
+AstNode* AstNode::evaluate() {
     AstNode *cur = this->childListHead;
     while (cur != NULL) {
-        cur->evaluate();
-        cur = cur->getNext();
+        cur = cur->evaluate();
     }
+    return this->getNext();
 }
 
 

@@ -21,7 +21,7 @@ Value *ExpressionNode::runFunctionAndGetResult() {
 }
 
 
-void ExpressionNode::evaluate() {
+AstNode* ExpressionNode::evaluate() {
     ExpressionNode *cur = (ExpressionNode*)this->childListHead;
     if (cur == NULL) {
         if (this->value->type == IDENTIFIER) {
@@ -31,7 +31,7 @@ void ExpressionNode::evaluate() {
             this->value = this->runFunctionAndGetResult();
         }
 
-        return;
+        return this->getNext();
     }
 
     while (cur != NULL) {
@@ -50,7 +50,7 @@ void ExpressionNode::evaluate() {
         }
 
         if (cur->op == NULL) {
-            return;
+            return this;
         }
 
         if (!strcmp(cur->op, "+")) {
@@ -95,4 +95,5 @@ void ExpressionNode::evaluate() {
 
         cur = (ExpressionNode*)cur->getNext();
     }
+    return this->getNext();
 };

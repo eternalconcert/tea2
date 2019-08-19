@@ -13,7 +13,7 @@ VarNode::VarNode(typeId type, char *identifier, AstNode *exp, AstNode *scope) {
 };
 
 
-void VarNode::evaluate() {
+AstNode* VarNode::evaluate() {
     this->rExp->evaluate();
     Value *val = this->rExp->value;
 
@@ -28,6 +28,7 @@ void VarNode::evaluate() {
         throw (ConstError(this->identifier));
     }
     this->scope->valueStore->set(this->identifier, val);
+    return this->getNext();
 };
 
 
@@ -39,13 +40,14 @@ VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *s
 };
 
 
-void VarDeclarationNode::evaluate() {
+AstNode* VarDeclarationNode::evaluate() {
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }
     Value *val = new Value();
     val->set(this->type);
     this->scope->valueStore->set(this->identifier, val);
+    return this->getNext();
 };
 
 
@@ -57,7 +59,7 @@ VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *sc
 };
 
 
-void VarAssignmentNode::evaluate() {
+AstNode* VarAssignmentNode::evaluate() {
     this->rExp->evaluate();
     Value *val = this->rExp->value;
 
@@ -70,4 +72,5 @@ void VarAssignmentNode::evaluate() {
     }
 
     valScope->valueStore->set(this->identifier, val);
+    return this->getNext();
 };

@@ -9,11 +9,11 @@ public:
     int id;
     AstNode *childListHead = NULL;
     AstNode *parent = NULL;
-    AstNode *returnNode = NULL;
+    AstNode *jumpToNode = NULL;
     ValueStore *valueStore = NULL;
     Value *value = NULL;
     void addToChildList(AstNode *newNode);
-    virtual void evaluate();
+    virtual AstNode* evaluate();
     virtual AstNode* getNext();
     void setNext(AstNode *nextNode);
     AstNode();
@@ -25,7 +25,7 @@ private:
 
 class PrintNode: public AstNode {
 public:
-    void evaluate();
+    AstNode* evaluate();
     PrintNode(AstNode *paramsHead);
 };
 
@@ -33,7 +33,7 @@ public:
 class QuitNode: public AstNode {
 public:
     Value *rcValue;
-    void evaluate();
+    AstNode* evaluate();
     AstNode *scope;
     QuitNode(Value *rcValue, AstNode *scope);
 };
@@ -44,7 +44,7 @@ public:
     ConstNode(typeId type, char *identifier, Value *value);
     char *identifier;
     Value *value;
-    void evaluate();
+    AstNode* evaluate();
 };
 
 
@@ -54,7 +54,7 @@ public:
     AstNode *scope;
     ExpressionNode(AstNode *scope);
     Value *runFunctionAndGetResult();
-    void evaluate();
+    AstNode* evaluate();
 };
 
 
@@ -65,7 +65,7 @@ public:
     char *identifier;
     ExpressionNode *rExp;
     AstNode *scope;
-    void evaluate();
+    AstNode* evaluate();
 };
 
 
@@ -75,7 +75,7 @@ public:
     typeId type;
     char *identifier;
     AstNode *scope;
-    void evaluate();
+    AstNode* evaluate();
 };
 
 class VarAssignmentNode: public AstNode {
@@ -84,13 +84,13 @@ public:
     char *identifier;
     ExpressionNode *rExp;
     AstNode *scope;
-    void evaluate();
+    AstNode* evaluate();
 };
 
 class IfNode: public AstNode {
 public:
     AstNode *elseBlock;
-    void evaluate();
+    AstNode* evaluate();
 };
 
 
@@ -101,17 +101,16 @@ public:
     char *identifier;
     AstNode *scope;
     Value *value;
-    void evaluate();
+    AstNode* evaluate();
     AstNode *run(AstNode *returnNode);
 };
 
 
 class ReturnNode: public AstNode {
 public:
-    void evaluate();
+    AstNode* evaluate();
     Value *value;
     AstNode *scope;
-    AstNode *rNode;
     ReturnNode(AstNode *scope);
     AstNode *getNext();
 };
