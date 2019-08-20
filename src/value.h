@@ -10,6 +10,7 @@ class AstNode;
 class Value {
 public:
     AstNode *scope;
+    AstNode *block;
     typeId type = UNDEFINED; // To check if a Value is present.. Not nice.
     typeId getTrueType();
     int intValue;
@@ -18,7 +19,6 @@ public:
     bool boolValue;
     char *identValue;
     bool assigned = true;
-    AstNode *block;
 
     void set(typeId type);  // Set empty
     void set(char *value);

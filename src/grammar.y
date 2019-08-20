@@ -73,7 +73,6 @@ main(int argc, char *argv[0]) {
     bool bval;
     typeId tval;
     AstNode *node;
-    Value *valueObj;
 }
 
 
@@ -91,7 +90,7 @@ main(int argc, char *argv[0]) {
 %token <sval> TOKIDENT
 
 %type <sval> operator
-%type <valueObj> expression literal fn_call
+%type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt const_declaration
 %type <node> var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
 %type <node> print readFile quit
@@ -150,16 +149,13 @@ statement:
 
 expressions:
     expression {
-        ExpressionNode *expNode = new ExpressionNode(curScope);
-        expNode->value = $1;
-        $$ = expNode;
+        $$ = $1;
     }
     |
     expressions operator expression {
-        ExpressionNode *child = new ExpressionNode(curScope);
+        ExpressionNode *child = (ExpressionNode*)$3;
         child->op = $2;
-        child->value = $3;
-        $$->addToChildList(child);
+        $$->addToChildList($3);
     }
     ;
 
@@ -169,9 +165,11 @@ expression:
     }
     |
     TOKIDENT {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
         valueObj->setIdent($1, curScope);
-        $$ = valueObj;
+        expNode->value = valueObj;
+        $$ = expNode;
     }
     |
     fn_call {
@@ -230,27 +228,35 @@ act_param:
 
 literal:
     TOKSTRING {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
         valueObj->set($1);
-        $$ = valueObj;
+        expNode->value = valueObj;
+        $$ = expNode;
     }
     |
     TOKINTEGER {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
         valueObj->set($1);
-        $$ = valueObj;
+        expNode->value = valueObj;
+        $$ = expNode;
     }
     |
     TOKFLOAT {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
         valueObj->set($1);
-        $$ = valueObj;
+        expNode->value = valueObj;
+        $$ = expNode;
     }
     |
     TOKBOOL {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
         valueObj->set($1);
-        $$ = valueObj;
+        expNode->value = valueObj;
+        $$ = expNode;
     }
     ;
 
@@ -277,9 +283,11 @@ fn_declaration:
 
 fn_call:
     TOKIDENT '(' /* act_params */ ')' {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *fnCall = new Value();
         fnCall->setFnCall($1, curScope);
-        $$ = fnCall;
+        expNode->value = fnCall;
+        $$ = expNode;
     }
 
 var_assignment:

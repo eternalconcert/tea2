@@ -41,7 +41,7 @@ public:
 
 class ConstNode: public AstNode {
 public:
-    ConstNode(typeId type, char *identifier, Value *value);
+    ConstNode(typeId type, char *identifier, AstNode *expNode);
     char *identifier;
     Value *value;
     AstNode* evaluate();

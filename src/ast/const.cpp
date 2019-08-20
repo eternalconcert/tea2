@@ -4,14 +4,14 @@
 #include "../value.h"
 
 
-ConstNode::ConstNode(typeId type, char *identifier, Value *value) {
-    if (value->type != type) {
+ConstNode::ConstNode(typeId type, char *identifier, AstNode *expNode) {
+    if (expNode->value->type != type) {
         throw (TypeError("Types did not match"));
     }
     AstNode();
 
     this->identifier = identifier;
-    this->value = value;
+    this->value = expNode->value;
 };
 
 
