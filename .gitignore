@@ -6,6 +6,7 @@ y.tab.h
 output.xml
 log.html
 report.html
+test.t
 
 syntax: glob
 pythonenv/*

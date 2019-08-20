@@ -283,11 +283,11 @@ fn_declaration:
 
 fn_call:
     TOKIDENT '(' /* act_params */ ')' {
-        ExpressionNode *expNode = new ExpressionNode(curScope);
+        ExpressionNode *retNode = new ExpressionNode(curScope);
         Value *fnCall = new Value();
-        fnCall->setFnCall($1, curScope);
-        expNode->value = fnCall;
-        $$ = expNode;
+        fnCall->setFnCall($1, retNode, curScope);
+        retNode->value = fnCall;
+        $$ = retNode;
     }
 
 var_assignment:

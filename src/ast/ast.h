@@ -9,7 +9,6 @@ public:
     int id;
     AstNode *childListHead;
     AstNode *parent;
-    AstNode *jumpToNode;
     ValueStore *valueStore;
     Value *value;
     void addToChildList(AstNode *newNode);
@@ -112,7 +111,6 @@ public:
     Value *value;
     AstNode *scope;
     ReturnNode(AstNode *scope);
-    AstNode *getNext();
 };
 
 Value *getFromValueStore(AstNode *scope, char* ident);
