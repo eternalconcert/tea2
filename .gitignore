@@ -1,0 +1,14 @@
+lex.yy.c
+lex.yy.o
+tea
+y.tab.c
+y.tab.h
+output.xml
+log.html
+report.html
+
+syntax: glob
+pythonenv/*
+
+
+
