@@ -39,10 +39,8 @@ AstNode* QuitNode::evaluate() {
             exit(this->rcValue->intValue);
             break;
         case IDENTIFIER:
-            // Value *val = constGlobal->values[this->rcValue->identValue];
             Value *val = getFromValueStore(this->scope, this->rcValue->identValue);
             if (val->getTrueType() != INT) {
-                // Still buggy!
                 throw (TypeError("Wrong type for exit function"));
             }
             exit(val->intValue);

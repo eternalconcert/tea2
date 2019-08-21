@@ -18,12 +18,11 @@ AstNode* VarNode::evaluate() {
     Value *val = this->rExp->value;
 
     if (val->type == IDENTIFIER) {
-        val = this->scope->valueStore->get(val->identValue);
+        val = getFromValueStore(this->scope, val->identValue);
     }
     if (val->type != this->type) {
         throw (TypeError("Types did not match"));
     }
-
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }
@@ -62,7 +61,6 @@ VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *sc
 AstNode* VarAssignmentNode::evaluate() {
     this->rExp->evaluate();
     Value *val = this->rExp->value;
-
     AstNode *valScope = getValueScope(this->scope, this->identifier);
 
     typeId ownType = valScope->valueStore->get(this->identifier)->type;
@@ -70,7 +68,6 @@ AstNode* VarAssignmentNode::evaluate() {
     if (val->type != ownType) {
         throw (TypeError("Types did not match"));
     }
-
     valScope->valueStore->set(this->identifier, val);
     return this->getNext();
 };
