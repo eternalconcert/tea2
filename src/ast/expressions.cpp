@@ -11,13 +11,10 @@ ExpressionNode::ExpressionNode(AstNode *scope) {
 
 Value *ExpressionNode::runFunctionAndGetResult() {
     Value *startValue = getFromValueStore(this->scope, this->value->identValue);
-    FnNode *eval = (FnNode*)startValue->block;
+    FnNode *functionBlock = (FnNode*)startValue->block;
     // From here
-    eval->run(this);
-    Value *a = new Value();
-    a->set(23);
-
-    return a;
+    functionBlock->run(this);
+    return functionBlock->value;
 }
 
 

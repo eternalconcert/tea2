@@ -25,6 +25,9 @@ AstNode *FnNode::run(AstNode *returnNode) {
     Value *val = getFromValueStore(this->scope, this->identifier);
     ExpressionNode *result = (ExpressionNode*)val->block->childListHead;
     result->evaluate();
+    // Some day, this will work... To test:
+    // result->value->set(23235);
+    this->value = result->value;
     return this;
 };
 
