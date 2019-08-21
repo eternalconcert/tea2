@@ -11,10 +11,12 @@ public:
     AstNode *parent;
     ValueStore *valueStore;
     Value *value;
+
     void addToChildList(AstNode *newNode);
     virtual AstNode* evaluate();
     virtual AstNode* getNext();
     void setNext(AstNode *nextNode);
+
     AstNode();
 
 private:
@@ -24,26 +26,33 @@ private:
 
 class PrintNode: public AstNode {
 public:
+    AstNode *scope;
+
     AstNode* evaluate();
-    PrintNode(AstNode *paramsHead);
+
+    PrintNode(AstNode *paramsHead, AstNode *scope);
 };
 
 
 class QuitNode: public AstNode {
 public:
     Value *rcValue;
-    AstNode* evaluate();
     AstNode *scope;
+
+    AstNode* evaluate();
+
     QuitNode(Value *rcValue, AstNode *scope);
 };
 
 
 class ConstNode: public AstNode {
 public:
-    ConstNode(typeId type, char *identifier, AstNode *expNode);
     char *identifier;
     Value *value;
+
     AstNode* evaluate();
+
+    ConstNode(typeId type, char *identifier, AstNode *expNode);
 };
 
 
@@ -51,39 +60,47 @@ class ExpressionNode: public AstNode {
 public:
     char *op;
     AstNode *scope;
-    ExpressionNode(AstNode *scope);
+
     Value *runFunctionAndGetResult();
     AstNode* evaluate();
+
+    ExpressionNode(AstNode *scope);
 };
 
 
 class VarNode: public AstNode {
 public:
-    VarNode(typeId type, char *identifier, AstNode *exp, AstNode *scope);
     typeId type;
     char *identifier;
     ExpressionNode *rExp;
     AstNode *scope;
+
     AstNode* evaluate();
+
+    VarNode(typeId type, char *identifier, AstNode *exp, AstNode *scope);
 };
 
 
 class VarDeclarationNode: public AstNode {
 public:
-    VarDeclarationNode(typeId type, char *identifier, AstNode *scope);
     typeId type;
     char *identifier;
     AstNode *scope;
+
     AstNode* evaluate();
+
+    VarDeclarationNode(typeId type, char *identifier, AstNode *scope);
 };
 
 class VarAssignmentNode: public AstNode {
 public:
-    VarAssignmentNode(char *identifier, AstNode *exp, AstNode *scope);
     char *identifier;
     ExpressionNode *rExp;
     AstNode *scope;
+
     AstNode* evaluate();
+
+    VarAssignmentNode(char *identifier, AstNode *exp, AstNode *scope);
 };
 
 class IfNode: public AstNode {
@@ -95,13 +112,15 @@ public:
 
 class FnNode: public AstNode {
 public:
-    FnNode(typeId type, char *identifier, AstNode *scope);
     typeId type;
     char *identifier;
     AstNode *scope;
     Value *value;
+
     AstNode* evaluate();
     AstNode *run(AstNode *returnNode);
+
+    FnNode(typeId type, char *identifier, AstNode *scope);
 };
 
 
@@ -110,6 +129,7 @@ public:
     AstNode* evaluate();
     Value *value;
     AstNode *scope;
+
     ReturnNode(AstNode *scope);
 };
 

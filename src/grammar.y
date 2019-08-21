@@ -330,7 +330,7 @@ builtin_function:
 
 print:
     TOKPRINT '(' act_params ')' {
-        PrintNode *print = new PrintNode($3);
+        PrintNode *print = new PrintNode($3, curScope);
         $$ = print;
     }
     ;

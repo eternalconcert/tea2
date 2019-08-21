@@ -4,7 +4,8 @@
 #include "../value.h"
 
 
-PrintNode::PrintNode(AstNode *paramsHead) {
+PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope) {
+    this->scope = scope;
     this->childListHead = paramsHead;
     AstNode();
 }
