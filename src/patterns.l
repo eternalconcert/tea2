@@ -14,11 +14,11 @@
 %x string
 %x multiLineComment
 %%
-"//".*                                   /* ignore comments TODO: Think about enforcing a blank after the # */;
+"//".*|"#".*                            /* ignore comments */;
 "/*"                                    { BEGIN multiLineComment; }
 <multiLineComment>[^*\n]+
 <multiLineComment>\n
-<multiLineComment>"*/"                  { BEGIN 0; }
+<multiLineComment>"*/"                  { END multiLineComment; }
 "="                                     return '=';
 ";"                                     return ';';
 ","                                     return ',';
