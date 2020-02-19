@@ -18,7 +18,7 @@
 "/*"                                    { BEGIN multiLineComment; }
 <multiLineComment>[^*\n]+
 <multiLineComment>\n
-<multiLineComment>"*/"                  { END multiLineComment; }
+<multiLineComment>"*/"                  { BEGIN 0; }
 "="                                     return '=';
 ";"                                     return ';';
 ","                                     return ',';

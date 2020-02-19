@@ -4,7 +4,7 @@ parser:
 	lex src/patterns.l
 	yacc -d src/grammar.y # --verbose
 
-tea: parser
+tea: clean parser
 	g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static
 
 win-tea: parser
@@ -15,6 +15,6 @@ run:
 
 clean:
 	find . -name "*.o" -delete
-	rm tea tea.exe lex.yy.c y.tab.c y.tab.h
+	rm -f tea tea.exe lex.yy.c y.tab.c y.tab.h
 
 .PHONY: tea
