@@ -94,11 +94,11 @@ AstNode* ExpressionNode::evaluate() {
             this->value = lVal <= rVal;
         }
 
-        if (!strcmp(cur->op, "and")) {
+        if (!strcmp(cur->op, "and") || !strcmp(cur->op, "&") || !strcmp(cur->op, "&&")) {
             this->value = lVal && rVal;
         }
 
-        if (!strcmp(cur->op, "or")) {
+        if (!strcmp(cur->op, "or") || !strcmp(cur->op, "|") || !strcmp(cur->op, "||")) {
             this->value = lVal || rVal;
         }
 
