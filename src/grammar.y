@@ -81,7 +81,7 @@ main(int argc, char *argv[0]) {
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
-%token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE
+%token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE TOKAND
 %token <tval> TYPEIDENT
 %token <sval> TOKSTRING
 %token <ival> TOKINTEGER
@@ -199,6 +199,8 @@ operator:
     TOKLT
     |
     TOKLTE
+    |
+    TOKAND
     ;
 
 return_stmt:

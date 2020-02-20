@@ -614,3 +614,9 @@ Value* operator<=(Value &lVal, Value *rVal) {
         return nVal;
     }
 };
+
+Value* operator&&(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    nVal->set(lVal.boolValue && rVal->boolValue);
+    return nVal;
+};
