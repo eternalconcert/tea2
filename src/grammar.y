@@ -80,7 +80,7 @@ main(int argc, char *argv[0]) {
 %token TOKPRINT TOKREADFILE TOKQUIT
 %token TOKLBRACE TOKRBRACE
 
-%token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE
+%token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
 %token <sval> TOKEQUAL TOKNEQUAL TOKGT TOKGTE TOKLT TOKLTE
 %token <tval> TYPEIDENT
 %token <sval> TOKSTRING
@@ -185,6 +185,8 @@ operator:
     TOKTIMES
     |
     TOKDIVIDE
+    |
+    TOKMOD
     |
     TOKEQUAL
     |
@@ -367,4 +369,3 @@ quit:
     }
 
 %%
-

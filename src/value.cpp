@@ -1,9 +1,9 @@
 #include <string.h>
+#include <cmath>
 #include "exceptions.h"
 #include "ast/ast.h"
 #include "valuestore.h"
 #include "value.h"
-
 
 void Value::set(typeId type) {
     this->type = type;
@@ -350,6 +350,65 @@ Value* operator/(Value &lVal, Value *rVal) {
     return nVal;
 };
 
+Value* operator%(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
+        // 10 % 3 = 1
+        nVal->set(lVal.intValue % rVal->intValue);
+
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
+        // 10 / 3.0 = 1.0
+        float v = std::fmod(lVal.intValue, rVal->floatValue);
+        nVal->set(v);
+    }
+
+    if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
+        // 2 % "A"
+        throw (TypeError("Modulo is not implemented for INT and STR"));
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
+        // 10.0 % 3 = 1.0
+        float v = std::fmod(lVal.floatValue, rVal->intValue);
+        nVal->set(v);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == FLOAT) {
+        // 10.0 % 3.0 = 1.0
+        float v = std::fmod(lVal.floatValue, rVal->floatValue);
+        nVal->set(v);
+    }
+
+    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
+        // 1.0 % "A"
+        throw (TypeError("Modulo is not implemented for FLOAT and STR"));
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
+        // "Hello" % 2
+
+        throw (TypeError("Modulo is not implemented for STR and INT"));
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
+        // "A" % 1.0
+        throw (TypeError("Modulo is not implemented for STR and FLOAT"));
+    }
+
+    if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
+        // "A" % "B"
+        throw (TypeError("Modulo is not implemented for STR and STR"));
+    }
+
+    if (lVal.getTrueType() == BOOL or rVal->getTrueType() == BOOL) {
+        // true / false
+        throw (TypeError("Modulo is not implemented for BOOL"));
+
+    }
+    return nVal;
+};
 
 Value* operator==(Value &lVal, Value *rVal) {
     Value *nVal = new Value();

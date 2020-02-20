@@ -26,6 +26,7 @@
 "-"                                     yylval.sval=strdup(yytext); return TOKMINUS;
 "*"                                     yylval.sval=strdup(yytext); return TOKTIMES;
 "\/"                                    yylval.sval=strdup(yytext); return TOKDIVIDE;
+"%"                                     yylval.sval=strdup(yytext); return TOKMOD;
 "=="                                    yylval.sval=strdup(yytext); return TOKEQUAL;
 "!="                                    yylval.sval=strdup(yytext); return TOKNEQUAL;
 ">"                                     yylval.sval=strdup(yytext); return TOKGT;

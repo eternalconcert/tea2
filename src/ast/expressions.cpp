@@ -66,6 +66,10 @@ AstNode* ExpressionNode::evaluate() {
             this->value = lVal / rVal;
         }
 
+        if (!strcmp(cur->op, "%")) {
+            this->value = lVal % rVal;
+        }
+
         if (!strcmp(cur->op, "==")) {
             this->value = lVal == rVal;
         }
