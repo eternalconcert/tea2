@@ -33,7 +33,8 @@
 ">="                                    yylval.sval=strdup(yytext); return TOKGTE;
 "<"                                     yylval.sval=strdup(yytext); return TOKLT;
 "<="                                    yylval.sval=strdup(yytext); return TOKLTE;
-"&&"                                    yylval.sval=strdup(yytext); return TOKAND;
+"and"                                     yylval.sval=strdup(yytext); return TOKAND;
+"or"                                     yylval.sval=strdup(yytext); return TOKOR;
 CONST                                   return TOKCONST;
 INT                                     yylval.tval=INT; return TYPEIDENT;
 FLOAT                                   yylval.tval=FLOAT; return TYPEIDENT;

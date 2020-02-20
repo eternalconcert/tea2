@@ -620,3 +620,9 @@ Value* operator&&(Value &lVal, Value *rVal) {
     nVal->set(lVal.boolValue && rVal->boolValue);
     return nVal;
 };
+
+Value* operator||(Value &lVal, Value *rVal) {
+    Value *nVal = new Value();
+    nVal->set(lVal.boolValue || rVal->boolValue);
+    return nVal;
+};
