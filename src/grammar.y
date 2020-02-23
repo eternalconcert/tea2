@@ -11,7 +11,7 @@
     AstNode *curScope = root;
 
     void pushScope() {
-        AstNode *newScope =  new AstNode();
+        AstNode *newScope = new AstNode();
         newScope->parent = curScope;
         curScope = newScope;
     };

@@ -44,4 +44,3 @@ AstNode* ReturnNode::evaluate() {
     this->value = result->value;
     return this->getNext();
 };
-
