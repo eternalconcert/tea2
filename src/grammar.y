@@ -101,7 +101,7 @@ main(int argc, char *argv[0]) {
 
 lbrace:
     TOKLBRACE {
-    pushScope();
+        pushScope();
 }
 
 rbrace:
