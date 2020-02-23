@@ -53,3 +53,12 @@ public:
         exit(6);
     };
 };
+
+
+class FileNotFoundException: public std::exception {
+public:
+    FileNotFoundException(std::string message) {
+        printf("FileNotFound: %s\n", message.c_str());
+        exit(7);
+    };
+};

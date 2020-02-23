@@ -45,6 +45,17 @@ public:
 };
 
 
+class ReadFileNode: public AstNode {
+public:
+    Value *pathValue;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    std::string read(std::string path);
+    ReadFileNode(Value *pathValue, AstNode *scope);
+};
+
+
 class ConstNode: public AstNode {
 public:
     char *identifier;

@@ -342,10 +342,22 @@ print:
     ;
 
 readFile:
-    TOKREADFILE '(' act_params ')' {
-        printf("%s\n", "readFile");
-        $$ = $3;
+    TOKREADFILE '(' TOKSTRING ')' {
+        Value *valueObj = new Value();
+        valueObj->set($3);
+
+        ReadFileNode *readFile = new ReadFileNode(valueObj, curScope);
+        $$ = readFile;
     }
+    |
+    TOKREADFILE '(' TOKIDENT ')' {
+        Value *valueObj = new Value();
+        valueObj->setIdent($3, curScope);
+
+        ReadFileNode *readFile = new ReadFileNode(valueObj, curScope);
+        $$ = readFile;
+    }
+    ;
 
 quit:
     TOKQUIT '(' TOKINTEGER ')' {
