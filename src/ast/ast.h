@@ -51,7 +51,7 @@ public:
     AstNode *scope;
 
     AstNode* evaluate();
-    std::string read(std::string path);
+    std::string readFile(std::string path);
     ReadFileNode(Value *pathValue, AstNode *scope);
 };
 

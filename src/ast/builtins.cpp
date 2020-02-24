@@ -59,7 +59,7 @@ ReadFileNode::ReadFileNode(Value *pathValue, AstNode *scope) {
 };
 
 
-std::string ReadFileNode::read(std::string path) {
+std::string ReadFileNode::readFile(std::string path) {
     std::ifstream file(path);
 
     if (!file) {
@@ -76,17 +76,21 @@ std::string ReadFileNode::read(std::string path) {
 
 
 AstNode* ReadFileNode::evaluate() {
+    std::string fromFile;
     switch (this->pathValue->type) {
         case STR:
-            printf("%s\n", this->read(this->pathValue->stringValue).c_str());
+            fromFile = this->readFile(this->pathValue->stringValue);
             break;
         case IDENTIFIER:
-            Value *val = getFromValueStore(this->scope, this->pathValue->identValue);
-            if (val->getTrueType() != STR) {
-                throw (TypeError("Wrong type readFile function"));
-            }
-            printf("%s\n", this->read(val->stringValue).c_str());
-            break;
+           Value *val = getFromValueStore(this->scope, this->pathValue->identValue);
+           if (val->getTrueType() != STR) {
+               throw (TypeError("Wrong type readFile function"));
+           }
+           fromFile = this->readFile(val->stringValue);
+           break;
     }
+    char* cStr = new char[sizeof(fromFile)];
+    strcpy(cStr, fromFile.c_str());
+    this->value->set(cStr);
     return this->getNext();
 };

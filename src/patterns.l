@@ -48,7 +48,7 @@ false                                   yylval.bval=false; return TOKBOOL;
 FN                                      return TOKFN;
 return                                  return TOKRETURN;
 print                                   return TOKPRINT;
-readFile                                return TOKREADFILE;
+read                                    return TOKREADFILE;
 quit                                    return TOKQUIT;
 "("                                     return '(';
 ")"                                     return ')';

@@ -93,7 +93,7 @@ main(int argc, char *argv[0]) {
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt const_declaration
 %type <node> var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
-%type <node> print readFile quit
+%type <node> print read quit
 
 %start statements
 
@@ -173,6 +173,10 @@ expression:
     }
     |
     fn_call {
+        $$ = $1;
+    }
+    |
+    builtin_function {
         $$ = $1;
     }
     ;
@@ -330,7 +334,7 @@ if_statement:
 builtin_function:
     print
     |
-    readFile
+    read
     |
     quit
 
@@ -341,7 +345,7 @@ print:
     }
     ;
 
-readFile:
+read:
     TOKREADFILE '(' TOKSTRING ')' {
         Value *valueObj = new Value();
         valueObj->set($3);
