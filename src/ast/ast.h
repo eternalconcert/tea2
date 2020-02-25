@@ -27,12 +27,17 @@ private:
 class PrintNode: public AstNode {
 public:
     AstNode *scope;
-
     AstNode* evaluate();
-
     PrintNode(AstNode *paramsHead, AstNode *scope);
 };
 
+
+class AssertNode: public AstNode {
+public:
+  AstNode *scope;
+  AstNode* evaluate();
+  AssertNode(AstNode *paramsHead, AstNode *scope);
+};
 
 class QuitNode: public AstNode {
 public:

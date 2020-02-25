@@ -25,7 +25,8 @@ AstNode* PrintNode::evaluate() {
     printf("\n");
     fflush(stdout);
     return this->getNext();
-}
+};
+
 
 QuitNode::QuitNode(Value *rcValue, AstNode *scope) {
     this->rcValue = rcValue;
@@ -84,7 +85,7 @@ AstNode* ReadFileNode::evaluate() {
         case IDENTIFIER:
            Value *val = getFromValueStore(this->scope, this->pathValue->identValue);
            if (val->getTrueType() != STR) {
-               throw (TypeError("Wrong type readFile function"));
+               throw (TypeError("Wrong type for read function"));
            }
            fromFile = this->readFile(val->stringValue);
            break;
@@ -92,5 +93,31 @@ AstNode* ReadFileNode::evaluate() {
     char* cStr = new char[sizeof(fromFile)];
     strcpy(cStr, fromFile.c_str());
     this->value->set(cStr);
+    return this->getNext();
+};
+
+AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope) {
+    this->scope = scope;
+    this->childListHead = paramsHead;
+    AstNode();
+}
+
+
+AstNode* AssertNode::evaluate() {
+    AstNode *cur = this->childListHead;
+    AstNode *prev = NULL;
+    while (cur != NULL) {
+        ExpressionNode *eval = (ExpressionNode*)cur;
+        eval->evaluate();
+        if (prev) {
+            Value& lVal = *eval->value;
+            Value *rVal = prev->value;
+            if (operator!=(lVal, rVal)->boolValue) {
+                throw AssertionError(prev->value, eval->value);
+            }
+        }
+        prev = eval;
+        cur = cur->getNext();
+    }
     return this->getNext();
 };

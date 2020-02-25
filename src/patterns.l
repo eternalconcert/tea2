@@ -50,6 +50,7 @@ return                                  return TOKRETURN;
 print                                   return TOKPRINT;
 read                                    return TOKREADFILE;
 quit                                    return TOKQUIT;
+assert                                  return TOKASSERT;
 "("                                     return '(';
 ")"                                     return ')';
 "{"                                     return TOKLBRACE;

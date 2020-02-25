@@ -410,32 +410,20 @@ Value* operator%(Value &lVal, Value *rVal) {
     return nVal;
 };
 
+
 Value* operator==(Value &lVal, Value *rVal) {
     Value *nVal = new Value();
+
+    if (lVal.getTrueType() != rVal->getTrueType()) {
+        nVal->set(false);
+        return nVal;
+    }
+
     if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
         // 1 == 1 = true
         nVal->set(lVal.intValue == rVal->intValue);
         return nVal;
 
-    }
-
-    if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
-        // 1 == 1.0 = true
-        nVal->set(lVal.intValue == rVal->floatValue);
-        return nVal;
-    }
-
-    if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
-        // 1 == "1" = true
-        std::string tempStr = std::to_string(lVal.intValue);
-        nVal->set(strcmp(tempStr.c_str(), rVal->stringValue) == 0);
-        return nVal;
-    }
-
-    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
-        // 1.0 == 1 = true
-        nVal->set(lVal.floatValue == rVal->intValue);
-        return nVal;
     }
 
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == FLOAT) {
@@ -444,48 +432,9 @@ Value* operator==(Value &lVal, Value *rVal) {
         return nVal;
     }
 
-    if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
-        // 1.0 == "1.0" = true
-        std::string tempStr = std::to_string(lVal.floatValue);
-        nVal->set(strcmp(tempStr.c_str(), rVal->stringValue) == 0);
-        return nVal;
-    }
-
-    if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
-        // "1" == 1 = true
-        std::string tempStr = std::to_string(rVal->intValue);
-        nVal->set(strcmp(tempStr.c_str(), lVal.stringValue) == 0);
-        return nVal;
-    }
-
-    if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
-        // "1.0" == 1.0 = true
-        std::string tempStr = std::to_string(rVal->floatValue);
-        nVal->set(strcmp(tempStr.c_str(), lVal.stringValue) == 0);
-        return nVal;
-    }
-
     if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
         // "A" == "A" = true
         nVal->set(strcmp(lVal.stringValue, rVal->stringValue) == 0);
-        return nVal;
-    }
-
-    if (lVal.getTrueType() == BOOL and rVal->getTrueType() == INT) {
-        // true == 1 = true
-        // true == 2 = true
-        // true == 0 = false
-        // true == -1 = false
-        nVal->set(bool(lVal.boolValue == (rVal->intValue > 0)));
-        return nVal;
-    }
-
-    if (lVal.getTrueType() == INT and rVal->getTrueType() == BOOL) {
-        //  1 == true = true
-        //  2 == true = true
-        //  0 == true = false
-        // -1 == true = false
-        nVal->set(bool((lVal.intValue > 0) == rVal->boolValue));
         return nVal;
     }
 

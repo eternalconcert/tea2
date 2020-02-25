@@ -77,7 +77,7 @@ main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKCONST TOKFN TOKRETURN
-%token TOKPRINT TOKREADFILE TOKQUIT
+%token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -93,7 +93,7 @@ main(int argc, char *argv[0]) {
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt const_declaration
 %type <node> var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
-%type <node> print read quit
+%type <node> print read quit assert
 
 %start statements
 
@@ -337,6 +337,9 @@ builtin_function:
     read
     |
     quit
+    |
+    assert
+    ;
 
 print:
     TOKPRINT '(' act_params ')' {
@@ -360,6 +363,13 @@ read:
 
         ReadFileNode *readFile = new ReadFileNode(valueObj, curScope);
         $$ = readFile;
+    }
+    ;
+
+assert:
+    TOKASSERT '(' act_params ')' {
+        AssertNode *print = new AssertNode($3, curScope);
+        $$ = print;
     }
     ;
 

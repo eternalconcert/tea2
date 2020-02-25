@@ -17,4 +17,8 @@ clean:
 	find . -name "*.o" -delete
 	rm -f tea tea.exe lex.yy.c y.tab.c y.tab.h
 
+test:
+	pythonenv/bin/robot robottests
+	./tea tests/tests.t
+
 .PHONY: tea

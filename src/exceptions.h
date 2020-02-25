@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "value.h"
 
 
 class RuntimeError: public std::exception {
@@ -59,6 +60,19 @@ class FileNotFoundException: public std::exception {
 public:
     FileNotFoundException(std::string message) {
         printf("FileNotFound: %s\n", message.c_str());
+        exit(7);
+    };
+};
+
+
+class AssertionError: public std::exception {
+public:
+  AssertionError(Value *first, Value *second) {
+        printf("AssertionError: ");
+        first->repr();
+        printf(" != ");
+        second->repr();
+        printf("\n");
         exit(7);
     };
 };
