@@ -11,6 +11,7 @@ FnNode::FnNode(typeId type, char *identifier, AstNode *scope) {
 };
 
 AstNode* FnNode::evaluate() {
+    ValueStore *constGlobal = ValueStore::getConstGlobalStore();
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }

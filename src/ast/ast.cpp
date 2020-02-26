@@ -42,11 +42,8 @@ AstNode *AstNode::getNext() {
 };
 
 
-void AstNode::setNext(AstNode *nextNode) {
-    this->next = nextNode;
-};
-
 Value *getFromValueStore(AstNode *scope, char* ident) {
+    ValueStore *constGlobal = ValueStore::getConstGlobalStore();
     if (constGlobal->values[ident] != NULL) {
         return constGlobal->values[ident];
     }

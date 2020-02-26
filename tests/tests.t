@@ -9,30 +9,30 @@ VOID FN test_INT_Assignments() {
 
 
 VOID FN test_STR_Assignments() {
-    STR b = "Hello";
-    assert(b, "Hello");
+    STR a = "Hello";
+    assert(a, "Hello");
     testCount = testCount + 1;
 };
 
 
 VOID FN test_FLOAT_Assignments() {
-    FLOAT c = 23.5;
-    assert(c, 23.5);
+    FLOAT a = 23.5;
+    assert(a, 23.5);
     testCount = testCount + 1;
 };
 
 
 VOID FN test_BOOL_Assignments() {
-    BOOL d = false;
-    assert(d, false);
+    BOOL a = false;
+    assert(a, false);
     testCount = testCount + 1;
 };
 
 
 VOID FN test_INT_Reassignments() {
-    INT e = 23;
-    e = 12;
-    assert(e, 12);
+    INT a = 23;
+    a = 12;
+    assert(a, 12);
     testCount = testCount + 1;
 };
 

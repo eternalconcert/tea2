@@ -23,8 +23,11 @@ AstNode* VarNode::evaluate() {
     if (val->type != this->type) {
         throw (TypeError("Types did not match"));
     }
+    ValueStore *constGlobal = ValueStore::getConstGlobalStore();
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
-        throw (ConstError(this->identifier));
+        if (constGlobal->values[this->identifier] != NULL) {
+            throw (ConstError(this->identifier));
+        }
     }
     this->scope->valueStore->set(this->identifier, val);
     return this->getNext();
@@ -40,6 +43,7 @@ VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *s
 
 
 AstNode* VarDeclarationNode::evaluate() {
+    ValueStore *constGlobal = ValueStore::getConstGlobalStore();
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }

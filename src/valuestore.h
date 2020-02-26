@@ -15,8 +15,13 @@ class ValueStore {
         Value* get(std::string ident) {
             return this->values[ident];
         }
+
+        static ValueStore *getConstGlobalStore();
+
+    private:
+        static ValueStore *_constGlobalInstance;
 };
 
-extern ValueStore *constGlobal;
+
 
 #endif

@@ -16,6 +16,7 @@ ConstNode::ConstNode(typeId type, char *identifier, AstNode *expNode) {
 
 
 AstNode* ConstNode::evaluate() {
+    ValueStore *constGlobal = ValueStore::getConstGlobalStore();
     if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
         throw (ConstError(this->identifier));
     }

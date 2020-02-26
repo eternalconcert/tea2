@@ -284,6 +284,19 @@ var_declaration:
     }
     ;
 
+var_assignment:
+    TOKIDENT '=' expressions {
+        VarAssignmentNode *variable = new VarAssignmentNode($1, $3, curScope);
+        $$ = variable;
+    }
+
+var_declaration_assignment:
+        TYPEIDENT TOKIDENT '=' expressions {
+        VarNode *variable = new VarNode($1, $2, $4, curScope);
+        $$ = variable;
+    }
+    ;
+
 fn_declaration:
     TYPEIDENT TOKFN TOKIDENT '(' /* formal_params */ ')' lbrace statements rbrace {
         FnNode *fnNode = new FnNode($1, $3, curScope);
@@ -299,19 +312,6 @@ fn_call:
         retNode->value = fnCall;
         $$ = retNode;
     }
-
-var_assignment:
-    TOKIDENT '=' expressions {
-        VarAssignmentNode *variable = new VarAssignmentNode($1, $3, curScope);
-        $$ = variable;
-    }
-
-var_declaration_assignment:
-        TYPEIDENT TOKIDENT '=' expressions {
-        VarNode *variable = new VarNode($1, $2, $4, curScope);
-        $$ = variable;
-    }
-    ;
 
 if_statement:
     TOKIF '(' expressions ')' lbrace statements rbrace {
