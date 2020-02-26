@@ -43,9 +43,9 @@ AstNode *AstNode::getNext() {
 
 
 Value *getFromValueStore(AstNode *scope, char* ident) {
-    ValueStore *constGlobal = ValueStore::getConstGlobalStore();
-    if (constGlobal->values[ident] != NULL) {
-        return constGlobal->values[ident];
+    Value *constant = getConstant(ident);
+    if (constant) {
+        return constant;
     }
     Value *val = scope->valueStore->values[ident];
     while (val == NULL and scope != NULL) {

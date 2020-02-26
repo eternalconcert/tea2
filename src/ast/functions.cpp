@@ -11,10 +11,7 @@ FnNode::FnNode(typeId type, char *identifier, AstNode *scope) {
 };
 
 AstNode* FnNode::evaluate() {
-    ValueStore *constGlobal = ValueStore::getConstGlobalStore();
-    if (constGlobal->values.find(this->identifier) != constGlobal->values.end()) {
-        throw (ConstError(this->identifier));
-    }
+    checkConstant(this->identifier);
     Value *val = new Value();
     val->setFn(this->identifier, this->scope, this);
     this->scope->valueStore->set(this->identifier, val);

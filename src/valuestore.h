@@ -12,9 +12,7 @@ class ValueStore {
             this->values[ident] = val;
         }
 
-        Value* get(std::string ident) {
-            return this->values[ident];
-        }
+        Value *get(std::string ident);
 
         static ValueStore *getConstGlobalStore();
 
@@ -23,5 +21,7 @@ class ValueStore {
 };
 
 
-
+Value *getConstant(std::string identifier);
+bool isConstant(std::string identifier);
+void checkConstant(std:: string identifier);
 #endif
