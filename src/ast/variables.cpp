@@ -57,6 +57,7 @@ VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *sc
 
 
 AstNode* VarAssignmentNode::evaluate() {
+    checkConstant(this->identifier);
     this->rExp->evaluate();
     Value *val = this->rExp->value;
     AstNode *valScope = getValueScope(this->scope, this->identifier);

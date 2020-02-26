@@ -81,3 +81,19 @@ No scope violation access for constants
         ...    print(d);'
     ${result}  Given tea has been called with inline command: ${command}
     Then the result should be  "23"  ${result}
+
+Const violation by reassigning value to constant
+    [Tags]    scope
+    ${command}    Catenate    '
+        ...    CONST INT d = 1;
+        ...    d = 2;'
+    ${result}  Given tea has been called with inline command: ${command}
+    Then the result should be  "ConstError: d"  ${result}
+
+Const violation by assigning constant to identifier in use
+    [Tags]    scope
+    ${command}    Catenate    '
+    ...    INT b = 2;
+    ...    CONST INT b = 1;'
+    ${result}  Given tea has been called with inline command: ${command}
+    Then the result should be  "ConstError: Identifier already in use as constant"  ${result}

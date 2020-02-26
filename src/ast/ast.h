@@ -65,10 +65,11 @@ class ConstNode: public AstNode {
 public:
     char *identifier;
     Value *value;
+    AstNode *scope;  // Root scope for checks
 
     AstNode* evaluate();
 
-    ConstNode(typeId type, char *identifier, AstNode *expNode);
+    ConstNode(typeId type, char *identifier, AstNode *expNode, AstNode *scope);
 };
 
 
@@ -150,4 +151,5 @@ public:
 };
 
 Value *getFromValueStore(AstNode *scope, char* ident);
+Value *getVariableFromValueStore(AstNode *scope, char *ident);
 AstNode *getValueScope(AstNode *scope, char* ident);

@@ -41,17 +41,22 @@ AstNode *AstNode::getNext() {
     return this->next;
 };
 
-
-Value *getFromValueStore(AstNode *scope, char* ident) {
-    Value *constant = getConstant(ident);
-    if (constant) {
-        return constant;
-    }
+Value *getVariableFromValueStore(AstNode *scope, char *ident) {
     Value *val = scope->valueStore->values[ident];
     while (val == NULL and scope != NULL) {
         val = scope->valueStore->values[ident];
         scope = scope->parent;
     }
+    return val;
+}
+
+
+Value *getFromValueStore(AstNode *scope, char *ident) {
+    Value *constant = getConstant(ident);
+    if (constant) {
+        return constant;
+    }
+    Value *val = getVariableFromValueStore(scope, ident);
     if (!val) {
         throw UnknownIdentifierError(ident);
     }

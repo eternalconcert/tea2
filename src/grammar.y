@@ -272,7 +272,7 @@ literal:
 
 const_declaration:
     TOKCONST TYPEIDENT TOKIDENT '=' literal {
-        ConstNode *constant = new ConstNode($2, $3, $5);
+        ConstNode *constant = new ConstNode($2, $3, $5, root);
         $$ = constant;
     }
     ;
