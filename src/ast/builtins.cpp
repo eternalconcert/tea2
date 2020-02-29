@@ -7,13 +7,13 @@
 
 PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope) {
     this->scope = scope;
-    this->childListHead = paramsHead;
+    this->paramsHead = paramsHead;
     AstNode();
 }
 
 
 AstNode* PrintNode::evaluate() {
-    AstNode *cur = this->childListHead;
+    AstNode *cur = this->paramsHead;
     while (cur != NULL) {
         ExpressionNode *eval = (ExpressionNode*)cur;
         eval->evaluate();
@@ -98,13 +98,13 @@ AstNode* ReadFileNode::evaluate() {
 
 AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope) {
     this->scope = scope;
-    this->childListHead = paramsHead;
+    this->paramsHead = paramsHead;
     AstNode();
 }
 
 
 AstNode* AssertNode::evaluate() {
-    AstNode *cur = this->childListHead;
+    AstNode *cur = this->paramsHead;
     AstNode *prev = NULL;
     while (cur != NULL) {
         ExpressionNode *eval = (ExpressionNode*)cur;

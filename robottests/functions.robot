@@ -20,6 +20,17 @@ Declare function with params
     ${result}  Given tea has been called with inline command: ${command}
     Then the return code should be  "0"  ${result.rc}
 
+Symbols of formal parameterare available in the function
+    [Tags]    functions
+    ${command}    Catenate    '
+        ...    VOID FN test(INT a) {
+        ...        a;
+        ...    };
+        ...    test(23);'
+    ${result}  Given tea has been called with inline command: ${command}
+    Then the result should be  "UnassignedIdentifierError: a"  ${result.stdout}
+    Then the return code should be  "5"  ${result.rc}
+
 Run function once
     [Tags]    functions
     ${command}    Catenate    '

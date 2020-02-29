@@ -3,15 +3,23 @@
 #include "ast.h"
 
 
-FnNode::FnNode(typeId type, char *identifier, AstNode *scope) {
+FnNode::FnNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope) {
     this->type = type;
     this->scope = scope;
     this->identifier = identifier;
+    this->paramsHead = paramsHead;
     AstNode();
 };
 
 AstNode* FnNode::evaluate() {
     checkConstant(this->identifier);
+
+    AstNode *cur = this->paramsHead;
+    while (cur != NULL) {
+        cur->evaluate();
+        cur = cur->getNext();
+    }
+
     Value *val = new Value();
     val->setFn(this->identifier, this->scope, this);
     this->scope->valueStore->set(this->identifier, val);

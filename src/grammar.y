@@ -312,13 +312,13 @@ var_declaration_assignment:
 
 fn_declaration:
     TYPEIDENT TOKFN TOKIDENT '(' formal_params ')' lbrace statements rbrace {
-        FnNode *fnNode = new FnNode($1, $3, curScope);
+        FnNode *fnNode = new FnNode($1, $3, $5, curScope);
         fnNode->addToChildList($8);
         $$ = fnNode;
 };
 
 fn_call:
-    TOKIDENT '(' /* act_params */ ')' {
+    TOKIDENT '(' act_params ')' {
         ExpressionNode *retNode = new ExpressionNode(curScope);
         Value *fnCall = new Value();
         fnCall->setFnCall($1, retNode, curScope);

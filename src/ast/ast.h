@@ -27,6 +27,7 @@ private:
 class PrintNode: public AstNode {
 public:
     AstNode *scope;
+    AstNode *paramsHead;
     AstNode* evaluate();
     PrintNode(AstNode *paramsHead, AstNode *scope);
 };
@@ -35,6 +36,7 @@ public:
 class AssertNode: public AstNode {
 public:
   AstNode *scope;
+  AstNode *paramsHead;
   AstNode* evaluate();
   AssertNode(AstNode *paramsHead, AstNode *scope);
 };
@@ -132,12 +134,14 @@ public:
     typeId type;
     char *identifier;
     AstNode *scope;
+    AstNode *paramsHead;
+
     Value *value;
 
     AstNode* evaluate();
     AstNode *run(AstNode *returnNode);
 
-    FnNode(typeId type, char *identifier, AstNode *scope);
+    FnNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope);
 };
 
 
