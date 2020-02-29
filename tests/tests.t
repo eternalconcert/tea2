@@ -37,12 +37,22 @@ VOID FN test_INT_Reassignments() {
 };
 
 
+VOID FN test_FN_declaration_with_params() {
+    VOID FN test(INT a, STR b) {
+        print(a, b);
+    };
+    testCount = testCount + 1;
+};
+
+
+
 // Running tests
 test_INT_Assignments();
 test_STR_Assignments();
 test_FLOAT_Assignments();
 test_BOOL_Assignments();
 test_INT_Reassignments();
+test_FN_declaration_with_params();
 
 // Printing results
 print("Run ", testCount, " tests successfully");

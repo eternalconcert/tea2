@@ -92,7 +92,7 @@ main(int argc, char *argv[0]) {
 %type <sval> operator
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt const_declaration
-%type <node> var_declaration var_declaration_assignment var_assignment act_params expressions act_param builtin_function
+%type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
 %type <node> print read quit assert
 
 %start statements
@@ -236,6 +236,19 @@ act_param:
     }
     ;
 
+formal_params: /* empty */ {
+        $$ = new AstNode();
+    }
+    |
+    var_declaration {
+        $1->addToChildList($1);
+    }
+    |
+    formal_params ',' var_declaration {
+        $1->addToChildList($3);
+    }
+    ;
+
 literal:
     TOKSTRING {
         ExpressionNode *expNode = new ExpressionNode(curScope);
@@ -298,9 +311,9 @@ var_declaration_assignment:
     ;
 
 fn_declaration:
-    TYPEIDENT TOKFN TOKIDENT '(' /* formal_params */ ')' lbrace statements rbrace {
+    TYPEIDENT TOKFN TOKIDENT '(' formal_params ')' lbrace statements rbrace {
         FnNode *fnNode = new FnNode($1, $3, curScope);
-        fnNode->addToChildList($7);
+        fnNode->addToChildList($8);
         $$ = fnNode;
 };
 
@@ -331,7 +344,7 @@ if_statement:
     };
 
 
-builtin_function:
+builtin_function:  // Causes reduce/reduce conflict
     print
     |
     read
