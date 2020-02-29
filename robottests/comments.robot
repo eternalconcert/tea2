@@ -6,4 +6,4 @@ Resource           common.resource
 Inline comments
     [Tags]    comments
     ${result}  Given tea has been called with inline command: 'print(1); // Some stuff'
-    Then the result should be  "1"  ${result}
+    Then the result should be  "1"  ${result.stdout}

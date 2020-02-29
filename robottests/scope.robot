@@ -11,7 +11,8 @@ Same scoped access
         ...        print(a);
         ...    }; '
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "5"  ${result}
+    Then the result should be  "5"  ${result.stdout}
+    And the return code should be  "0"  ${result.rc}
 
 Parent scoped access
     [Tags]    scope
@@ -21,7 +22,8 @@ Parent scoped access
         ...        print(b);
         ...    }; '
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "23"  ${result}
+    Then the result should be  "23"  ${result.stdout}
+    And the return code should be  "0"  ${result.rc}
 
 Scope violation access
     [Tags]    scope
@@ -31,7 +33,8 @@ Scope violation access
         ...    };
         ...    print(c);'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "UnknownIdentifierError: c"  ${result}
+    Then the result should be  "UnknownIdentifierError: c"  ${result.stdout}
+    And the return code should be  "4"  ${result.rc}
 
 Scope violation in assignment
     [Tags]    scope
@@ -41,7 +44,8 @@ Scope violation in assignment
         ...    };
         ...    d = 5;'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "UnknownIdentifierError: d"  ${result}
+    Then the result should be  "UnknownIdentifierError: d"  ${result.stdout}
+    And the return code should be  "4"  ${result.rc}
 
 No scope violation in assignment
     [Tags]    scope
@@ -50,7 +54,8 @@ No scope violation in assignment
         ...    d = "world!";
         ...    print(d);'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "world!"  ${result}
+    Then the result should be  "world!"  ${result.stdout}
+    And the return code should be  "0"  ${result.rc}
 
 No const violation by redefining variables
     [Tags]    scope
@@ -59,7 +64,7 @@ No const violation by redefining variables
         ...    d = "world!";
         ...    print(d);'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "world!"  ${result}
+    Then the result should be  "world!"  ${result.stdout}
 
 No const violation by redefining variables and using as parameter
     [Tags]    scope    bug
@@ -70,7 +75,8 @@ No const violation by redefining variables and using as parameter
         ...    STR d = "world!";
         ...    print(d);'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "world!"  ${result}
+    Then the result should be  "world!"  ${result.stdout}
+    And the return code should be  "0"  ${result.rc}
 
 No scope violation access for constants
     [Tags]    scope
@@ -80,7 +86,8 @@ No scope violation access for constants
         ...    };
         ...    print(d);'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "23"  ${result}
+    Then the result should be  "23"  ${result.stdout}
+    And the return code should be  "0"  ${result.rc}
 
 Const violation by reassigning value to constant
     [Tags]    scope
@@ -88,7 +95,8 @@ Const violation by reassigning value to constant
         ...    CONST INT d = 1;
         ...    d = 2;'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "ConstError: d"  ${result}
+    Then the result should be  "ConstError: d"  ${result.stdout}
+    And the return code should be  "6"  ${result.rc}
 
 Const violation by assigning constant to identifier in use
     [Tags]    scope
@@ -96,4 +104,17 @@ Const violation by assigning constant to identifier in use
     ...    INT b = 2;
     ...    CONST INT b = 1;'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "ConstError: Identifier already in use as constant"  ${result}
+    Then the result should be  "ConstError: Identifier already in use as constant"  ${result.stdout}
+    And the return code should be  "6"  ${result.rc}
+
+Variable assignment after function declaration and function call leads to UnknownIdentifierError
+    [Tags]    scope
+    ${command}    Catenate    '
+    ...    VOID FN test() {
+    ...        print(a);
+    ...    };
+    ...    test();
+    ...    INT a = 1;'
+    ${result}  Given tea has been called with inline command: ${command}
+    Then the result should be  "UnknownIdentifierError: a"  ${result.stdout}
+    And the return code should be  "4"  ${result.rc}

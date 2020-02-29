@@ -55,4 +55,4 @@ For the condition ${condition} the result should be ${expected}
     ...            print("not met");
     ...        };'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be    ${expected}    ${result}
+    Then the return code should be    ${expected}    ${result.stdout}

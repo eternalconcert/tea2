@@ -11,7 +11,7 @@ Declare function
         ...    };
         ...    print("check point"); '
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "check point"  ${result}
+    Then the result should be  "check point"  ${result.stdout}
 
 Run function once
     [Tags]    functions
@@ -21,7 +21,7 @@ Run function once
         ...    };
         ...    test(); '
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "Should appear"  ${result}
+    Then the result should be  "Should appear"  ${result.stdout}
 
 Run function twice
     [Tags]    functions
@@ -32,4 +32,4 @@ Run function twice
         ...    test();
         ...    test(); '
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "Should appear twice when called twice\nShould appear twice when called twice"  ${result}
+    Then the result should be  "Should appear twice when called twice\nShould appear twice when called twice"  ${result.stdout}
