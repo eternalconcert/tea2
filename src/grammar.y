@@ -381,8 +381,8 @@ read:
 
 assert:
     TOKASSERT '(' act_params ')' {
-        AssertNode *print = new AssertNode($3, curScope);
-        $$ = print;
+        AssertNode *assert = new AssertNode($3, curScope);
+        $$ = assert;
     }
     ;
 
