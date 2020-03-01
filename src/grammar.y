@@ -312,9 +312,9 @@ var_declaration_assignment:
 
 fn_declaration:
     TYPEIDENT TOKFN TOKIDENT '(' formal_params ')' lbrace statements rbrace {
-        FnNode *fnNode = new FnNode($1, $3, $5, curScope);
-        fnNode->addToChildList($8);
-        $$ = fnNode;
+        FnDeclarationNode *fnDeclarationNode = new FnDeclarationNode($1, $3, $5, curScope);
+        fnDeclarationNode->addToChildList($8);
+        $$ = fnDeclarationNode;
 };
 
 fn_call:

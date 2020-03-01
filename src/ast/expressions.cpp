@@ -11,7 +11,7 @@ ExpressionNode::ExpressionNode(AstNode *scope) {
 
 Value *ExpressionNode::runFunctionAndGetResult() {
     Value *startValue = getFromValueStore(this->scope, this->value->identValue);
-    FnNode *functionBlock = (FnNode*)startValue->block;
+    FnDeclarationNode *functionBlock = (FnDeclarationNode*)startValue->block;
     // From here
     functionBlock->run(this);
     return functionBlock->value;

@@ -129,7 +129,7 @@ public:
 };
 
 
-class FnNode: public AstNode {
+class FnDeclarationNode: public AstNode {
 public:
     typeId type;
     char *identifier;
@@ -141,7 +141,7 @@ public:
     AstNode* evaluate();
     AstNode *run(AstNode *returnNode);
 
-    FnNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope);
+    FnDeclarationNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope);
 };
 
 

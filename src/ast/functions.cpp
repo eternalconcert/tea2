@@ -3,7 +3,7 @@
 #include "ast.h"
 
 
-FnNode::FnNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope) {
+FnDeclarationNode::FnDeclarationNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope) {
     this->type = type;
     this->scope = scope;
     this->identifier = identifier;
@@ -11,7 +11,7 @@ FnNode::FnNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scop
     AstNode();
 };
 
-AstNode* FnNode::evaluate() {
+AstNode* FnDeclarationNode::evaluate() {
     checkConstant(this->identifier);
 
     AstNode *cur = this->paramsHead;
@@ -27,7 +27,7 @@ AstNode* FnNode::evaluate() {
 };
 
 
-AstNode *FnNode::run(AstNode *returnNode) {
+AstNode *FnDeclarationNode::run(AstNode *returnNode) {
     Value *val = getFromValueStore(this->scope, this->identifier);
     ExpressionNode *result = (ExpressionNode*)val->block->childListHead;
     result->evaluate();
