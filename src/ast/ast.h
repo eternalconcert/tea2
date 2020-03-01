@@ -139,9 +139,18 @@ public:
     Value *value;
 
     AstNode* evaluate();
-    AstNode *run(AstNode *returnNode);
 
     FnDeclarationNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope);
+};
+
+
+class FnCallNode: public AstNode {
+public:
+    AstNode *scope;
+    AstNode *paramsHead;
+    char *identifier;
+    AstNode* evaluate();
+    FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope);
 };
 
 

@@ -53,3 +53,15 @@ Run function twice
     ${result}  Given tea has been called with inline command: ${command}
     Then the result should be  "Should appear twice when called twice\nShould appear twice when called twice"  ${result.stdout}
     Then the return code should be  "0"  ${result.rc}
+
+
+Function call with params available in inner scop
+    [Tags]    functions
+    ${command}    Catenate    '
+        ...    VOID FN test(INT a, STR b) {
+        ...        print(a, b);
+        ...    };
+        ...    test(23, "hello");'
+    ${result}  Given tea has been called with inline command: ${command}
+    Then the result should be  "23hello"  ${result.stdout}
+    Then the return code should be  "0"  ${result.rc}

@@ -319,12 +319,12 @@ fn_declaration:
 
 fn_call:
     TOKIDENT '(' act_params ')' {
-        ExpressionNode *retNode = new ExpressionNode(curScope);
-        Value *fnCall = new Value();
-        fnCall->setFnCall($1, retNode, curScope);
-        retNode->value = fnCall;
-        $$ = retNode;
+        FnCallNode *fnCall = new FnCallNode($1, $3, curScope);
+        fnCall->value->setFnCall($1, $$, curScope);
+        $$ = fnCall;
     }
+    ;
+
 
 if_statement:
     TOKIF '(' expressions ')' lbrace statements rbrace {

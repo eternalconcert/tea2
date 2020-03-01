@@ -27,14 +27,35 @@ AstNode* FnDeclarationNode::evaluate() {
 };
 
 
-AstNode *FnDeclarationNode::run(AstNode *returnNode) {
+FnCallNode::FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope) {
+    this->scope = scope;
+    this->identifier = identifier;
+    this->paramsHead = paramsHead;
+    AstNode();
+}
+
+
+AstNode* FnCallNode::evaluate() {
     Value *val = getFromValueStore(this->scope, this->identifier);
     ExpressionNode *result = (ExpressionNode*)val->block->childListHead;
     result->evaluate();
     // Some day, this will work... To test:
     // result->value->set(23235);
-    this->value = result->value;
-    return this;
+    // this->value = result->value;
+    return this->getNext();
+
+    // AstNode *cur = this->paramsHead;
+    // while (cur != NULL) {
+    //     ExpressionNode *eval = (ExpressionNode*)cur;
+    //     eval->evaluate();
+    //     if (eval->value->type != UNDEFINED) {
+    //         eval->value->repr();
+    //     }
+    //     cur = cur->getNext();
+    // }
+
+    // // this->value->set(std::string("I am a value!").c_str());
+    // return this->getNext();
 };
 
 
