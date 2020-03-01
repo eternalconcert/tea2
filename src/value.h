@@ -5,12 +5,13 @@
 #include "commons.h"
 
 class AstNode;
+class FnDeclarationNode;
 
 
 class Value {
 public:
     AstNode *scope;
-    AstNode *block;
+    FnDeclarationNode *functionBody;
     AstNode *retNode;
     typeId type = UNDEFINED; // To check if a Value is present.. Not nice.
     typeId getTrueType();
@@ -27,7 +28,7 @@ public:
     void set(float value);
     void set(bool value);
     void setIdent(char *value, AstNode *scope);
-    void setFn(char *value, AstNode *scope, AstNode *block);
+    void setFn(char *identifier, AstNode *scope, FnDeclarationNode *functionBody);
     void setFnCall(char *value, AstNode *retNode, AstNode *scope);
     void repr();
 };

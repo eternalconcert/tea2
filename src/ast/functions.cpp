@@ -14,12 +14,6 @@ FnDeclarationNode::FnDeclarationNode(typeId type, char *identifier, AstNode *par
 AstNode* FnDeclarationNode::evaluate() {
     checkConstant(this->identifier);
 
-    AstNode *cur = this->paramsHead;
-    while (cur != NULL) {
-        cur->evaluate();
-        cur = cur->getNext();
-    }
-
     Value *val = new Value();
     val->setFn(this->identifier, this->scope, this);
     this->scope->valueStore->set(this->identifier, val);
@@ -36,9 +30,17 @@ FnCallNode::FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope) {
 
 
 AstNode* FnCallNode::evaluate() {
+    // Getting original function body and evaluating formal params
     Value *val = getFromValueStore(this->scope, this->identifier);
-    ExpressionNode *result = (ExpressionNode*)val->block->childListHead;
-    result->evaluate();
+    FnDeclarationNode *body = val->functionBody;
+    AstNode *cur = body->paramsHead;
+    while (cur != NULL) {
+        cur->evaluate();
+        cur = cur->getNext();
+    }
+
+    ExpressionNode *functionBody = (ExpressionNode*)val->functionBody->childListHead;
+    functionBody->evaluate();
     // Some day, this will work... To test:
     // result->value->set(23235);
     // this->value = result->value;
