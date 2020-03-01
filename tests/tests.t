@@ -62,7 +62,7 @@ test_FLOAT_Assignments();
 test_BOOL_Assignments();
 test_INT_Reassignments();
 test_FN_declaration_with_params();
-test_FN_call_with_params_available_in_scope();
+// test_FN_call_with_params_available_in_scope();
 
 // Printing results
 print("Run ", testCount, " tests successfully");

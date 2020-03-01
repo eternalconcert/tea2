@@ -1,5 +1,6 @@
 #include <string>
 #include "commons.h"
+#include "exceptions.h"
 
 
 typeId getTypeIdByName(std::string name) {
@@ -68,6 +69,7 @@ std::string getTypeNameById(typeId id) {
         case FUNCTIONCALL:
             return "FUNCTIONCALL";
 
-
+        default:
+            throw RuntimeError("Unknown TypeId");
     };
 };

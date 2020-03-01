@@ -33,12 +33,19 @@ AstNode* FnCallNode::evaluate() {
     // Getting original function body and evaluating formal params
     Value *val = getFromValueStore(this->scope, this->identifier);
     FnDeclarationNode *body = val->functionBody;
-    AstNode *cur = body->paramsHead;
-    while (cur != NULL) {
-        cur->evaluate();
-        cur = cur->getNext();
+    AstNode *formalParam = body->paramsHead;
+
+    while (formalParam != NULL) {
+        formalParam->evaluate();
+        formalParam = formalParam->getNext();
     }
 
+    AstNode *actualParam = this->paramsHead;
+    while (actualParam != NULL) {
+        ExpressionNode *eval = (ExpressionNode*)actualParam;
+        eval->evaluate();
+        actualParam = actualParam->getNext();
+    }
     ExpressionNode *functionBody = (ExpressionNode*)val->functionBody->childListHead;
     functionBody->evaluate();
     // Some day, this will work... To test:
