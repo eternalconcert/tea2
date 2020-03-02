@@ -70,6 +70,6 @@ std::string getTypeNameById(typeId id) {
             return "FUNCTIONCALL";
 
         default:
-            throw RuntimeError("Unknown TypeId");
+            return "UNDEFINED";
     };
 };

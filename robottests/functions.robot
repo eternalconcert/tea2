@@ -20,16 +20,16 @@ Declare function with params
     ${result}  Given tea has been called with inline command: ${command}
     Then the return code should be  "0"  ${result.rc}
 
-Symbols of formal parameterare available in the function
+Too less parameters to function
     [Tags]    functions
     ${command}    Catenate    '
         ...    VOID FN test(INT a) {
         ...        a;
         ...    };
-        ...    test(23);'
+        ...    test();'
     ${result}  Given tea has been called with inline command: ${command}
-    Then the result should be  "UnassignedIdentifierError: a"  ${result.stdout}
-    Then the return code should be  "5"  ${result.rc}
+    Then the result should be  "ParameterError: "Not enough arguments supplied"  ${result.stdout}
+    Then the return code should be  "8"  ${result.rc}
 
 Run function once
     [Tags]    functions

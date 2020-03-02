@@ -33,38 +33,49 @@ AstNode* FnCallNode::evaluate() {
     // Getting original function body and evaluating formal params
     Value *val = getFromValueStore(this->scope, this->identifier);
     FnDeclarationNode *body = val->functionBody;
-    AstNode *formalParam = body->paramsHead;
-
-    while (formalParam != NULL) {
-        formalParam->evaluate();
-        formalParam = formalParam->getNext();
-    }
+    VarDeclarationNode *formalParam = (VarDeclarationNode*)body->paramsHead;
 
     AstNode *actualParam = this->paramsHead;
-    while (actualParam != NULL) {
-        ExpressionNode *eval = (ExpressionNode*)actualParam;
-        eval->evaluate();
-        actualParam = actualParam->getNext();
+
+
+    while (formalParam != NULL) {
+        if (actualParam == NULL) {
+            throw ParameterError("Not enough arguments supplied");
+        }
+
+        if (formalParam->type > 10) { // Hack!
+            formalParam = NULL;
+        } else {
+            formalParam->evaluate();
+            ExpressionNode *eval = (ExpressionNode*)actualParam;
+            eval->evaluate();
+
+
+            if (formalParam->type != eval->value->type) {
+                throw TypeError("Argument types does not match");
+            }
+
+            // formalParam->value = eval->value;
+
+            checkConstant(formalParam->identifier);
+            eval->value->set(formalParam->type);
+            eval->value->assigned = true;
+            this->scope->valueStore->set(formalParam->identifier, eval->value);
+            formalParam = (VarDeclarationNode*)formalParam->getNext();
+            actualParam = actualParam->getNext();
+        }
+
+
     }
     ExpressionNode *functionBody = (ExpressionNode*)val->functionBody->childListHead;
     functionBody->evaluate();
     // Some day, this will work... To test:
-    // result->value->set(23235);
-    // this->value = result->value;
+    // Value *result = new Value;
+    // result->set(23235);
+    // this->value = result;
+    // -> 02.03.2020, 23:23 It works!
     return this->getNext();
 
-    // AstNode *cur = this->paramsHead;
-    // while (cur != NULL) {
-    //     ExpressionNode *eval = (ExpressionNode*)cur;
-    //     eval->evaluate();
-    //     if (eval->value->type != UNDEFINED) {
-    //         eval->value->repr();
-    //     }
-    //     cur = cur->getNext();
-    // }
-
-    // // this->value->set(std::string("I am a value!").c_str());
-    // return this->getNext();
 };
 
 

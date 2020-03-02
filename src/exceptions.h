@@ -23,7 +23,7 @@ public:
 class TypeError: public std::exception {
 public:
     TypeError(std::string message) {
-        printf("TypeError! %s\n", message.c_str());
+        printf("TypeError: %s\n", message.c_str());
         exit(3);
     };
 };
@@ -74,5 +74,14 @@ public:
         second->repr();
         printf("\n");
         exit(7);
+    };
+};
+
+
+class ParameterError: public std::exception {
+public:
+    ParameterError(std::string message) {
+        printf("ParameterError: %s\n", message.c_str());
+        exit(8);
     };
 };
