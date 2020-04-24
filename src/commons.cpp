@@ -37,6 +37,8 @@ typeId getTypeIdByName(std::string name) {
         return FUNCTIONCALL;
     }
 
+    return UNDEFINED;
+
 };
 
 std::string getTypeNameById(typeId id) {

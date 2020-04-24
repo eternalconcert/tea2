@@ -443,6 +443,8 @@ Value* operator==(Value &lVal, Value *rVal) {
         nVal->set(lVal.boolValue == rVal->boolValue);
         return nVal;
     }
+    
+    return nVal;
 };
 
 
@@ -521,6 +523,8 @@ Value* operator>(Value &lVal, Value *rVal) {
         nVal->set(lVal.boolValue > rVal->boolValue);
         return nVal;
     }
+    
+    return nVal;
 };
 
 

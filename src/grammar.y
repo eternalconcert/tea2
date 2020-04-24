@@ -36,7 +36,7 @@
         exit(1);
     }
 
-main(int argc, char *argv[0]) {
+int main(int argc, char *argv[0]) {
     if (argc <= 1) {
         printf("%s\n", "No file or command specified");
         exit(1);
