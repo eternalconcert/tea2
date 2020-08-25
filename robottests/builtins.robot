@@ -118,16 +118,6 @@ Print expression and other arguments
     ${result}  Given tea has been called with inline command: 'print(1 - 2, "hello" + " world", "!");'
     Then the result should be  "-1hello world!"  ${result.stdout}
 
-Print constant
-    [Tags]    printing
-    ${result}  Given tea has been called with inline command: 'CONST STR hello = "Hello world!"; print(hello);'
-    Then the result should be  "Hello world!"  ${result.stdout}
-
-Print constant as expression operant
-    [Tags]    printing
-    ${result}  Given tea has been called with inline command: 'CONST INT a = 12; print(a * "x");'
-    Then the result should be  "xxxxxxxxxxxx"  ${result.stdout}
-
 Print variable
     [Tags]    printing
     ${result}  Given tea has been called with inline command: 'STR hello = "Hello world!"; print(hello);'

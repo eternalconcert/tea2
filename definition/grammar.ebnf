@@ -1,6 +1,5 @@
 Program              = { Statement ';' | Expression ';' | Comment | InlineComment }.
-Statement            = { ConstDeclaration |
-                         VarDeclaration |
+Statement            = { VarDeclaration |
                          FuncDeclaration |
                          IfStatement |
                          ForLoop |
@@ -20,7 +19,6 @@ Character            = Letter | Integer | ArithmeticOperator | ' ' | '!' | '...'
 Float                = Integer '.' ('0' | PosInt ) { ('0' | PosInt ) }.
 Boolean              = 'true' | 'false'.
 List                 = '[' [{ ( Literal | Identifier ) }] ']'.
-ConstDeclaration     = 'CONST' TypeIdent Identifier '=' Literal.
 VarDeclaration       = 'VAR' TypeIdent Identifier ['=' (Literal | Identifier)].
 VarAssignment        = Identifier '=' (Literal | Identifier).
 Identifier           = Letter { Letter | PosInt }.
@@ -32,5 +30,5 @@ FuncCall             = Identifier '(' [(Literal | Identifier) { ',' (Literal | I
 IfStatement          = 'if' LogicalExpression {',' LogicalExpression } '{' [Statement {',' Statement }] '}' [ 'else' '{' [Statement {',' Statement }] '}' ].
 ForLoop              = 'for' Identifier 'in' ( Identifier | List ) '{' [Statement {',' Statement }] '}'.
 Return               = 'return' [Identifier | Literal] .
-Comment              = '/*' {Character}. '*/'
-InlineComment              = '//' {Character}.
+Comment              = '/*' {Character} '*/' .
+InlineComment        = '//' {Character} .

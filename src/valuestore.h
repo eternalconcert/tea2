@@ -13,15 +13,6 @@ class ValueStore {
         }
 
         Value *get(std::string ident);
-
-        static ValueStore *getConstGlobalStore();
-
-    private:
-        static ValueStore *_constGlobalInstance;
 };
 
-
-Value *getConstant(std::string identifier);
-bool isConstant(std::string identifier);
-void checkConstant(std:: string identifier);
 #endif

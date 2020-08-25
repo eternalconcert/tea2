@@ -76,7 +76,7 @@ int main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKELSE TOKCONST TOKFN TOKRETURN
+%token TOKIF TOKELSE TOKFN TOKRETURN
 %token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT
 %token TOKLBRACE TOKRBRACE
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <node> expression literal fn_call
-%type <node> statement statements if_statement fn_declaration return_stmt const_declaration
+%type <node> statement statements if_statement fn_declaration return_stmt
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
 %type <node> print read quit assert
 
@@ -119,9 +119,6 @@ statements: {
 
 statement:
     builtin_function {
-        $$ = $1;
-    }
-    | const_declaration {
         $$ = $1;
     }
     | var_declaration {
@@ -280,13 +277,6 @@ literal:
         valueObj->set($1);
         expNode->value = valueObj;
         $$ = expNode;
-    }
-    ;
-
-const_declaration:
-    TOKCONST TYPEIDENT TOKIDENT '=' literal {
-        ConstNode *constant = new ConstNode($2, $3, $5, root);
-        $$ = constant;
     }
     ;
 

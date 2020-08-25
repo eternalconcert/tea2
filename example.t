@@ -3,14 +3,6 @@
 5 - 1;
 1 + 3;
 
-CONST INT NUMBER = 12314;
-CONST FLOAT FLOATING = 0.5;
-CONST STR TEXT = "Hello world!";
-CONST BOOL BOOLEAN = false;
-# print(NUMBER);
-# print(FLOATING);
-# print(TEXT);
-print(BOOLEAN);
 
 INT var_number = 11233;
 INT var_number_no_assignment;
@@ -24,15 +16,14 @@ print(boolean_var);
 STR var_string_no_assignment;
 STR var_string = "String";
 
-FN INT name(INT formal_param1, INT formal_param2) {
+INT FN addition(INT formal_param1, INT formal_param2) {
     INT result;
     result = formal_param1 + formal_param2;
     return result;
 };
 
 STR message1 = "This is an outer scope string variable it should appear unchanged far below.";
-FN VOID empty(INT formal_param1=1, INT formal_param2) {
-    CONST BOOL BOOLEAN = true;
+VOID FN empty(INT formal_param1=1, INT formal_param2) {
     print(message1);
     message1 = "Right here it should be changed";
     FN VOID empty() {
@@ -44,8 +35,8 @@ FN VOID empty(INT formal_param1=1, INT formal_param2) {
 print("Next one must be like the first one");
 print(message1);
 
-var_number_no_assignment_1 = name(const_number, 2);
-INT var_number_no_assignment_2 = name(const_number, 3);
+var_number_no_assignment_1 = addition(3, 2);
+INT var_number_no_assignment_2 = addition(5, 3);
 
 1 + 1;
 2 - 2;
@@ -82,9 +73,9 @@ else {
 print("Hallo Welt!");
 print(23235);
 print(23235.2);
-cmd("echo 'Hello world!'");
+command("echo 'Hello world!'");
 STR command = "echo 'Hello from the world!'";
-cmd(command);
+command(command);
 
 INT test;
 

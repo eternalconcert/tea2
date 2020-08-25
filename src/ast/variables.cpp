@@ -24,8 +24,6 @@ AstNode* VarNode::evaluate() {
         throw (TypeError("Types did not match"));
     }
 
-    checkConstant(this->identifier);
-
     this->scope->valueStore->set(this->identifier, val);
     return this->getNext();
 };
@@ -40,7 +38,6 @@ VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *s
 
 
 AstNode* VarDeclarationNode::evaluate() {
-    checkConstant(this->identifier);
     Value *val = new Value();
     val->set(this->type);
     this->scope->valueStore->set(this->identifier, val);
@@ -57,7 +54,6 @@ VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *sc
 
 
 AstNode* VarAssignmentNode::evaluate() {
-    checkConstant(this->identifier);
     this->rExp->evaluate();
     Value *val = this->rExp->value;
     AstNode *valScope = getValueScope(this->scope, this->identifier);

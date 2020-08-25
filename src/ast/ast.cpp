@@ -52,10 +52,6 @@ Value *getVariableFromValueStore(AstNode *scope, char *ident) {
 
 
 Value *getFromValueStore(AstNode *scope, char *ident) {
-    Value *constant = getConstant(ident);
-    if (constant) {
-        return constant;
-    }
     Value *val = getVariableFromValueStore(scope, ident);
     if (!val) {
         throw UnknownIdentifierError(ident);

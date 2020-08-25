@@ -1,8 +1,4 @@
-#!/usr/bin/tea
-
-CONST INT const_number = 1;
-CONST STR const_string = "String";
-CONST BOOL const_boolean = false;
+//!/usr/bin/tea
 
 INT var_number_no_assignment;
 INT var_number = 1;
@@ -11,17 +7,17 @@ BOOL boolean_val = true;
 STR var_string_no_assignment;
 STR var_string = "String";
 
-FN INT name(INT formal_param1, INT formal_param2=2) {
+INT FN addition(INT formal_param1, INT formal_param2=2) {
     INT result;
     result = formal_param1 + formal_param2;
     return result;
 };
 
-FN VOID empty(INT formal_param1=1, INT formal_param2) {
+VOID FN empty(INT formal_param1=1, INT formal_param2) {
 };
 
-var_number_no_assignment_1 = name(const_number, 2);
-INT var_number_no_assignment_2 = name(const_number, 3);
+var_number_no_assignment_1 = addition(3, 2);
+INT var_number_no_assignment_2 = addition(5, 3);
 
 1 + 1;
 2 - 2;
@@ -46,12 +42,9 @@ if var_number == 1 or var_number not in list1 and var_number != 0 {
     INT a = 3;
 };
 
-# Some builtin functions
-# 1) Print
+// Some builtin functions
+// 1) Print
 print("Printing a literal");
-
-CONST STR stringConst = "Printing a stringConst";
-print(stringConst);
 
 STR stringVar = "Printing a stringVar";
 print(stringVar);
@@ -61,11 +54,8 @@ FN VOID printing() {
     print(stringVar);
 };
 
-# 2) CMD
+// 2) CMD
 cmd("echo 'Echoing a literal'");
-
-CONST STR cmdConst = "echo 'Echoing a cmdConst'";
-cmd(cmdConst);
 
 STR cmdVar = "echo 'Echoing a cmdVar'";
 cmd(cmdVar);
@@ -75,7 +65,7 @@ FN VOID printing() {
     cmd(cmdVar);
 };
 
-# Not fully implemented by now
+// Not fully implemented by now
 ARRAY list1 = [1, 2, 3, "Hello ", "world!"];
 INT num = list1[0];
 ARRAY list2;

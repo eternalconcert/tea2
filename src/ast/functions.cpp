@@ -12,8 +12,6 @@ FnDeclarationNode::FnDeclarationNode(typeId type, char *identifier, AstNode *par
 };
 
 AstNode* FnDeclarationNode::evaluate() {
-    checkConstant(this->identifier);
-
     Value *val = new Value();
     val->setFn(this->identifier, this->scope, this);
     this->scope->valueStore->set(this->identifier, val);
@@ -57,7 +55,6 @@ AstNode* FnCallNode::evaluate() {
 
             // formalParam->value = eval->value;
 
-            checkConstant(formalParam->identifier);
             eval->value->set(formalParam->type);
             eval->value->assigned = true;
             this->scope->valueStore->set(formalParam->identifier, eval->value);

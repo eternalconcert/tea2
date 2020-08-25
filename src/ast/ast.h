@@ -3,7 +3,6 @@
 #include "../valuestore.h"
 #include "../value.h"
 
-
 class AstNode {
 public:
     int id;
@@ -23,7 +22,6 @@ private:
     AstNode *next;
 };
 
-
 class PrintNode: public AstNode {
 public:
     AstNode *scope;
@@ -31,7 +29,6 @@ public:
     AstNode* evaluate();
     PrintNode(AstNode *paramsHead, AstNode *scope);
 };
-
 
 class AssertNode: public AstNode {
 public:
@@ -51,7 +48,6 @@ public:
     QuitNode(Value *rcValue, AstNode *scope);
 };
 
-
 class ReadFileNode: public AstNode {
 public:
     Value *pathValue;
@@ -61,19 +57,6 @@ public:
     std::string readFile(std::string path);
     ReadFileNode(Value *pathValue, AstNode *scope);
 };
-
-
-class ConstNode: public AstNode {
-public:
-    char *identifier;
-    Value *value;
-    AstNode *scope;  // Root scope for checks
-
-    AstNode* evaluate();
-
-    ConstNode(typeId type, char *identifier, AstNode *expNode, AstNode *scope);
-};
-
 
 class ExpressionNode: public AstNode {
 public:
@@ -86,7 +69,6 @@ public:
     ExpressionNode(AstNode *scope);
 };
 
-
 class VarNode: public AstNode {
 public:
     typeId type;
@@ -98,7 +80,6 @@ public:
 
     VarNode(typeId type, char *identifier, AstNode *exp, AstNode *scope);
 };
-
 
 class VarDeclarationNode: public AstNode {
 public:
@@ -128,7 +109,6 @@ public:
     AstNode* evaluate();
 };
 
-
 class FnDeclarationNode: public AstNode {
 public:
     typeId type;
@@ -143,7 +123,6 @@ public:
     FnDeclarationNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope);
 };
 
-
 class FnCallNode: public AstNode {
 public:
     AstNode *scope;
@@ -152,7 +131,6 @@ public:
     AstNode* evaluate();
     FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope);
 };
-
 
 class ReturnNode: public AstNode {
 public:
