@@ -13,6 +13,7 @@ public:
 
     void addToChildList(AstNode *newNode);
     virtual AstNode* evaluate();
+    AstNode *init(int argc, char **args);
     virtual AstNode* getNext();
     void setNext(AstNode *nextNode);
 
@@ -28,6 +29,14 @@ public:
     AstNode *paramsHead;
     AstNode* evaluate();
     PrintNode(AstNode *paramsHead, AstNode *scope);
+};
+
+class SystemNode: public AstNode {
+public:
+    AstNode *scope;
+    int index;
+    AstNode* evaluate();
+    SystemNode(int index, AstNode *scope);
 };
 
 class AssertNode: public AstNode {

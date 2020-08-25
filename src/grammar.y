@@ -41,7 +41,12 @@ int main(int argc, char *argv[0]) {
         printf("%s\n", "No file or command specified");
         exit(1);
     }
-    else if (argc == 2) {
+
+    else if (argc >= 3 and !strcmp(argv[1], "-c")) {
+        yy_scan_string(argv[2]);
+    }
+
+    else if (argc >= 2) {
         FILE *inFile = fopen(argv[1], "r");
         if (!inFile) {
             printf("tea: /%s: No such file or directory\n", argv[1]);
@@ -50,17 +55,13 @@ int main(int argc, char *argv[0]) {
         yyin = inFile;
     }
 
-    else if (argc >= 3 and !strcmp(argv[1], "-c")) {
-        yy_scan_string(argv[2]);
-    }
-
     else {
         printf("tea: Problem during startup\n");
         exit(1);
     }
 
     yyparse();
-    root->evaluate();
+    root->init(argc, argv);
 }
 
 %}
@@ -77,7 +78,7 @@ int main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN
-%token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT TOKCMD
+%token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT TOKCMD TOKSYS
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -93,7 +94,7 @@ int main(int argc, char *argv[0]) {
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print read quit assert cmd
+%type <node> print read quit assert cmd system
 
 %start statements
 
@@ -344,6 +345,8 @@ builtin_function:  // Causes reduce/reduce conflict
     assert
     |
     cmd
+    |
+    system
     ;
 
 print:
@@ -383,24 +386,31 @@ cmd:
         Value *valueObj = new Value();
         valueObj->set($3);
 
-        CmdNode *quit = new CmdNode(valueObj, curScope);
-        $$ = quit;
+        CmdNode *cmd = new CmdNode(valueObj, curScope);
+        $$ = cmd;
     }
     |
     TOKCMD '(' TOKIDENT ')' {
         Value *valueObj = new Value();
         valueObj->setIdent($3, curScope);
 
-        CmdNode *quit = new CmdNode(valueObj, curScope);
-        $$ = quit;
+        CmdNode *cmd = new CmdNode(valueObj, curScope);
+        $$ = cmd;
     }
     |
     TOKCMD '('  ')' {
         Value *valueObj = new Value();
         valueObj->set(0);
 
-        CmdNode *quit = new CmdNode(valueObj, curScope);
-        $$ = quit;
+        CmdNode *cmd = new CmdNode(valueObj, curScope);
+        $$ = cmd;
+    }
+    ;
+
+system:
+    TOKSYS '[' TOKINTEGER ']' {
+        SystemNode *sys = new SystemNode($3, curScope);
+        $$ = sys;
     }
     ;
 

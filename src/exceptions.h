@@ -47,15 +47,6 @@ public:
 };
 
 
-class ConstError: public std::exception {
-public:
-    ConstError(std::string message) {
-        printf("ConstError: %s\n", message.c_str());
-        exit(6);
-    };
-};
-
-
 class FileNotFoundException: public std::exception {
 public:
     FileNotFoundException(std::string message) {
@@ -83,5 +74,14 @@ public:
     ParameterError(std::string message) {
         printf("ParameterError: %s\n", message.c_str());
         exit(8);
+    };
+};
+
+
+class SystemError: public std::exception {
+public:
+    SystemError(std::string message) {
+        printf("SystemError: %s\n", message.c_str());
+        exit(9);
     };
 };

@@ -2,6 +2,7 @@
 #include "ast.h"
 #include "../exceptions.h"
 #include "../value.h"
+#include "../utils/utils.h"
 
 int maxId = 0;
 
@@ -12,6 +13,12 @@ AstNode::AstNode() {
     this->value = new Value();  // evaluated value in case of expressions
 };
 
+
+AstNode* AstNode::init(int argc, char **args) {
+    System *sys = System::getSystem();
+    sys->setSystem(argc, args);
+    return this->evaluate();
+}
 
 AstNode* AstNode::evaluate() {
     AstNode *cur = this->childListHead;
