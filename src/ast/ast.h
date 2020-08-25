@@ -38,6 +38,16 @@ public:
   AssertNode(AstNode *paramsHead, AstNode *scope);
 };
 
+class CmdNode: public AstNode {
+public:
+    Value *shValue;
+    AstNode *scope;
+
+    AstNode* evaluate();
+
+    CmdNode(Value *shValue, AstNode *scope);
+};
+
 class QuitNode: public AstNode {
 public:
     Value *rcValue;

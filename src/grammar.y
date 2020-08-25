@@ -77,7 +77,7 @@ int main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN
-%token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT
+%token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT TOKCMD
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -93,7 +93,7 @@ int main(int argc, char *argv[0]) {
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print read quit assert
+%type <node> print read quit assert cmd
 
 %start statements
 
@@ -342,6 +342,8 @@ builtin_function:  // Causes reduce/reduce conflict
     quit
     |
     assert
+    |
+    cmd
     ;
 
 print:
@@ -376,6 +378,32 @@ assert:
     }
     ;
 
+cmd:
+    TOKCMD '(' TOKSTRING ')' {
+        Value *valueObj = new Value();
+        valueObj->set($3);
+
+        CmdNode *quit = new CmdNode(valueObj, curScope);
+        $$ = quit;
+    }
+    |
+    TOKCMD '(' TOKIDENT ')' {
+        Value *valueObj = new Value();
+        valueObj->setIdent($3, curScope);
+
+        CmdNode *quit = new CmdNode(valueObj, curScope);
+        $$ = quit;
+    }
+    |
+    TOKCMD '('  ')' {
+        Value *valueObj = new Value();
+        valueObj->set(0);
+
+        CmdNode *quit = new CmdNode(valueObj, curScope);
+        $$ = quit;
+    }
+    ;
+
 quit:
     TOKQUIT '(' TOKINTEGER ')' {
         Value *valueObj = new Value();
@@ -400,5 +428,6 @@ quit:
         QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;
     }
+    ;
 
 %%

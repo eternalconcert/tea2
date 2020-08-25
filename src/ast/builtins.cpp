@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "../exceptions.h"
 #include "../value.h"
+#include "../utils/utils.h"
 
 
 PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope) {
@@ -119,5 +120,33 @@ AstNode* AssertNode::evaluate() {
         prev = eval;
         cur = cur->getNext();
     }
+    return this->getNext();
+};
+
+
+CmdNode::CmdNode(Value *shValue, AstNode *scope) {
+    this->shValue = shValue;
+    this->scope = scope;
+    AstNode();
+};
+
+
+AstNode* CmdNode::evaluate() {
+    std::string result;
+    switch (this->shValue->type) {
+        case STR:
+            result = exec(shValue->stringValue);
+            break;
+        case IDENTIFIER:
+            Value *val = getFromValueStore(this->scope, this->shValue->identValue);
+            if (val->getTrueType() != STR) {
+                throw (TypeError("Wrong type for cmd function"));
+            }
+            result = exec(val->stringValue);
+            break;
+    }
+    char* cStr = new char[sizeof(result)];
+    strcpy(cStr, result.c_str());
+    this->value->set(cStr);
     return this->getNext();
 };
