@@ -6,7 +6,7 @@ Resource           common.resource
 Declare function
     [Tags]    functions
     ${command}    Catenate    '
-        ...    VOID FN test() {
+        ...    void fn test() {
         ...        print("Should not appear");
         ...    };'
     ${result}  Given tea has been called with inline command: ${command}
@@ -15,7 +15,7 @@ Declare function
 Declare function with params
     [Tags]    functions
     ${command}    Catenate    '
-        ...    VOID FN test(INT a, STR b) {
+        ...    void fn test(int a, str b) {
         ...    };'
     ${result}  Given tea has been called with inline command: ${command}
     Then the return code should be  "0"  ${result.rc}
@@ -23,7 +23,7 @@ Declare function with params
 Too less parameters to function
     [Tags]    functions
     ${command}    Catenate    '
-        ...    VOID FN test(INT a) {
+        ...    void fn test(int a) {
         ...        a;
         ...    };
         ...    test();'
@@ -34,7 +34,7 @@ Too less parameters to function
 Run function once
     [Tags]    functions
     ${command}    Catenate    '
-        ...    VOID FN test() {
+        ...    void fn test() {
         ...        print("Should appear");
         ...    };
         ...    test(); '
@@ -45,7 +45,7 @@ Run function once
 Run function twice
     [Tags]    functions
     ${command}    Catenate    '
-        ...    VOID FN test() {
+        ...    void fn test() {
         ...        print("Should appear twice when called twice");
         ...    };
         ...    test();
@@ -58,7 +58,7 @@ Run function twice
 # Function call with params available in inner scop
 #     [Tags]    functions
 #     ${command}    Catenate    '
-#         ...    VOID FN test(INT a, STR b) {
+#         ...    void fn test(int a, str b) {
 #         ...        print(a, b);
 #         ...    };
 #         ...    test(23, "hello");'

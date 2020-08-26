@@ -7,7 +7,7 @@ Same scoped access
     [Tags]    scope
     ${command}    Catenate    '
         ...    if (true) {
-        ...        INT a = 5;
+        ...        int a = 5;
         ...        print(a);
         ...    }; '
     ${result}  Given tea has been called with inline command: ${command}
@@ -17,7 +17,7 @@ Same scoped access
 Parent scoped access
     [Tags]    scope
     ${command}    Catenate    '
-        ...    INT b = 23;
+        ...    int b = 23;
         ...    if (true) {
         ...        print(b);
         ...    }; '
@@ -29,7 +29,7 @@ Scope violation access
     [Tags]    scope
     ${command}    Catenate    '
         ...    if (true) {
-        ...        INT c = 23;
+        ...        int c = 23;
         ...    };
         ...    print(c);'
     ${result}  Given tea has been called with inline command: ${command}
@@ -40,7 +40,7 @@ Scope violation in assignment
     [Tags]    scope
     ${command}    Catenate    '
         ...    if (true) {
-        ...        INT d = 23;
+        ...        int d = 23;
         ...    };
         ...    d = 5;'
     ${result}  Given tea has been called with inline command: ${command}
@@ -50,7 +50,7 @@ Scope violation in assignment
 No scope violation in assignment
     [Tags]    scope
     ${command}    Catenate    '
-        ...    STR d = "hello";
+        ...    str d = "hello";
         ...    d = "world!";
         ...    print(d);'
     ${result}  Given tea has been called with inline command: ${command}
@@ -60,11 +60,11 @@ No scope violation in assignment
 Variable assignment after function declaration and function call leads to UnknownIdentifierError
     [Tags]    scope
     ${command}    Catenate    '
-    ...    VOID FN test() {
+    ...    void fn test() {
     ...        print(a);
     ...    };
     ...    test();
-    ...    INT a = 1;'
+    ...    int a = 1;'
     ${result}  Given tea has been called with inline command: ${command}
     Then the result should be  "UnknownIdentifierError: a"  ${result.stdout}
     And the return code should be  "4"  ${result.rc}

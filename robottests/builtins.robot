@@ -120,15 +120,15 @@ Print expression and other arguments
 
 Print variable
     [Tags]    printing
-    ${result}  Given tea has been called with inline command: 'STR hello = "Hello world!"; print(hello);'
+    ${result}  Given tea has been called with inline command: 'str hello = "Hello world!"; print(hello);'
     Then the result should be  "Hello world!"  ${result.stdout}
 
 Print variable as expression operant
     [Tags]    printing
-    ${result}  Given tea has been called with inline command: 'INT a = 12; print(a * "x");'
+    ${result}  Given tea has been called with inline command: 'int a = 12; print(a * "x");'
     Then the result should be  "xxxxxxxxxxxx"  ${result.stdout}
 
 Print multiple variables
     [Tags]    printing
-    ${result}  Given tea has been called with inline command: 'INT a = 4; INT b = 2; print(a, b);'
+    ${result}  Given tea has been called with inline command: 'int a = 4; int b = 2; print(a, b);'
     Then the result should be  "42"  ${result.stdout}
