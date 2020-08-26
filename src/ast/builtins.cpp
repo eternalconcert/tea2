@@ -54,6 +54,7 @@ LastRcNode::LastRcNode() {
 
 AstNode* LastRcNode::evaluate() {
     System *sys = System::getSystem();
+    this->value->set(sys->lastRc);
     return this->getNext();
 };
 

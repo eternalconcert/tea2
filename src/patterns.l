@@ -52,7 +52,7 @@ quit                                    return TOKQUIT;
 assert                                  return TOKASSERT;
 cmd                                     return TOKCMD;
 SYSARGS                                 return TOKSYSARGS;
-LCR                                     return TOKLRC;
+LRC                                     return TOKLRC;
 "("                                     return '(';
 ")"                                     return ')';
 "["                                     return '[';

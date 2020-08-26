@@ -1,9 +1,13 @@
 #include "utils.h"
+#include <string.h>
 
 std::string exec(const char* command) {
   std::array<char, 128> buffer;
   std::string result;
-  FILE *ptr = popen(command, "r");
+  char* cStr = new char[sizeof(command) + 6];
+  strcpy(cStr, command);
+  strcat(cStr, " 2>&1");
+  FILE *ptr = popen(cStr, "r");
 
   while (fgets(buffer.data(), buffer.size(), ptr) != NULL) {
     result += buffer.data();
