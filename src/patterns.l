@@ -14,7 +14,7 @@
 %x string
 %x multiLineComment
 %%
-"//".*|"#".*                            /* ignore comments */;
+"//".*|"#!".*                            /* ignore comments */;
 "/*"                                    { BEGIN multiLineComment; }
 <multiLineComment>[^*\n]+
 <multiLineComment>\n
@@ -51,7 +51,8 @@ read                                    return TOKREADFILE;
 quit                                    return TOKQUIT;
 assert                                  return TOKASSERT;
 cmd                                     return TOKCMD;
-system                                  return TOKSYS;
+SYSARGS                                 return TOKSYSARGS;
+LCR                                     return TOKLRC;
 "("                                     return '(';
 ")"                                     return ')';
 "["                                     return '[';

@@ -29,23 +29,34 @@ AstNode* PrintNode::evaluate() {
 };
 
 
-SystemNode::SystemNode(int index, AstNode *scope) {
+SystemArgsNode::SystemArgsNode(int index, AstNode *scope) {
     this->scope = scope;
     this->index = index;
     AstNode();
 }
 
 
-AstNode* SystemNode::evaluate() {
+AstNode* SystemArgsNode::evaluate() {
     System *sys = System::getSystem();
     if (sys->argc <= this->index) {
         throw SystemError("Too less system args");
     } else {
         this->value->set(sys->args[this->index]);
-        fflush(stdout);
     }
     return this->getNext();
 };
+
+
+LastRcNode::LastRcNode() {
+    AstNode();
+}
+
+
+AstNode* LastRcNode::evaluate() {
+    System *sys = System::getSystem();
+    return this->getNext();
+};
+
 
 
 QuitNode::QuitNode(Value *rcValue, AstNode *scope) {

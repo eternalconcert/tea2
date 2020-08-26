@@ -3,12 +3,13 @@
 std::string exec(const char* command) {
   std::array<char, 128> buffer;
   std::string result;
-  std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command, "r"), pclose);
-  if (!pipe) {
-    throw std::runtime_error("popen() failed!");
-  }
-  while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+  FILE *ptr = popen(command, "r");
+
+  while (fgets(buffer.data(), buffer.size(), ptr) != NULL) {
     result += buffer.data();
   }
+  int rc = WEXITSTATUS(pclose(ptr));
+  System *sys = System::getSystem();
+  sys->lastRc = rc;
   return result;
 }

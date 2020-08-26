@@ -31,12 +31,18 @@ public:
     PrintNode(AstNode *paramsHead, AstNode *scope);
 };
 
-class SystemNode: public AstNode {
+class SystemArgsNode: public AstNode {
 public:
     AstNode *scope;
     int index;
     AstNode* evaluate();
-    SystemNode(int index, AstNode *scope);
+    SystemArgsNode(int index, AstNode *scope);
+};
+
+class LastRcNode: public AstNode {
+public:
+    AstNode* evaluate();
+    LastRcNode();
 };
 
 class AssertNode: public AstNode {

@@ -14,6 +14,7 @@ void System::setSystem(int argc, char **inArgs) {
     System *instance = System::getSystem();
     for (int i = 0; i < argc; i++) {
       instance->args[i] = inArgs[i];
+      instance->lastRc = 0;
     }
     instance->argc = argc;
 };

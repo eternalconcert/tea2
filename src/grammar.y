@@ -78,7 +78,7 @@ int main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN
-%token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT TOKCMD TOKSYS
+%token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT TOKCMD TOKSYSARGS TOKLRC
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -94,7 +94,7 @@ int main(int argc, char *argv[0]) {
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print read quit assert cmd system
+%type <node> print read quit assert cmd sysargs lastrc
 
 %start statements
 
@@ -346,7 +346,9 @@ builtin_function:  // Causes reduce/reduce conflict
     |
     cmd
     |
-    system
+    sysargs
+    |
+    lastrc
     ;
 
 print:
@@ -407,12 +409,18 @@ cmd:
     }
     ;
 
-system:
-    TOKSYS '[' TOKINTEGER ']' {
-        SystemNode *sys = new SystemNode($3, curScope);
-        $$ = sys;
+sysargs:
+    TOKSYSARGS '[' TOKINTEGER ']' {
+        SystemArgsNode *sysArgs = new SystemArgsNode($3, curScope);
+        $$ = sysArgs;
     }
     ;
+
+lastrc:
+    TOKLRC {
+        LastRcNode *lrc = new LastRcNode();
+        $$ = lrc;
+    }
 
 quit:
     TOKQUIT '(' TOKINTEGER ')' {
