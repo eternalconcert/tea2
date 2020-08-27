@@ -7,6 +7,7 @@ output.xml
 log.html
 report.html
 test.t
+coverage/
 
 syntax: glob
 pythonenv/*

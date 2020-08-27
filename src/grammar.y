@@ -119,10 +119,7 @@ statements: {
     ;
 
 statement:
-    builtin_function {
-        $$ = $1;
-    }
-    | var_declaration {
+    var_declaration {
         $$ = $1;
     }
     | var_assignment {
@@ -171,10 +168,6 @@ expression:
     }
     |
     fn_call {
-        $$ = $1;
-    }
-    |
-    builtin_function {
         $$ = $1;
     }
     ;
@@ -309,6 +302,8 @@ fn_declaration:
 };
 
 fn_call:
+    builtin_function
+    |
     TOKIDENT '(' act_params ')' {
         FnCallNode *fnCall = new FnCallNode($1, $3, curScope);
         fnCall->value->setFnCall($1, $$, curScope);

@@ -101,7 +101,7 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
         // 1 + "A" = "1A"
         std::string tempStr = std::to_string(lVal.intValue);
-        char* cStr = new char[tempStr.length() + sizeof(rVal->stringValue)];
+        char* cStr = new char[tempStr.length() + strlen(rVal->stringValue)];
         strcpy(cStr, tempStr.c_str());
         strcat(cStr, rVal->stringValue);
         nVal->set(cStr);
@@ -120,7 +120,7 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
         // 1.0 + "A" = "1.0A"
         std::string tempStr = std::to_string(lVal.floatValue);
-        char* cStr = new char[tempStr.length() + sizeof(rVal->stringValue)];
+        char* cStr = new char[tempStr.length() + strlen(rVal->stringValue)];
         strcpy(cStr, tempStr.c_str());
         strcat(cStr, rVal->stringValue);
         nVal->set(cStr);
@@ -129,7 +129,7 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "A" + 1 = "A1"
         std::string tempStr = std::to_string(rVal->intValue);
-        char* cStr = new char[tempStr.length() + sizeof(lVal.stringValue)];
+        char* cStr = new char[tempStr.length() + strlen(lVal.stringValue)];
         strcpy(cStr, lVal.stringValue);
         strcat(cStr, tempStr.c_str());
         nVal->set(cStr);
@@ -138,7 +138,7 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
         // "A" + 1.0 = "A1.0"
         std::string tempStr = std::to_string(rVal->floatValue);
-        char* cStr = new char[tempStr.length() + sizeof(lVal.stringValue)];
+        char* cStr = new char[tempStr.length() + strlen(lVal.stringValue)];
         strcpy(cStr, lVal.stringValue);
         strcat(cStr, tempStr.c_str());
         nVal->set(cStr);
@@ -146,7 +146,7 @@ Value* operator+(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
         // "A" + "B" = "AB"
-        char* cStr = new char[sizeof(lVal.stringValue)+ sizeof(rVal->stringValue)];
+        char* cStr = new char[strlen(lVal.stringValue) + strlen(rVal->stringValue)];
         strcpy(cStr, lVal.stringValue);
         strcat(cStr, rVal->stringValue);
         nVal->set(cStr);
@@ -241,7 +241,7 @@ Value* operator*(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
         // 3 + "A" = "AAA"
-        char* cStr = new char[(sizeof(rVal->stringValue) * lVal.intValue)];
+        char* cStr = new char[(strlen(rVal->stringValue) * lVal.intValue)];
 
         for (int i=1; i <= lVal.intValue; i++) {
             strcat(cStr, rVal->stringValue);
@@ -266,7 +266,7 @@ Value* operator*(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "A" * 3 = "AAA"
-        char* cStr = new char[(sizeof(lVal.stringValue) * rVal->intValue)];
+        char* cStr = new char[(strlen(lVal.stringValue) * rVal->intValue)];
 
         for (int i=1; i <= rVal->intValue; i++) {
             strcat(cStr, lVal.stringValue);
