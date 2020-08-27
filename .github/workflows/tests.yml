@@ -15,10 +15,9 @@ jobs:
         apt-get install lex bison lcov
     - name: Build
       run: |
-        CPPSOURCES = $(shell find src/ -name "*.cpp")
-       	lex src/patterns.l
+        lex src/patterns.l
 	      yacc -d src/grammar.y
-        g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static
+        g++ lex.yy.c y.tab.c $(shell find src/ -name "*.cpp") -o tea --static
     - name: Test
       run: |
         ./tea tests/tests.t
