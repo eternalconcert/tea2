@@ -51,7 +51,7 @@ void fn test_scoped_Reassignment() {
 
 void fn test_fn_declaration_with_params() {
     void fn test(int a, str b) {
-        assert(a, 23);
+        assert(a, 5);
         assert(b, "hello");
     };
 
