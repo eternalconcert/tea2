@@ -77,7 +77,7 @@ int main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKELSE TOKFN TOKRETURN
+%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE
 %token TOKPRINT TOKREADFILE TOKQUIT TOKASSERT TOKCMD TOKSYSARGS TOKLRC
 %token TOKLBRACE TOKRBRACE
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <node> expression literal fn_call
-%type <node> statement statements if_statement fn_declaration return_stmt
+%type <node> statement statements if_statement fn_declaration return_stmt while_loop
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
 %type <node> print read quit assert cmd sysargs lastrc
 
@@ -132,6 +132,9 @@ statement:
         $$ = $1;
     }
     | if_statement {
+        $$ = $1;
+    }
+    | while_loop {
         $$ = $1;
     }
     | fn_declaration {
@@ -329,6 +332,15 @@ if_statement:
         ifNode->elseBlock = ($10);
     };
 
+while_loop:
+    TOKWHILE '(' expressions ')' lbrace statements rbrace {
+        WhileNode *whileNode = new WhileNode();
+        $$ = whileNode;
+        whileNode->condition = $3;
+        whileNode->addToChildList($6);
+    }
+    ;
+
 
 builtin_function:  // Causes reduce/reduce conflict
     print
@@ -406,7 +418,18 @@ cmd:
 
 sysargs:
     TOKSYSARGS '[' TOKINTEGER ']' {
-        SystemArgsNode *sysArgs = new SystemArgsNode($3, curScope);
+        Value *valueObj = new Value();
+        valueObj->set($3);
+
+        SystemArgsNode *sysArgs = new SystemArgsNode(valueObj, curScope);
+        $$ = sysArgs;
+    }
+    |
+    TOKSYSARGS '[' TOKIDENT ']' {
+        Value *valueObj = new Value();
+        valueObj->setIdent($3, curScope);
+
+        SystemArgsNode *sysArgs = new SystemArgsNode(valueObj, curScope);
         $$ = sysArgs;
     }
     ;

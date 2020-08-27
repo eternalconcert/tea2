@@ -34,9 +34,9 @@ public:
 class SystemArgsNode: public AstNode {
 public:
     AstNode *scope;
-    int index;
+    Value *indexValue;
     AstNode* evaluate();
-    SystemArgsNode(int index, AstNode *scope);
+    SystemArgsNode(Value *indexValue, AstNode *scope);
 };
 
 class LastRcNode: public AstNode {
@@ -131,6 +131,12 @@ public:
 class IfNode: public AstNode {
 public:
     AstNode *elseBlock;
+    AstNode* evaluate();
+};
+
+class WhileNode: public AstNode {
+public:
+    AstNode* condition;
     AstNode* evaluate();
 };
 

@@ -29,19 +29,32 @@ AstNode* PrintNode::evaluate() {
 };
 
 
-SystemArgsNode::SystemArgsNode(int index, AstNode *scope) {
+SystemArgsNode::SystemArgsNode(Value *indexValue, AstNode *scope) {
     this->scope = scope;
-    this->index = index;
+    this->indexValue = indexValue;
     AstNode();
 }
 
 
 AstNode* SystemArgsNode::evaluate() {
+    int idx;
+    switch (this->indexValue->type) {
+        case INT:
+            idx = this->indexValue->intValue;
+            break;
+        case IDENTIFIER:
+            Value *val = getFromValueStore(this->scope, this->indexValue->identValue);
+            if (val->getTrueType() != INT) {
+                throw (TypeError("Wrong type for index"));
+            }
+            idx = val->intValue;
+            break;
+    }
     System *sys = System::getSystem();
-    if (sys->argc <= this->index) {
+    if (sys->argc <= this->indexValue->intValue) {
         throw SystemError("Too less system args");
     } else {
-        this->value->set(sys->args[this->index]);
+        this->value->set(sys->args[idx]);
     }
     return this->getNext();
 };
@@ -68,18 +81,20 @@ QuitNode::QuitNode(Value *rcValue, AstNode *scope) {
 
 
 AstNode* QuitNode::evaluate() {
+    int rc;
     switch (this->rcValue->type) {
         case INT:
-            exit(this->rcValue->intValue);
+            rc = this->rcValue->intValue;
             break;
         case IDENTIFIER:
             Value *val = getFromValueStore(this->scope, this->rcValue->identValue);
             if (val->getTrueType() != INT) {
                 throw (TypeError("Wrong type for exit function"));
             }
-            exit(val->intValue);
+            rc = val->intValue;
             break;
     }
+    exit(rc);
     return this->getNext();
 };
 

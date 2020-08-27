@@ -46,6 +46,7 @@ true                                    yylval.bval=true; return TOKBOOL;
 false                                   yylval.bval=false; return TOKBOOL;
 fn                                      return TOKFN;
 return                                  return TOKRETURN;
+while                                   return TOKWHILE;
 print                                   return TOKPRINT;
 read                                    return TOKREADFILE;
 quit                                    return TOKQUIT;

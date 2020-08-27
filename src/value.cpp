@@ -90,7 +90,6 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == INT and rVal->getTrueType() == INT) {
         // 1 + 1 = 2
         nVal->set(lVal.intValue + rVal->intValue);
-
     }
 
     if (lVal.getTrueType() == INT and rVal->getTrueType() == FLOAT) {
