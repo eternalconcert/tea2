@@ -15,7 +15,6 @@ test: clean parser
 	mv *.gcno coverage
 	lcov -c --directory coverage --output-file coverage/main_coverage.info
 	genhtml coverage/main_coverage.info --output-directory coverage/out
-	firefox coverage/out/index.html
 
 win-tea: parser
 	x86_64-w64-mingw32-g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea.exe --static
