@@ -27,8 +27,9 @@ class PrintNode: public AstNode {
 public:
     AstNode *scope;
     AstNode *paramsHead;
+    bool newLine;
     AstNode* evaluate();
-    PrintNode(AstNode *paramsHead, AstNode *scope);
+    PrintNode(AstNode *paramsHead, AstNode *scope, bool newLine);
 };
 
 class SystemArgsNode: public AstNode {
@@ -82,6 +83,17 @@ public:
     std::string readFile(std::string path);
     ReadFileNode(Value *pathValue, AstNode *scope);
 };
+
+class InputNode: public AstNode {
+public:
+    Value *pathValue;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    std::string readInput();
+    InputNode(AstNode *scope);
+};
+
 
 class ExpressionNode: public AstNode {
 public:

@@ -1,4 +1,5 @@
 #include <string.h>
+#include <iostream>
 #include <fstream>
 #include "ast.h"
 #include "../exceptions.h"
@@ -6,12 +7,12 @@
 #include "../utils/utils.h"
 
 
-PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope) {
+PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope, bool newLine) {
     this->scope = scope;
+    this->newLine = newLine;
     this->paramsHead = paramsHead;
     AstNode();
 }
-
 
 AstNode* PrintNode::evaluate() {
     AstNode *cur = this->paramsHead;
@@ -23,7 +24,9 @@ AstNode* PrintNode::evaluate() {
         }
         cur = cur->getNext();
     }
-    printf("\n");
+    if (this->newLine) {
+        printf("\n");
+    };
     fflush(stdout);
     return this->getNext();
 };
@@ -98,8 +101,6 @@ AstNode* QuitNode::evaluate() {
     return this->getNext();
 };
 
-
-
 ReadFileNode::ReadFileNode(Value *pathValue, AstNode *scope) {
     this->pathValue = pathValue;
     this->scope = scope;
@@ -122,7 +123,6 @@ std::string ReadFileNode::readFile(std::string path) {
     }
 };
 
-
 AstNode* ReadFileNode::evaluate() {
     std::string fromFile;
     switch (this->pathValue->type) {
@@ -143,12 +143,30 @@ AstNode* ReadFileNode::evaluate() {
     return this->getNext();
 };
 
+InputNode::InputNode(AstNode *scope) {
+    this->scope = scope;
+    AstNode();
+};
+
+
+std::string InputNode::readInput() {
+    return "TEST";
+};
+
+AstNode* InputNode::evaluate() {
+    std::string in;
+    std::getline(std::cin, in);
+    char* cStr = new char[sizeof(in)];
+    strcpy(cStr, in.c_str());
+    this->value->set(cStr);
+    return this->getNext();
+};
+
 AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope) {
     this->scope = scope;
     this->paramsHead = paramsHead;
     AstNode();
 }
-
 
 AstNode* AssertNode::evaluate() {
     AstNode *cur = this->paramsHead;
