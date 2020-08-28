@@ -28,6 +28,9 @@ AstNode* AstNode::evaluate() {
     return this->getNext();
 }
 
+void AstNode::setLocation(YYLTYPE location) {
+    this->location = location;
+};
 
 void AstNode::addToChildList(AstNode *newNode) {
     newNode->parent = this;

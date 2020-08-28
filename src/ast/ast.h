@@ -2,6 +2,7 @@
 #include "../commons.h"
 #include "../valuestore.h"
 #include "../value.h"
+#include "../../y.tab.h"
 
 class AstNode {
 public:
@@ -10,7 +11,9 @@ public:
     AstNode *parent;
     ValueStore *valueStore;
     Value *value;
+    YYLTYPE location;
 
+    void setLocation(YYLTYPE location);
     void addToChildList(AstNode *newNode);
     virtual AstNode* evaluate();
     AstNode *init(int argc, char **args);
@@ -50,10 +53,9 @@ class AssertNode: public AstNode {
 public:
   AstNode *scope;
   AstNode *paramsHead;
-  int line;
-  int column;
+
   AstNode* evaluate();
-  AssertNode(AstNode *paramsHead, AstNode *scope, int line, int column);
+  AssertNode(AstNode *paramsHead, AstNode *scope);
 };
 
 class CmdNode: public AstNode {

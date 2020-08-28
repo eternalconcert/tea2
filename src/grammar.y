@@ -114,6 +114,7 @@ statements: {
         $$ = curScope;
     }
     | statements statement ';' {
+        $2->setLocation(@2);
         curScope->addToChildList($2);
     }
     ;
@@ -402,7 +403,7 @@ input:
 
 assert:
     TOKASSERT '(' act_params ')' {
-        AssertNode *assert = new AssertNode($3, curScope, @1.first_line, @1.first_column);
+        AssertNode *assert = new AssertNode($3, curScope);
         $$ = assert;
     }
     ;

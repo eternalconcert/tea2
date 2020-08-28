@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "value.h"
+#include "../y.tab.h"
 
 
 class RuntimeError: public std::exception {
@@ -49,8 +50,8 @@ public:
 
 class FileNotFoundException: public std::exception {
 public:
-    FileNotFoundException(std::string message) {
-        printf("FileNotFound: %s\n", message.c_str());
+    FileNotFoundException(std::string message, YYLTYPE location) {
+        printf("%i:%i: FileNotFound: %s\n", location.first_line, location.first_column, message.c_str());
         exit(7);
     };
 };
@@ -58,8 +59,8 @@ public:
 
 class AssertionError: public std::exception {
 public:
-  AssertionError(Value *first, Value *second, int line, int column) {
-        printf("%i:%i: AssertionError: ", line, column);
+  AssertionError(Value *first, Value *second, YYLTYPE location) {
+        printf("%i:%i: AssertionError: ", location.first_line, location.first_column);
         first->repr();
         printf(" != ");
         second->repr();

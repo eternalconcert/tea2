@@ -112,14 +112,14 @@ std::string ReadFileNode::readFile(std::string path) {
     std::ifstream file(path);
 
     if (!file) {
-        throw FileNotFoundException(path);
+        throw FileNotFoundException(path, this->location);
     }
 
     try {
         std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
         return content;
     } catch (std::ios_base::failure) {
-        throw FileNotFoundException(path);
+        throw FileNotFoundException(path, this->location);
     }
 };
 
@@ -162,11 +162,9 @@ AstNode* InputNode::evaluate() {
     return this->getNext();
 };
 
-AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope, int line, int column) {
+AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope) {
     this->scope = scope;
     this->paramsHead = paramsHead;
-    this->line = line;
-    this->column = column;
     AstNode();
 }
 
@@ -180,7 +178,7 @@ AstNode* AssertNode::evaluate() {
             Value& lVal = *eval->value;
             Value *rVal = prev->value;
             if (operator!=(lVal, rVal)->boolValue) {
-                throw AssertionError(prev->value, eval->value, this->line, this->column);
+                throw AssertionError(prev->value, eval->value, this->location);
             }
         }
         prev = eval;
