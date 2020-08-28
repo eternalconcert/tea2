@@ -58,8 +58,8 @@ public:
 
 class AssertionError: public std::exception {
 public:
-  AssertionError(Value *first, Value *second) {
-        printf("AssertionError: ");
+  AssertionError(Value *first, Value *second, int line, int column) {
+        printf("%i:%i: AssertionError: ", line, column);
         first->repr();
         printf(" != ");
         second->repr();

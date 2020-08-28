@@ -162,9 +162,11 @@ AstNode* InputNode::evaluate() {
     return this->getNext();
 };
 
-AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope) {
+AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope, int line, int column) {
     this->scope = scope;
     this->paramsHead = paramsHead;
+    this->line = line;
+    this->column = column;
     AstNode();
 }
 
@@ -178,7 +180,7 @@ AstNode* AssertNode::evaluate() {
             Value& lVal = *eval->value;
             Value *rVal = prev->value;
             if (operator!=(lVal, rVal)->boolValue) {
-                throw AssertionError(prev->value, eval->value);
+                throw AssertionError(prev->value, eval->value, this->line, this->column);
             }
         }
         prev = eval;

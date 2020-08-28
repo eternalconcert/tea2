@@ -50,8 +50,10 @@ class AssertNode: public AstNode {
 public:
   AstNode *scope;
   AstNode *paramsHead;
+  int line;
+  int column;
   AstNode* evaluate();
-  AssertNode(AstNode *paramsHead, AstNode *scope);
+  AssertNode(AstNode *paramsHead, AstNode *scope, int line, int column);
 };
 
 class CmdNode: public AstNode {

@@ -402,7 +402,7 @@ input:
 
 assert:
     TOKASSERT '(' act_params ')' {
-        AssertNode *assert = new AssertNode($3, curScope);
+        AssertNode *assert = new AssertNode($3, curScope, @1.first_line, @1.first_column);
         $$ = assert;
     }
     ;

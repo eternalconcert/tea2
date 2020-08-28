@@ -1,16 +1,24 @@
+%option yylineno
+%option noyywrap
 %{
+    int colnum = 1;
+    #define YY_USER_ACTION { \
+        yylloc.first_line = yylloc.last_line = yylineno; \
+        yylloc.first_column = colnum; \
+        colnum = colnum + yyleng; \
+        yylloc.last_column = colnum; \
+    }
+
     #include <stdio.h>
     #include <stdlib.h>
     #include "src/ast/ast.h"
     #include "y.tab.h"
-    std::string strbuf;
 
+    std::string strbuf;
 
 //\"(\\.|[^"\\])*\"                       yylval.sval = (char*)calloc(strlen(yytext)-1, sizeof(char));strncpy(yylval.sval, &yytext[1], strlen(yytext)-2);return TOKSTRING; // Simple string.
 // <string>\\[0-7]*                       { strbuf += strtol(yytext+1, 0, 8); } // No idea..
 %}
-%option yylineno
-%option noyywrap
 %x string
 %x multiLineComment
 %%
@@ -73,5 +81,5 @@ LRC                                     return TOKLRC;
 <string>\"                              { yylval.sval = strdup(strbuf.c_str()); BEGIN 0; return TOKSTRING; }
 [+-]?[0-9]+                             yylval.ival=atoi(yytext); return TOKINTEGER;
 [+-]?[0-9]+\.[0-9]+                     yylval.fval=atof(yytext); return TOKFLOAT;
-\n                                      /* ignore EOL */;
+\n                                      colnum = 1; /* ignore EOL */;
 [ \t]+                                  /* ingnore whitespace */;
