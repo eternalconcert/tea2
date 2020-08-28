@@ -135,15 +135,6 @@ void fn test_system_exec_failure_with_ident() {
     testCount = testCount + 1;
 };
 
-void fn test_return() {
-    int fn func() {
-        return 1;
-    };
-    int a = func();
-    assert(a, 1);
-    testCount = testCount + 1;
-};
-
 void fn test_system_exec_success() {
     cmd("ls");
     int rc = LRC;
@@ -167,7 +158,6 @@ test_sysargs_index_ident();
 test_read_file();
 test_read_file_ident();
 test_system_exec_failure_with_ident();
-test_return();
 test_system_exec_success(); // Causes succeeding tests to fail
 
 // Printing results
