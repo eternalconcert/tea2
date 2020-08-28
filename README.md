@@ -101,7 +101,7 @@ if (correct_answers == 2) {
 };
 
 if (correct_answers > 2) {
-  print("You are a nerd.");
+  print("You are a nerd. 🖖");
   print("Or you read the source code. Which makes you also a nerd.");
 };
 
