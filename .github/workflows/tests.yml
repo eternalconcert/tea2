@@ -21,4 +21,7 @@ jobs:
         g++ lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static
     - name: Test
       run: |
-        ./tea tests/tests.t
+        	./tea tests/tests_basics.t
+	        ./tea tests/tests_operations.t
+	        ./tea tests/tests_comparisons.t
+	        ./tea tests/tests_conditions.t

@@ -1,6 +1,17 @@
 int testCount = 0;
 
 
+void fn test_multiline_comment() {
+    int a = 23;
+    /* This
+    is
+    a
+    comment */
+    assert(a, 23);
+    testCount = testCount + 1;
+};
+
+
 void fn test_int_Assignments() {
     int a = 23;
     assert(a, 23);
@@ -76,7 +87,7 @@ void fn test_sysargs() {
     str sysarg_0 = SYSARGS[0];
     assert(sysarg_0, "./tea");
     str sysarg_1 = SYSARGS[1];
-    assert(sysarg_1, "tests/tests.t");
+    assert(sysarg_1, "tests/tests_basics.t");
     testCount = testCount + 1;
 };
 
@@ -88,11 +99,40 @@ void fn test_sysargs_index_ident() {
 
     i = 1;
     str sysarg_1 = SYSARGS[i];
-    assert(sysarg_1, "tests/tests.t");
+    assert(sysarg_1, "tests/tests_basics.t");
+    testCount = testCount + 1;
+};
+
+void fn test_read_file() {
+    str result = read("tests/file.txt");
+    assert(result, "hello world");
+    testCount = testCount + 1;
+};
+
+void fn test_read_file_ident() {
+    str path = "tests/file.txt";
+    str result = read(path);
+    assert(result, "hello world");
+    testCount = testCount + 1;
+};
+
+void fn test_system_exec_failure_with_ident() {
+    str command = "test1234";
+    cmd(command);
+    int rc = LRC;
+    assert(rc, 127);
+    testCount = testCount + 1;
+};
+
+void fn test_system_exec_success() {
+    cmd("ls");
+    int rc = LRC;
+    assert(rc, 0);
     testCount = testCount + 1;
 };
 
 // Running tests
+test_multiline_comment();
 test_int_Assignments();
 test_str_Assignments();
 test_float_Assignments();
@@ -103,6 +143,10 @@ test_fn_declaration_with_params();
 test_fn_call_with_params_available_in_scope();
 test_sysargs();
 test_sysargs_index_ident();
+test_read_file();
+test_read_file_ident();
+test_system_exec_failure_with_ident();
+test_system_exec_success(); // Causes succeeding tests to fail
 
 // Printing results
-print("Run ", testCount, " tests successfully");
+print("Run ", testCount, " tests successfully (test_basics.t)");
