@@ -22,6 +22,6 @@ jobs:
     - name: Test
       run: |
         ./tea tests/tests_basics.t
-	      ./tea tests/tests_operations.t
-	      ./tea tests/tests_comparisons.t
-	      ./tea tests/tests_conditions.t
+        ./tea tests/tests_operations.t
+        ./tea tests/tests_comparisons.t
+        ./tea tests/tests_conditions.t
