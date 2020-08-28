@@ -12,35 +12,35 @@ void fn test_multiline_comment() {
 };
 
 
-void fn test_int_Assignments() {
+void fn test_int_assignments() {
     int a = 23;
     assert(a, 23);
     testCount = testCount + 1;
 };
 
 
-void fn test_str_Assignments() {
+void fn test_str_assignments() {
     str a = "Hello";
     assert(a, "Hello");
     testCount = testCount + 1;
 };
 
 
-void fn test_float_Assignments() {
+void fn test_float_assignments() {
     float a = 23.5;
     assert(a, 23.5);
     testCount = testCount + 1;
 };
 
 
-void fn test_bool_Assignments() {
+void fn test_bool_assignments() {
     bool a = false;
     assert(a, false);
     testCount = testCount + 1;
 };
 
 
-void fn test_int_Reassignments() {
+void fn test_int_reassignments() {
     int a = 23;
     assert(a, 23);
     a = 12;
@@ -49,13 +49,24 @@ void fn test_int_Reassignments() {
 };
 
 
-void fn test_scoped_Reassignment() {
+void fn test_scoped_reassignment() {
     int a = 23;
     assert(a, 23);
     if (true) {
         a = 12;
     };
     assert(a, 12);
+    testCount = testCount + 1;
+};
+
+void fn test_else_block() {
+    int a = 23;
+    if (false) {
+        a = 12;
+    } else {
+        a = 5;
+    };
+    assert(a, 5);
     testCount = testCount + 1;
 };
 
@@ -124,6 +135,15 @@ void fn test_system_exec_failure_with_ident() {
     testCount = testCount + 1;
 };
 
+void fn test_return() {
+    int fn func() {
+        return 1;
+    };
+    int a = func();
+    assert(a, 1);
+    testCount = testCount + 1;
+};
+
 void fn test_system_exec_success() {
     cmd("ls");
     int rc = LRC;
@@ -133,12 +153,13 @@ void fn test_system_exec_success() {
 
 // Running tests
 test_multiline_comment();
-test_int_Assignments();
-test_str_Assignments();
-test_float_Assignments();
-test_bool_Assignments();
-test_int_Reassignments();
-test_scoped_Reassignment();
+test_int_assignments();
+test_str_assignments();
+test_float_assignments();
+test_bool_assignments();
+test_int_reassignments();
+test_scoped_reassignment();
+test_else_block();
 test_fn_declaration_with_params();
 test_fn_call_with_params_available_in_scope();
 test_sysargs();
@@ -146,6 +167,7 @@ test_sysargs_index_ident();
 test_read_file();
 test_read_file_ident();
 test_system_exec_failure_with_ident();
+test_return();
 test_system_exec_success(); // Causes succeeding tests to fail
 
 // Printing results

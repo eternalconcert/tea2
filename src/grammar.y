@@ -406,14 +406,6 @@ cmd:
         CmdNode *cmd = new CmdNode(valueObj, curScope);
         $$ = cmd;
     }
-    |
-    TOKCMD '('  ')' {
-        Value *valueObj = new Value();
-        valueObj->set(0);
-
-        CmdNode *cmd = new CmdNode(valueObj, curScope);
-        $$ = cmd;
-    }
     ;
 
 sysargs:
