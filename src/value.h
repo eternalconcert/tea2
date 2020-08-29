@@ -7,6 +7,7 @@
 class AstNode;
 class FnDeclarationNode;
 
+#include "../y.tab.h"
 
 class Value {
 public:
@@ -21,15 +22,16 @@ public:
     bool boolValue;
     char *identValue;
     bool assigned = true;
+    YYLTYPE location;
 
-    void set(typeId type);  // Set empty
-    void set(char *value);
-    void set(int value);
-    void set(float value);
-    void set(bool value);
-    void setIdent(char *value, AstNode *scope);
-    void setFn(char *identifier, AstNode *scope, FnDeclarationNode *functionBody);
-    void setFnCall(char *value, AstNode *retNode, AstNode *scope);
+    void set(typeId type, YYLTYPE location);  // Set emp, YYLTYPE locationty
+    void set(char *value, YYLTYPE location);
+    void set(int value, YYLTYPE location);
+    void set(float value, YYLTYPE location);
+    void set(bool value, YYLTYPE location);
+    void setIdent(char *value, AstNode *scope, YYLTYPE location);
+    void setFn(char *identifier, AstNode *scope, FnDeclarationNode *functionBody, YYLTYPE location);
+    void setFnCall(char *value, AstNode *retNode, AstNode *scope, YYLTYPE location);
     void repr();
 };
 

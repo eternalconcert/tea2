@@ -2,16 +2,6 @@
 #include "value.h"
 #include "../y.tab.h"
 
-
-class RuntimeError: public std::exception {
-public:
-    RuntimeError(std::string message) {
-        printf("RuntimeError: %s\n", message.c_str());
-        exit(1);
-    };
-};
-
-
 class ParserError: public std::exception {
 public:
     ParserError(std::string message) {
@@ -23,8 +13,8 @@ public:
 
 class TypeError: public std::exception {
 public:
-    TypeError(std::string message) {
-        printf("TypeError: %s\n", message.c_str());
+    TypeError(std::string message, YYLTYPE location) {
+        printf("%i:%i: TypeError: %s\n", location.first_line, location.first_column, message.c_str());
         exit(3);
     };
 };
@@ -32,8 +22,8 @@ public:
 
 class UnknownIdentifierError: public std::exception {
 public:
-    UnknownIdentifierError(std::string message) {
-        printf("UnknownIdentifierError: %s\n", message.c_str());
+    UnknownIdentifierError(std::string message, YYLTYPE location) {
+        printf("%i:%i: UnknownIdentifierError: %s\n", location.first_line, location.first_column, message.c_str());
         exit(4);
     };
 };
@@ -41,8 +31,8 @@ public:
 
 class UnassignedIdentifierError: public std::exception {
 public:
-    UnassignedIdentifierError(std::string message) {
-        printf("UnassignedIdentifierError: %s\n", message.c_str());
+    UnassignedIdentifierError(std::string message, YYLTYPE location) {
+        printf("%i:%i: UnassignedIdentifierError: %s\n", location.first_line, location.first_column, message.c_str());
         exit(5);
     };
 };

@@ -18,7 +18,6 @@ public:
     virtual AstNode* evaluate();
     AstNode *init(int argc, char **args);
     virtual AstNode* getNext();
-    void setNext(AstNode *nextNode);
 
     AstNode();
 
@@ -188,6 +187,6 @@ public:
     ReturnNode(AstNode *scope);
 };
 
-Value *getFromValueStore(AstNode *scope, char* ident);
+Value *getFromValueStore(AstNode *scope, char* ident, YYLTYPE location);
 Value *getVariableFromValueStore(AstNode *scope, char *ident);
-AstNode *getValueScope(AstNode *scope, char* ident);
+AstNode *getValueScope(AstNode *scope, char* ident, YYLTYPE location);

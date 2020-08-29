@@ -16,6 +16,9 @@ PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope, bool newLine) {
 
 AstNode* PrintNode::evaluate() {
     AstNode *cur = this->paramsHead;
+
+    cur->location = this->location; // Maybe this can help with the other problems. If removed, location will not work on printing identifiers.
+
     while (cur != NULL) {
         ExpressionNode *eval = (ExpressionNode*)cur;
         eval->evaluate();
@@ -46,9 +49,9 @@ AstNode* SystemArgsNode::evaluate() {
             idx = this->indexValue->intValue;
             break;
         case IDENTIFIER:
-            Value *val = getFromValueStore(this->scope, this->indexValue->identValue);
+            Value *val = getFromValueStore(this->scope, this->indexValue->identValue, this->location);
             if (val->getTrueType() != INT) {
-                throw (TypeError("Wrong type for index"));
+                throw (TypeError("Wrong type for index", this->location));
             }
             idx = val->intValue;
             break;
@@ -57,7 +60,7 @@ AstNode* SystemArgsNode::evaluate() {
     if (sys->argc <= this->indexValue->intValue) {
         throw SystemError("Too less system args");
     } else {
-        this->value->set(sys->args[idx]);
+        this->value->set(sys->args[idx], this->location);
     }
     return this->getNext();
 };
@@ -70,7 +73,7 @@ LastRcNode::LastRcNode() {
 
 AstNode* LastRcNode::evaluate() {
     System *sys = System::getSystem();
-    this->value->set(sys->lastRc);
+    this->value->set(sys->lastRc, this->location);
     return this->getNext();
 };
 
@@ -90,9 +93,9 @@ AstNode* QuitNode::evaluate() {
             rc = this->rcValue->intValue;
             break;
         case IDENTIFIER:
-            Value *val = getFromValueStore(this->scope, this->rcValue->identValue);
+            Value *val = getFromValueStore(this->scope, this->rcValue->identValue, this->location);
             if (val->getTrueType() != INT) {
-                throw (TypeError("Wrong type for exit function"));
+                throw (TypeError("Wrong type for exit function", this->location));
             }
             rc = val->intValue;
             break;
@@ -130,16 +133,16 @@ AstNode* ReadFileNode::evaluate() {
             fromFile = this->readFile(this->pathValue->stringValue);
             break;
         case IDENTIFIER:
-           Value *val = getFromValueStore(this->scope, this->pathValue->identValue);
+           Value *val = getFromValueStore(this->scope, this->pathValue->identValue, this->location);
            if (val->getTrueType() != STR) {
-               throw (TypeError("Wrong type for read function"));
+               throw (TypeError("Wrong type for read function", this->location));
            }
            fromFile = this->readFile(val->stringValue);
            break;
     }
     char* cStr = new char[sizeof(fromFile)];
     strcpy(cStr, fromFile.c_str());
-    this->value->set(cStr);
+    this->value->set(cStr, this->location);
     return this->getNext();
 };
 
@@ -158,7 +161,7 @@ AstNode* InputNode::evaluate() {
     std::getline(std::cin, in);
     char* cStr = new char[sizeof(in)];
     strcpy(cStr, in.c_str());
-    this->value->set(cStr);
+    this->value->set(cStr, this->location);
     return this->getNext();
 };
 
@@ -202,15 +205,15 @@ AstNode* CmdNode::evaluate() {
             result = exec(shValue->stringValue);
             break;
         case IDENTIFIER:
-            Value *val = getFromValueStore(this->scope, this->shValue->identValue);
+            Value *val = getFromValueStore(this->scope, this->shValue->identValue, this->location);
             if (val->getTrueType() != STR) {
-                throw (TypeError("Wrong type for cmd function"));
+                throw (TypeError("Wrong type for cmd function", this->location));
             }
             result = exec(val->stringValue);
             break;
     }
     char* cStr = new char[sizeof(result)];
     strcpy(cStr, result.c_str());
-    this->value->set(cStr);
+    this->value->set(cStr, this->location);
     return this->getNext();
 };

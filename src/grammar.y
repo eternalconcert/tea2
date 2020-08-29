@@ -166,7 +166,7 @@ expression:
     TOKIDENT {
         ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
-        valueObj->setIdent($1, curScope);
+        valueObj->setIdent($1, curScope, @1);
         expNode->value = valueObj;
         $$ = expNode;
     }
@@ -248,7 +248,7 @@ literal:
     TOKSTRING {
         ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
-        valueObj->set($1);
+        valueObj->set($1, @1);
         expNode->value = valueObj;
         $$ = expNode;
     }
@@ -256,7 +256,7 @@ literal:
     TOKINTEGER {
         ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
-        valueObj->set($1);
+        valueObj->set($1, @1);
         expNode->value = valueObj;
         $$ = expNode;
     }
@@ -264,7 +264,7 @@ literal:
     TOKFLOAT {
         ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
-        valueObj->set($1);
+        valueObj->set($1, @1);
         expNode->value = valueObj;
         $$ = expNode;
     }
@@ -272,7 +272,7 @@ literal:
     TOKBOOL {
         ExpressionNode *expNode = new ExpressionNode(curScope);
         Value *valueObj = new Value();
-        valueObj->set($1);
+        valueObj->set($1, @1);
         expNode->value = valueObj;
         $$ = expNode;
     }
@@ -310,7 +310,7 @@ fn_call:
     |
     TOKIDENT '(' act_params ')' {
         FnCallNode *fnCall = new FnCallNode($1, $3, curScope);
-        fnCall->value->setFnCall($1, $$, curScope);
+        fnCall->value->setFnCall($1, $$, curScope, @1);
         $$ = fnCall;
     }
     ;
@@ -379,7 +379,7 @@ out:
 read:
     TOKREADFILE '(' TOKSTRING ')' {
         Value *valueObj = new Value();
-        valueObj->set($3);
+        valueObj->set($3, @3);
 
         ReadFileNode *readFile = new ReadFileNode(valueObj, curScope);
         $$ = readFile;
@@ -387,7 +387,7 @@ read:
     |
     TOKREADFILE '(' TOKIDENT ')' {
         Value *valueObj = new Value();
-        valueObj->setIdent($3, curScope);
+        valueObj->setIdent($3, curScope, @3);
 
         ReadFileNode *readFile = new ReadFileNode(valueObj, curScope);
         $$ = readFile;
@@ -411,7 +411,7 @@ assert:
 cmd:
     TOKCMD '(' TOKSTRING ')' {
         Value *valueObj = new Value();
-        valueObj->set($3);
+        valueObj->set($3, @3);
 
         CmdNode *cmd = new CmdNode(valueObj, curScope);
         $$ = cmd;
@@ -419,7 +419,7 @@ cmd:
     |
     TOKCMD '(' TOKIDENT ')' {
         Value *valueObj = new Value();
-        valueObj->setIdent($3, curScope);
+        valueObj->setIdent($3, curScope, @3);
 
         CmdNode *cmd = new CmdNode(valueObj, curScope);
         $$ = cmd;
@@ -429,7 +429,7 @@ cmd:
 sysargs:
     TOKSYSARGS '[' TOKINTEGER ']' {
         Value *valueObj = new Value();
-        valueObj->set($3);
+        valueObj->set($3, @3);
 
         SystemArgsNode *sysArgs = new SystemArgsNode(valueObj, curScope);
         $$ = sysArgs;
@@ -437,7 +437,7 @@ sysargs:
     |
     TOKSYSARGS '[' TOKIDENT ']' {
         Value *valueObj = new Value();
-        valueObj->setIdent($3, curScope);
+        valueObj->setIdent($3, curScope, @3);
 
         SystemArgsNode *sysArgs = new SystemArgsNode(valueObj, curScope);
         $$ = sysArgs;
@@ -453,7 +453,7 @@ lastrc:
 quit:
     TOKQUIT '(' TOKINTEGER ')' {
         Value *valueObj = new Value();
-        valueObj->set($3);
+        valueObj->set($3, @3);
 
         QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;
@@ -461,7 +461,7 @@ quit:
     |
     TOKQUIT '(' TOKIDENT ')' {
         Value *valueObj = new Value();
-        valueObj->setIdent($3, curScope);
+        valueObj->setIdent($3, curScope, @3);
 
         QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;
@@ -469,7 +469,7 @@ quit:
     |
     TOKQUIT '('  ')' {
         Value *valueObj = new Value();
-        valueObj->set(0);
+        valueObj->set(0, @1);
 
         QuitNode *quit = new QuitNode(valueObj, curScope);
         $$ = quit;

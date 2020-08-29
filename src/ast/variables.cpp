@@ -18,10 +18,10 @@ AstNode* VarNode::evaluate() {
     Value *val = this->rExp->value;
 
     if (val->type == IDENTIFIER) {
-        val = getFromValueStore(this->scope, val->identValue);
+        val = getFromValueStore(this->scope, val->identValue, this->location);
     }
     if (val->type != this->type) {
-        throw (TypeError("Types did not match"));
+        throw (TypeError("Types did not match", this->location));
     }
 
     this->scope->valueStore->set(this->identifier, val);
@@ -39,7 +39,7 @@ VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *s
 
 AstNode* VarDeclarationNode::evaluate() {
     Value *val = new Value();
-    val->set(this->type);
+    val->set(this->type, this->location);
     this->scope->valueStore->set(this->identifier, val);
     return this->getNext();
 };
@@ -56,12 +56,12 @@ VarAssignmentNode::VarAssignmentNode(char *identifier, AstNode *exp, AstNode *sc
 AstNode* VarAssignmentNode::evaluate() {
     this->rExp->evaluate();
     Value *val = this->rExp->value;
-    AstNode *valScope = getValueScope(this->scope, this->identifier);
+    AstNode *valScope = getValueScope(this->scope, this->identifier, this->location);
 
     typeId ownType = valScope->valueStore->get(this->identifier)->type;
 
     if (val->type != ownType) {
-        throw (TypeError("Types did not match"));
+        throw (TypeError("Types did not match", this->location));
     }
     valScope->valueStore->set(this->identifier, val);
     return this->getNext();

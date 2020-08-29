@@ -13,7 +13,7 @@ FnDeclarationNode::FnDeclarationNode(typeId type, char *identifier, AstNode *par
 
 AstNode* FnDeclarationNode::evaluate() {
     Value *val = new Value();
-    val->setFn(this->identifier, this->scope, this);
+    val->setFn(this->identifier, this->scope, this, this->location);
     this->scope->valueStore->set(this->identifier, val);
     return this->getNext();
 };
@@ -29,7 +29,7 @@ FnCallNode::FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope) {
 
 AstNode* FnCallNode::evaluate() {
     // Getting original function body and evaluating formal params
-    Value *val = getFromValueStore(this->scope, this->identifier);
+    Value *val = getFromValueStore(this->scope, this->identifier, this->location);
     FnDeclarationNode *body = val->functionBody;
     VarDeclarationNode *formalParam = (VarDeclarationNode*)body->paramsHead;
 
@@ -50,12 +50,12 @@ AstNode* FnCallNode::evaluate() {
 
 
             if (formalParam->type != eval->value->type) {
-                throw TypeError("Argument types does not match");
+                throw TypeError("Argument types does not match", this->location);
             }
 
             // formalParam->value = eval->value;
 
-            eval->value->set(formalParam->type);
+            eval->value->set(formalParam->type, this->location);
             eval->value->assigned = true;
             this->scope->valueStore->set(formalParam->identifier, eval->value);
             formalParam = (VarDeclarationNode*)formalParam->getNext();

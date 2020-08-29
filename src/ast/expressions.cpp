@@ -10,7 +10,7 @@ ExpressionNode::ExpressionNode(AstNode *scope) {
 
 
 Value *ExpressionNode::runFunctionAndGetResult() {
-    Value *startValue = getFromValueStore(this->scope, this->value->identValue);
+    Value *startValue = getFromValueStore(this->scope, this->value->identValue, this->location);
     FnCallNode *functionBlock = (FnCallNode*)startValue->functionBody;
     // From here
     functionBlock->evaluate();
@@ -22,7 +22,7 @@ AstNode* ExpressionNode::evaluate() {
     ExpressionNode *cur = (ExpressionNode*)this->childListHead;
     if (cur == NULL) {
         if (this->value->type == IDENTIFIER) {
-            this->value = getFromValueStore(this->scope, this->value->identValue);
+            this->value = getFromValueStore(this->scope, this->value->identValue, this->location);
         }
         if (this->value->type == FUNCTIONCALL) {
             this->value = this->runFunctionAndGetResult();
@@ -35,11 +35,11 @@ AstNode* ExpressionNode::evaluate() {
         Value& lVal = *this->value;
         Value *rVal = cur->value;
         if (this->value->type == IDENTIFIER) {
-            lVal = *getFromValueStore(this->scope, this->value->identValue);
+            lVal = *getFromValueStore(this->scope, this->value->identValue, this->location);
         }
 
         if (cur->value->type == IDENTIFIER) {
-            rVal = getFromValueStore(this->scope, cur->value->identValue);
+            rVal = getFromValueStore(this->scope, cur->value->identValue, this->location);
         }
 
         if (this->value->type == FUNCTIONCALL) {
