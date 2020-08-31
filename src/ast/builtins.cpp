@@ -5,6 +5,7 @@
 #include "../exceptions.h"
 #include "../value.h"
 #include "../utils/utils.h"
+#include "unistd.h"
 
 
 PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope, bool newLine) {
@@ -77,7 +78,34 @@ AstNode* LastRcNode::evaluate() {
     return this->getNext();
 };
 
+SleepNode::SleepNode(Value *seconds, AstNode *scope) {
+    this->seconds = seconds;
+    this->scope = scope;
+    AstNode();
+};
 
+
+AstNode* SleepNode::evaluate() {
+    switch (this->seconds->type) {
+        case FLOAT:
+            usleep(this->seconds->floatValue * 1000000);
+            break;
+        case INT:
+            usleep(this->seconds->intValue * 1000000);
+            break;
+        case IDENTIFIER:
+            Value *val = getFromValueStore(this->scope, this->seconds->identValue, this->location);
+            if (val->getTrueType() == FLOAT) {
+                usleep(val->floatValue * 1000000);
+            }  else if (val->getTrueType() == INT) {
+                usleep(val->intValue * 1000000);
+            } else {
+                throw (TypeError("Wrong type for sleep function", this->location));
+            }
+            break;
+    }
+    return this->getNext();
+};
 
 QuitNode::QuitNode(Value *rcValue, AstNode *scope) {
     this->rcValue = rcValue;

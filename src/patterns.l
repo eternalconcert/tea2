@@ -58,6 +58,7 @@ while                                   return TOKWHILE;
 print                                   return TOKPRINT;
 stdout                                  return TOKOUT;
 read                                    return TOKREADFILE;
+sleep                                   return TOKSLEEP;
 quit                                    return TOKQUIT;
 assert                                  return TOKASSERT;
 cmd                                     return TOKCMD;

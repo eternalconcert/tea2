@@ -78,7 +78,7 @@ int main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE
-%token TOKPRINT TOKOUT TOKREADFILE TOKQUIT TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT
+%token TOKPRINT TOKOUT TOKREADFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -94,7 +94,7 @@ int main(int argc, char *argv[0]) {
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt while_loop
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print out read input quit assert cmd sysargs lastrc
+%type <node> print out read input quit sleep assert cmd sysargs lastrc
 
 %start statements
 
@@ -354,6 +354,8 @@ builtin_function:  // Causes reduce/reduce conflict
     |
     quit
     |
+    sleep
+    |
     assert
     |
     cmd
@@ -475,5 +477,32 @@ quit:
         $$ = quit;
     }
     ;
+
+sleep:
+    TOKSLEEP '(' TOKFLOAT ')' {
+        Value *valueObj = new Value();
+        valueObj->set($3, @3);
+
+        SleepNode *sleep = new SleepNode(valueObj, curScope);
+        $$ = sleep;
+    }
+    |
+    TOKSLEEP '(' TOKINTEGER ')' {
+        Value *valueObj = new Value();
+        valueObj->set($3, @3);
+
+        SleepNode *sleep = new SleepNode(valueObj, curScope);
+        $$ = sleep;
+    }
+    |
+    TOKSLEEP '(' TOKIDENT ')' {
+        Value *valueObj = new Value();
+        valueObj->setIdent($3, curScope, @3);
+
+        SleepNode *sleep = new SleepNode(valueObj, curScope);
+        $$ = sleep;
+    }
+    ;
+
 
 %%

@@ -67,6 +67,15 @@ public:
     CmdNode(Value *shValue, AstNode *scope);
 };
 
+class SleepNode: public AstNode {
+public:
+    Value *seconds;
+    AstNode *scope;
+    AstNode *evaluate();
+
+    SleepNode(Value *seconds, AstNode *scope);
+};
+
 class QuitNode: public AstNode {
 public:
     Value *rcValue;
