@@ -1,4 +1,4 @@
-name: Tests
+name: Build
 
 on:
   push:
@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -25,3 +25,9 @@ jobs:
         ./tea tests/tests_operations.t
         ./tea tests/tests_comparisons.t
         ./tea tests/tests_conditions.t
+        ./tea tests/tests_loops.t
+    - name: Save artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: tea
+        path: tea

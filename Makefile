@@ -13,6 +13,7 @@ test: clean parser
 	./tea tests/tests_operations.t
 	./tea tests/tests_comparisons.t
 	./tea tests/tests_conditions.t
+	./tea tests/tests_loops.t
 	mkdir -p coverage
 	mv *.gcda coverage
 	mv *.gcno coverage

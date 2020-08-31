@@ -2,10 +2,15 @@
 #include "ast.h"
 
 void recursion(ExpressionNode *condition, AstNode *body) {
+    ExpressionNode *copy = new ExpressionNode(condition->scope);
+    copy->value->type = condition->value->type;
+    copy->value->identValue = condition->value->identValue;
+
     condition->evaluate();
     if (condition->value->boolValue) {
       body->evaluate();
-      /// recursion(condition, body);
+      delete(condition);
+      recursion(copy, body);
     }
 };
 
