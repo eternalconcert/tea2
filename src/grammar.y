@@ -46,6 +46,11 @@ int main(int argc, char *argv[0]) {
         yy_scan_string(argv[2]);
     }
 
+    else if (argc == 2 and !strcmp(argv[1], "-v")) {
+        printf("%i\n", BUILDNO);
+        exit(0);
+    }
+
     else if (argc >= 2) {
         FILE *inFile = fopen(argv[1], "r");
         if (!inFile) {

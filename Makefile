@@ -1,3 +1,4 @@
+BUILDNO ?= 0
 CPPSOURCES = $(shell find src/ -name "*.cpp")
 
 parser:
@@ -5,7 +6,7 @@ parser:
 	yacc -d src/grammar.y # --verbose
 
 tea: clean parser
-	g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static
+	g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static -D BUILDNO=$(BUILDNO)
 
 test: clean parser
 	g++ lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static
