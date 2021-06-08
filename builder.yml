@@ -16,6 +16,4 @@ stages:
       ./tea tests/tests_comparisons.t
       ./tea tests/tests_conditions.t
       ./tea tests/tests_loops.t
-      ls /out
       cp tea /out/tea_$BUILDER_RUN
-      ls /out
