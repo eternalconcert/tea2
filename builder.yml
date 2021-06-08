@@ -10,8 +10,6 @@ stages:
       yacc -d src/grammar.y
       g++ lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static -D BUILDNO=$BUILDER_RUN
       cp tea /out/tea_$BUILDER_RUN
-  - name: tests
-    run:
       /out/tea_$BUILDER_RUN tests/tests_basics.t
       /out/tea_$BUILDER_RUN tests/tests_operations.t
       /out/tea_$BUILDER_RUN tests/tests_comparisons.t
