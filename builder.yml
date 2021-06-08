@@ -13,6 +13,7 @@ stages:
   - name: tests
     run:
       run: |
+        ls /out/
         /out/tea tests/tests_basics.t
         /out/tea tests/tests_operations.t
         /out/tea tests/tests_comparisons.t
