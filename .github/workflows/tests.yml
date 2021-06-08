@@ -22,6 +22,7 @@ jobs:
         cp tea /out/
     - name: Test
       run: |
+        ld /out/
         /out/tea tests/tests_basics.t
         /out/tea tests/tests_operations.t
         /out/tea tests/tests_comparisons.t
