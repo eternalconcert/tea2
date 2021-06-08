@@ -19,15 +19,13 @@ jobs:
         lex src/patterns.l
         yacc -d src/grammar.y
         g++ lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static -D BUILDNO=0
-        cp tea /out/
     - name: Test
       run: |
-        ls /out/
-        /out/tea tests/tests_basics.t
-        /out/tea tests/tests_operations.t
-        /out/tea tests/tests_comparisons.t
-        /out/tea tests/tests_conditions.t
-        /out/tea tests/tests_loops.t
+        ./tea tests/tests_basics.t
+        ./tea tests/tests_operations.t
+        ./tea tests/tests_comparisons.t
+        ./tea tests/tests_conditions.t
+        ./tea tests/tests_loops.t
     - name: Save artifact
       uses: actions/upload-artifact@v2
       with:
