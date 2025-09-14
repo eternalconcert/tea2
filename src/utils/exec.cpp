@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <string>
 #include <string.h>
 
 std::string exec(const char* command) {
@@ -12,7 +13,7 @@ std::string exec(const char* command) {
   while (fgets(buffer.data(), buffer.size(), ptr) != NULL) {
     result += buffer.data();
   }
-  int rc = WEXITSTATUS(pclose(ptr));
+  int rc = pclose(ptr);
   System *sys = System::getSystem();
   sys->lastRc = rc;
   return result;

@@ -49,13 +49,16 @@ AstNode* SystemArgsNode::evaluate() {
         case INT:
             idx = this->indexValue->intValue;
             break;
-        case IDENTIFIER:
+        case IDENTIFIER: {
             Value *val = getFromValueStore(this->scope, this->indexValue->identValue, this->location);
             if (val->getTrueType() != INT) {
                 throw (TypeError("Wrong type for index", this->location));
             }
             idx = val->intValue;
             break;
+        }
+        default:
+            throw TypeError("Unsupported type for system args index", this->location);
     }
     System *sys = System::getSystem();
     if (sys->argc <= this->indexValue->intValue) {
@@ -160,13 +163,16 @@ AstNode* ReadFileNode::evaluate() {
         case STR:
             fromFile = this->readFile(this->pathValue->stringValue);
             break;
-        case IDENTIFIER:
-           Value *val = getFromValueStore(this->scope, this->pathValue->identValue, this->location);
-           if (val->getTrueType() != STR) {
-               throw (TypeError("Wrong type for read function", this->location));
-           }
-           fromFile = this->readFile(val->stringValue);
-           break;
+        case IDENTIFIER: {
+            Value *val = getFromValueStore(this->scope, this->pathValue->identValue, this->location);
+            if (val->getTrueType() != STR) {
+                throw (TypeError("Wrong type for read function", this->location));
+            }
+            fromFile = this->readFile(val->stringValue);
+            break;
+        }
+        default:
+            throw TypeError("Unsupported type for read function", this->location);
     }
     char* cStr = new char[sizeof(fromFile)];
     strcpy(cStr, fromFile.c_str());
@@ -232,13 +238,16 @@ AstNode* CmdNode::evaluate() {
         case STR:
             result = exec(shValue->stringValue);
             break;
-        case IDENTIFIER:
+        case IDENTIFIER: {
             Value *val = getFromValueStore(this->scope, this->shValue->identValue, this->location);
             if (val->getTrueType() != STR) {
                 throw (TypeError("Wrong type for cmd function", this->location));
             }
             result = exec(val->stringValue);
             break;
+        }
+        default:
+            throw TypeError("Unsupported type for cmd function", this->location);
     }
     char* cStr = new char[sizeof(result)];
     strcpy(cStr, result.c_str());

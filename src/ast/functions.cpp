@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string.h>
 #include "../exceptions.h"
 #include "ast.h"
@@ -35,8 +36,7 @@ AstNode* FnCallNode::evaluate() {
 
     AstNode *actualParam = this->paramsHead;
 
-
-    while (formalParam != NULL) {
+    while (formalParam != NULL && formalParam->type != NULL) {
         if (actualParam == NULL) {
             throw ParameterError("Not enough arguments supplied");
         }
@@ -48,8 +48,7 @@ AstNode* FnCallNode::evaluate() {
             ExpressionNode *eval = (ExpressionNode*)actualParam;
             eval->evaluate();
 
-
-            if (formalParam->type != eval->value->type) {
+           if (formalParam->type != eval->value->type) {
                 throw TypeError("Argument types does not match", this->location);
             }
 
@@ -61,8 +60,6 @@ AstNode* FnCallNode::evaluate() {
             formalParam = (VarDeclarationNode*)formalParam->getNext();
             actualParam = actualParam->getNext();
         }
-
-
     }
     ExpressionNode *functionBody = (ExpressionNode*)val->functionBody->childListHead;
     functionBody->evaluate();
