@@ -12,6 +12,7 @@ public:
     ValueStore *valueStore;
     Value *value;
     YYLTYPE location;
+    StmtType statementType;
 
     void setLocation(YYLTYPE location);
     void addToChildList(AstNode *newNode);
@@ -192,7 +193,6 @@ public:
     AstNode* evaluate();
     Value *value;
     AstNode *scope;
-
     ReturnNode(AstNode *scope);
 };
 

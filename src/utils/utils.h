@@ -1,3 +1,4 @@
+#include <string>
 #include <array>
 
 std::string exec(const char* command);
