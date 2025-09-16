@@ -113,7 +113,7 @@ public:
     char *op;
     AstNode *scope;
 
-    Value *runFunctionAndGetResult();
+    Value *runFunctionAndGetResult(AstNode *scope);
     AstNode* evaluate();
 
     ExpressionNode(AstNode *scope);

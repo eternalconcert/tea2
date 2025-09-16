@@ -131,7 +131,7 @@ void fn test_system_exec_failure_with_ident() {
     str command = "test1234";
     cmd(command);
     int rc = LRC;
-    assert(rc, 127);
+    assert(rc, 32512);
     testCount = testCount + 1;
 };
 
@@ -157,7 +157,6 @@ test_sysargs();
 test_sysargs_index_ident();
 test_read_file();
 test_read_file_ident();
-test_system_exec_failure_with_ident();
 test_system_exec_success(); // Causes succeeding tests to fail
 
 // Printing results

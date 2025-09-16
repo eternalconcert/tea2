@@ -51,9 +51,8 @@ AstNode* FnCallNode::evaluate() {
     // formale Parameter evaluieren
     VarDeclarationNode *formalParam = (VarDeclarationNode*)body->paramsHead;
     AstNode *actualParam = this->paramsHead;
-
-    while (formalParam != nullptr && formalParam->type) {
-        if (actualParam == nullptr) {
+    while (formalParam != NULL && formalParam->type != UNDEFINED) {
+        if (actualParam == NULL) {
             throw ParameterError("Not enough arguments supplied");
         }
 

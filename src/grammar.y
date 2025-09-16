@@ -6,7 +6,6 @@
     #include "src/exceptions.h"
     #include <string.h>
 
-
     AstNode *root = new AstNode();
     AstNode *curScope = root;
 

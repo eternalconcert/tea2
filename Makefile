@@ -12,7 +12,7 @@ mac-tea: parser
 	clang++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea -D BUILDNO=$(BUILDNO) -D MACOS
 
 test: clean parser
-	g++ lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static
+	g++ lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static -D BUILDNO=$(BUILDNO)
 	./tea tests/tests_basics.t
 	./tea tests/tests_operations.t
 	./tea tests/tests_comparisons.t
