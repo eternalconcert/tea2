@@ -75,7 +75,7 @@ Value *getFromValueStore(AstNode *scope, char *ident, YYLTYPE location) {
 
 
 AstNode *getValueScope(AstNode *scope, char* ident, YYLTYPE location) {
-    if (scope->valueStore->values[ident]) {
+    if (scope->valueStore->values[ident] != NULL) {
         return scope;
     }
     else {
