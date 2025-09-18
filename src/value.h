@@ -33,6 +33,9 @@ public:
     void setFn(char *identifier, AstNode *scope, FnDeclarationNode *functionBody, YYLTYPE location);
     void setFnCall(char *value, AstNode *retNode, AstNode *scope, YYLTYPE location);
     void repr();
+
+    int toInt(YYLTYPE location);
+    char *toStr(YYLTYPE location);
 };
 
 

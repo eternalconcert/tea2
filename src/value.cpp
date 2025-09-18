@@ -61,6 +61,32 @@ void Value::setFnCall(char *value, AstNode *retNode, AstNode *scope, YYLTYPE loc
     this->identValue = value;
 };
 
+int Value::toInt(YYLTYPE location) {
+    int num;
+    switch (this->type) {
+        case STR:
+            num = std::stoi(this->stringValue);
+            this->set(num, this->location);
+            this->type = INT;
+            break;
+    }
+    return num;
+};
+
+char* Value::toStr(YYLTYPE location) {
+    char *str = nullptr;
+    switch (this->type) {
+        case INT:
+            std::string temp = std::to_string(this->intValue);
+            str = new char[temp.size() + 1];
+            strcpy(str, temp.c_str());
+            this->set(str, location);
+            this->type = STR;
+            break;
+    }
+    return str;
+};
+
 
 void Value::repr() {
     switch (this->type) {

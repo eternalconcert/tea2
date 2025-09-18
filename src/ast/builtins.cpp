@@ -185,10 +185,7 @@ InputNode::InputNode(AstNode *scope) {
     AstNode();
 };
 
-
-std::string InputNode::readInput() {
-    return "TEST";
-};
+void InputNode::readInput() {};
 
 AstNode* InputNode::evaluate() {
     std::string in;
@@ -224,6 +221,46 @@ AstNode* AssertNode::evaluate() {
     return this->getNext();
 };
 
+
+
+CastNode::CastNode(char* identifier, typeId typeName, AstNode* scope) {
+    this->identifier = identifier;
+    this->typeName = typeName;
+    this->scope = scope;
+    this->parent = scope;
+}
+
+AstNode* CastNode::evaluate() {
+    Value* value = getFromValueStore(this->scope, this->identifier, this->location);
+    switch (this->typeName) {
+        case UNDEFINED:
+            // Nichts zu tun oder Fehler werfen
+            break;
+
+        case INT: {
+            value->toInt(this->location);
+            break;
+        }
+
+        case FLOAT: {
+            float num = std::stof(value->stringValue);
+            value->set(num, this->location);
+            break;
+        }
+
+        case STR: {
+            value->toStr(this->location);
+            break;
+        }
+
+        case BOOL: {
+            bool b = (strcmp(value->stringValue, "true") == 0 || strcmp(value->stringValue, "1") == 0);
+            value->set(b, this->location);
+            break;
+        }
+    }
+    return this->getNext();
+}
 
 CmdNode::CmdNode(Value *shValue, AstNode *scope) {
     this->shValue = shValue;

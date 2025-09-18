@@ -63,6 +63,7 @@ quit                                    return TOKQUIT;
 assert                                  return TOKASSERT;
 cmd                                     return TOKCMD;
 input                                   return TOKINPUT;
+cast                                    return TOKCAST;
 SYSARGS                                 return TOKSYSARGS;
 LRC                                     return TOKLRC;
 "("                                     return '(';

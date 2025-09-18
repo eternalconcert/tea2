@@ -103,8 +103,18 @@ public:
     AstNode *scope;
 
     AstNode* evaluate();
-    std::string readInput();
+    void readInput();
     InputNode(AstNode *scope);
+};
+
+
+class CastNode: public AstNode {
+public:
+    AstNode *scope;
+    char *identifier;
+    typeId typeName;
+    AstNode* evaluate();
+    CastNode(char *identifier, typeId typeName, AstNode *scope);
 };
 
 

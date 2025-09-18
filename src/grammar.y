@@ -82,7 +82,7 @@ int main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE
-%token TOKPRINT TOKOUT TOKREADFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT
+%token TOKPRINT TOKOUT TOKREADFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -98,7 +98,7 @@ int main(int argc, char *argv[0]) {
 %type <node> expression literal fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt while_loop
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print out read input quit sleep assert cmd sysargs lastrc
+%type <node> print out read input quit sleep assert cmd sysargs lastrc cast
 
 %start statements
 
@@ -367,6 +367,8 @@ builtin_function:  // Causes reduce/reduce conflict
     sysargs
     |
     lastrc
+    |
+    cast
     ;
 
 print:
@@ -404,6 +406,13 @@ input:
     TOKINPUT {
         InputNode *input = new InputNode(curScope);
         $$ = input;
+    }
+    ;
+
+cast:
+    TOKCAST '(' TOKIDENT ',' TYPEIDENT ')' {
+        CastNode *cast = new CastNode($3, $5, curScope);
+        $$ = cast;
     }
     ;
 
