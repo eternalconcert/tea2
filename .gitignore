@@ -12,3 +12,4 @@ coverage/
 syntax: glob
 pythonenv/*
 *.gcda
+example/build/*
