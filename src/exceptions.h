@@ -2,6 +2,14 @@
 #include "value.h"
 #include "../y.tab.h"
 
+class BaseError: public std::exception {
+public:
+    BaseError(std::string message, YYLTYPE location) {
+        printf("%i:%i %s\n", location.first_line, location.first_column, message.c_str());
+        exit(47);
+    };
+};
+
 class ParserError: public std::exception {
 public:
     ParserError(std::string message) {
@@ -10,6 +18,13 @@ public:
     };
 };
 
+class RuntimeError: public std::exception {
+public:
+    RuntimeError(std::string message, YYLTYPE location) {
+        printf("%i:%i: RuntimeError: %s\n", location.first_line, location.first_column, message.c_str());
+        exit(3);
+    };
+};
 
 class TypeError: public std::exception {
 public:

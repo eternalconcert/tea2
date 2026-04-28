@@ -186,7 +186,7 @@ int main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKIMPORT TOKEXPORT
+%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKIMPORT TOKEXPORT TOKTHROW
 %token TOKPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN
 %token TOKLBRACE TOKRBRACE
 
@@ -201,7 +201,7 @@ int main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <node> expression literal array_literal array_items array_index fn_call
-%type <node> statement statements if_statement fn_declaration return_stmt while_loop import_statement export_statement
+%type <node> statement statements if_statement fn_declaration return_stmt while_loop import_statement export_statement throw
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
 %type <node> print out read write split find len input quit sleep assert cmd sysargs lastrc cast
 
@@ -257,6 +257,9 @@ statement:
         $$ = $1;
     }
     | export_statement {
+        $$ = $1;
+    }
+    | throw {
         $$ = $1;
     }
     ;
@@ -562,6 +565,13 @@ builtin_function:  // Causes reduce/reduce conflict
     lastrc
     |
     cast
+    ;
+
+throw:
+    TOKTHROW TOKIDENT '(' expressions ')' {
+        ThrowNode *throwNode = new ThrowNode($2, $4, curScope);
+        $$ = throwNode;
+    }
     ;
 
 print:

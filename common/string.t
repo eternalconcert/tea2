@@ -31,14 +31,13 @@ export str fn replaceMany(str invalue, array patterns, array replacements) {
     int numberOfPatterns = len(patterns);
     int numberOfReplacements = len(replacements);
 
-    assert(
-      numberOfPatterns,
-      numberOfReplacements,
-      replace(
-        replace("Number of patterns (%numberOfPatterns%) and replacements (%numberOfReplacements%) must be the same", "%numberOfPatterns%", "" + numberOfPatterns),
-        "%numberOfReplacements%", "" + numberOfReplacements
-      )
-    );
+    if (numberOfPatterns != numberOfReplacements) {
+      str message = replace(
+          replace("Number of patterns (%numberOfPatterns%) and replacements (%numberOfReplacements%) must be equal.", "%numberOfPatterns%", "" + numberOfPatterns),
+          "%numberOfReplacements%", "" + numberOfReplacements
+       );
+       throw StringError(message);
+    };
 
     int i = 0;
     while (i < numberOfPatterns) {

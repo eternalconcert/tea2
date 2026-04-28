@@ -58,6 +58,7 @@ return                                  return TOKRETURN;
 while                                   return TOKWHILE;
 import                                  return TOKIMPORT;
 export                                  return TOKEXPORT;
+throw                                   return TOKTHROW;
 print                                   return TOKPRINT;
 stdout                                  return TOKOUT;
 read                                    return TOKREADFILE;

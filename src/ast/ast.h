@@ -274,6 +274,15 @@ public:
     ReturnNode(AstNode *scope);
 };
 
+class ThrowNode: public AstNode {
+public:
+    char *identifier;
+    AstNode *msgExpression;
+    AstNode *scope;
+    AstNode* evaluate();
+    ThrowNode(char *identifier, AstNode *msgExpression, AstNode *scope);
+};
+
 Value *getFromValueStore(AstNode *scope, char* ident, YYLTYPE location);
 Value *getVariableFromValueStore(AstNode *scope, char *ident);
 AstNode *getValueScope(AstNode *scope, char* ident, YYLTYPE location);
