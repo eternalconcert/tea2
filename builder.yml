@@ -22,5 +22,7 @@ stages:
     run: |
       cp /out/tea tea
       cd example
+      mkdir -p build/static
       ./app.t
-      cp -r build /out/example
+      tar -czvf build.tar.gz build
+      cp build.tar.gz /out/build.tar.gz
