@@ -1,5 +1,5 @@
 job: build
-image: cloud.canister.io:5000/eternalconcert/builder-default
+image: docker.softcreate.de/eternalconcert/builder-default
 stages:
   - name: build
     run: |
