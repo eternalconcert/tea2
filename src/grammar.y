@@ -186,7 +186,7 @@ int main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKIMPORT TOKEXPORT TOKTHROW
+%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKIMPORT TOKEXPORT TOKTHROW
 %token TOKPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN
 %token TOKLBRACE TOKRBRACE
 
@@ -201,9 +201,10 @@ int main(int argc, char *argv[0]) {
 
 %type <sval> operator
 %type <node> expression literal array_literal array_items array_index fn_call
-%type <node> statement statements if_statement fn_declaration return_stmt while_loop import_statement export_statement throw
+%type <node> statement statements if_statement fn_declaration return_stmt while_loop for_loop import_statement export_statement throw
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
 %type <node> print out read write split find len input quit sleep assert cmd sysargs lastrc cast
+%type <node> for_init for_condition for_post
 
 %start statements
 
@@ -245,6 +246,9 @@ statement:
         $$ = $1;
     }
     | while_loop {
+        $$ = $1;
+    }
+    | for_loop {
         $$ = $1;
     }
     | fn_declaration {
@@ -531,6 +535,53 @@ while_loop:
         $$ = whileNode;
         whileNode->condition = $3;
         whileNode->addToChildList($6);
+    }
+    ;
+
+for_loop:
+    TOKFOR '(' for_init ';' for_condition ';' for_post ')' lbrace statements rbrace {
+        ForNode *forNode = new ForNode();
+        $$ = forNode;
+        forNode->init = $3;
+        forNode->condition = $5;
+        forNode->post = $7;
+        forNode->addToChildList($10);
+    }
+    ;
+
+for_init: /* empty */ {
+        $$ = NULL;
+    }
+    | var_declaration_assignment {
+        $$ = $1;
+    }
+    | var_assignment {
+        $$ = $1;
+    }
+    | var_declaration {
+        $$ = $1;
+    }
+    | expressions {
+        $$ = $1;
+    }
+    ;
+
+for_condition: /* empty */ {
+        $$ = NULL;
+    }
+    | expressions {
+        $$ = $1;
+    }
+    ;
+
+for_post: /* empty */ {
+        $$ = NULL;
+    }
+    | var_assignment {
+        $$ = $1;
+    }
+    | expressions {
+        $$ = $1;
     }
     ;
 

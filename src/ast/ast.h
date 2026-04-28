@@ -243,6 +243,14 @@ public:
     AstNode* evaluate();
 };
 
+class ForNode: public AstNode {
+public:
+    AstNode *init;
+    AstNode *condition;
+    AstNode *post;
+    AstNode* evaluate();
+};
+
 class FnDeclarationNode: public AstNode {
 public:
     typeId type;

@@ -56,6 +56,7 @@ false                                   yylval.bval=false; return TOKBOOL;
 fn                                      return TOKFN;
 return                                  return TOKRETURN;
 while                                   return TOKWHILE;
+for                                     return TOKFOR;
 import                                  return TOKIMPORT;
 export                                  return TOKEXPORT;
 throw                                   return TOKTHROW;
