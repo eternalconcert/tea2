@@ -4,8 +4,8 @@
 Value *ValueStore::get(const std::string ident) {
     auto it = values.find(ident);
     if (it != values.end()) {
-        return it->second;  // existiert
+        return it->second;
     } else {
-        return nullptr;     // existiert nicht
+        return nullptr;
     }
 }

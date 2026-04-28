@@ -14,6 +14,8 @@ mac-tea: parser
 test: clean parser
 	g++ lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static -D BUILDNO=$(BUILDNO)
 	./tea tests/tests_basics.t
+	./tea tests/tests_imports.t
+	./tea tests/tests_functions.t
 	./tea tests/tests_operations.t
 	./tea tests/tests_comparisons.t
 	./tea tests/tests_conditions.t

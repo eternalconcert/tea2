@@ -57,6 +57,15 @@ public:
         printf("\n");
         exit(7);
     };
+
+  AssertionError(Value *first, Value *second, std::string message, YYLTYPE location) {
+        printf("%i:%i: AssertionError: %s: ", location.first_line, location.first_column, message.c_str());
+        first->repr();
+        printf(" != ");
+        second->repr();
+        printf("\n");
+        exit(7);
+    };
 };
 
 

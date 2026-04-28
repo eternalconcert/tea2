@@ -15,6 +15,7 @@ void fn test_multiline_comment() {
 void fn test_int_assignments() {
     int a = 23;
     assert(a, 23);
+    assert(a, 23, "custom assert message");
     testCount = testCount + 1;
 };
 
@@ -71,29 +72,6 @@ void fn test_else_block() {
 };
 
 
-void fn test_fn_declaration_with_params() {
-    void fn test(int a, str b) {
-        assert(a, 5);
-        assert(b, "hello");
-    };
-
-    test(5, "hello");
-    testCount = testCount + 1;
-};
-
-
-void fn test_fn_call_with_params_available_in_scope() {
-    void fn test(int a, str b) {
-        a = a + 1;
-        assert(a, 6);
-        b = b + " world";
-        assert(b, "hello world");
-    };
-    test(5, "hello");
-    testCount = testCount + 1;
-};
-
-
 void fn test_sysargs() {
     str sysarg_0 = SYSARGS[0];
     assert(sysarg_0, "./tea");
@@ -127,6 +105,76 @@ void fn test_read_file_ident() {
     testCount = testCount + 1;
 };
 
+void fn test_write_file() {
+    write("/tmp/tea_write_test.txt", "hello tea");
+    str result = read("/tmp/tea_write_test.txt");
+    assert(result, "hello tea");
+    testCount = testCount + 1;
+};
+
+void fn test_write_file_ident() {
+    str path = "/tmp/tea_write_test_ident.txt";
+    str content = "hello from variables";
+    write(path, content);
+    str result = read(path);
+    assert(result, content);
+    testCount = testCount + 1;
+};
+
+void fn test_split() {
+    array result = split("hello,tea,world", ",");
+    assert(result, ["hello", "tea", "world"]);
+    assert(result[0], "hello");
+    int index = 2;
+    assert(result[index], "world");
+    int offset = -1;
+    assert(result[index] + offset, "world-1");
+    testCount = testCount + 1;
+};
+
+void fn test_str_index() {
+    str text = "hello";
+    assert(text[0], "h");
+    int index = 4;
+    assert(text[index], "o");
+    testCount = testCount + 1;
+};
+
+str fn test_get_substring(str invalue, int startIndex, int endIndex) {
+    str result = "";
+    int i = startIndex;
+    while (i < endIndex) {
+        result = result + invalue[i];
+        i = i + 1;
+    };
+    return result;
+};
+
+void fn test_str_index_in_expression() {
+    assert(test_get_substring("hello world", 0, 5), "hello");
+    testCount = testCount + 1;
+};
+
+void fn test_str_find() {
+    assert(find("hello hello", "lo"), [3, 9]);
+    assert(find("hello", "x"), []);
+    assert(find("aaaa", "aa"), [0, 1, 2]);
+    testCount = testCount + 1;
+};
+
+void fn test_str_len() {
+    assert(len("hello"), 5);
+    str text = "tea";
+    assert(len(text), 3);
+    assert(len(""), 0);
+    assert(len(["hello", "tea", "world"]), 3);
+    array values = split("a,b,c", ",");
+    assert(len(values), 3);
+    int startIndex = 2;
+    assert(startIndex + len(text), 5);
+    testCount = testCount + 1;
+};
+
 void fn test_system_exec_failure_with_ident() {
     str command = "test1234";
     cmd(command);
@@ -151,12 +199,17 @@ test_bool_assignments();
 test_int_reassignments();
 test_scoped_reassignment();
 test_else_block();
-test_fn_declaration_with_params();
-test_fn_call_with_params_available_in_scope();
 test_sysargs();
 test_sysargs_index_ident();
 test_read_file();
 test_read_file_ident();
+test_write_file();
+test_write_file_ident();
+test_split();
+test_str_index();
+test_str_index_in_expression();
+test_str_find();
+test_str_len();
 test_system_exec_success(); // Causes succeeding tests to fail
 
 // Printing results

@@ -5,10 +5,8 @@
 std::string exec(const char* command) {
   std::array<char, 128> buffer;
   std::string result;
-  char* cStr = new char[strlen(command) + sizeof(char) * 6];
-  strcpy(cStr, command);
-  strcat(cStr, " 2>&1");
-  FILE *ptr = popen(cStr, "r");
+  std::string commandWithStderr = std::string(command) + " 2>&1";
+  FILE *ptr = popen(commandWithStderr.c_str(), "r");
 
   while (fgets(buffer.data(), buffer.size(), ptr) != NULL) {
     result += buffer.data();

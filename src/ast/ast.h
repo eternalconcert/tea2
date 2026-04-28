@@ -13,6 +13,7 @@ public:
     Value *value;
     YYLTYPE location;
     StmtType statementType;
+    bool exported;
 
     void setLocation(YYLTYPE location);
     void addToChildList(AstNode *newNode);
@@ -97,6 +98,46 @@ public:
     ReadFileNode(Value *pathValue, AstNode *scope);
 };
 
+class WriteFileNode: public AstNode {
+public:
+    AstNode *pathExpression;
+    AstNode *contentExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    WriteFileNode(AstNode *pathExpression, AstNode *contentExpression, AstNode *scope);
+};
+
+class ImportNode: public AstNode {
+public:
+    std::string importPath;
+    std::string baseDir;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    ImportNode(char *importPath, AstNode *scope, std::string baseDir);
+};
+
+class SplitNode: public AstNode {
+public:
+    AstNode *stringExpression;
+    AstNode *separatorExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    SplitNode(AstNode *stringExpression, AstNode *separatorExpression, AstNode *scope);
+};
+
+class FindNode: public AstNode {
+public:
+    AstNode *stringExpression;
+    AstNode *patternExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    FindNode(AstNode *stringExpression, AstNode *patternExpression, AstNode *scope);
+};
+
 class InputNode: public AstNode {
 public:
     Value *pathValue;
@@ -122,11 +163,38 @@ class ExpressionNode: public AstNode {
 public:
     char *op;
     AstNode *scope;
+    Value *initialValue;
 
-    Value *runFunctionAndGetResult(AstNode *scope);
+    Value *runFunctionAndGetResult(AstNode *scope, Value *functionValue);
     AstNode* evaluate();
 
     ExpressionNode(AstNode *scope);
+};
+
+class LenNode: public ExpressionNode {
+public:
+    AstNode *stringExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    LenNode(AstNode *stringExpression, AstNode *scope);
+};
+
+class ArrayLiteralNode: public ExpressionNode {
+public:
+    AstNode *items;
+
+    AstNode* evaluate();
+    ArrayLiteralNode(AstNode *items, AstNode *scope);
+};
+
+class ArrayIndexNode: public ExpressionNode {
+public:
+    char *identifier;
+    AstNode *indexExpression;
+
+    AstNode* evaluate();
+    ArrayIndexNode(char *identifier, AstNode *indexExpression, AstNode *scope);
 };
 
 class VarNode: public AstNode {
@@ -209,3 +277,12 @@ public:
 Value *getFromValueStore(AstNode *scope, char* ident, YYLTYPE location);
 Value *getVariableFromValueStore(AstNode *scope, char *ident);
 AstNode *getValueScope(AstNode *scope, char* ident, YYLTYPE location);
+AstNode *parseTeaFileIntoScope(std::string path, AstNode *scope);
+std::string resolveTeaPath(std::string path, std::string baseDir);
+std::string currentParseDir();
+bool isTeaModuleImported(std::string path);
+bool beginTeaModuleImport(std::string path);
+void finishTeaModuleImport(std::string path);
+void markTeaModuleImported(std::string path);
+void registerImportedTeaModuleValue(std::string path, std::string ident, Value *value);
+void copyImportedTeaModuleValues(std::string path, AstNode *scope);

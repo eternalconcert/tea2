@@ -28,7 +28,26 @@ FnCallNode::FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope) {
 }
 
 
-// Hilfsfunktion: findet rekursiv den ReturnNode in einem AstNode
+void resetReturnNodes(AstNode* node) {
+    if (!node) return;
+
+    if (dynamic_cast<ReturnNode*>(node) != nullptr) {
+        node->statementType = OTHER;
+    }
+
+    AstNode* child = node->childListHead;
+    while (child) {
+        resetReturnNodes(child);
+        child = child->getNext();
+    }
+
+    IfNode* ifNode = dynamic_cast<IfNode*>(node);
+    if (ifNode != nullptr) {
+        resetReturnNodes(ifNode->elseBlock);
+    }
+}
+
+// Hilfsfunktion: findet rekursiv den ausgeführten ReturnNode in einem AstNode
 AstNode* findReturnNode(AstNode* node) {
     if (!node) return nullptr;
 
@@ -40,6 +59,12 @@ AstNode* findReturnNode(AstNode* node) {
         if (found) return found;
         child = child->getNext();
     }
+
+    IfNode* ifNode = dynamic_cast<IfNode*>(node);
+    if (ifNode != nullptr) {
+        return findReturnNode(ifNode->elseBlock);
+    }
+
     return nullptr;
 }
 
@@ -47,6 +72,7 @@ AstNode* FnCallNode::evaluate() {
     // Funktion aus dem ValueStore holen
     Value *val = getFromValueStore(this->scope, this->identifier, this->location);
     FnDeclarationNode *body = val->functionBody;
+    AstNode *functionScope = body->childListHead;
 
     // formale Parameter evaluieren
     VarDeclarationNode *formalParam = (VarDeclarationNode*)body->paramsHead;
@@ -56,23 +82,27 @@ AstNode* FnCallNode::evaluate() {
             throw ParameterError("Not enough arguments supplied");
         }
 
-        formalParam->evaluate();
         ExpressionNode *eval = (ExpressionNode*)actualParam;
         eval->evaluate();
+        Value *actualValue = eval->value;
+        if (actualValue->type == IDENTIFIER) {
+            actualValue = getFromValueStore(this->scope, actualValue->identValue, this->location);
+        }
 
-        if (formalParam->type != eval->value->type) {
+        if (formalParam->type != actualValue->type) {
             throw TypeError("Argument types does not match", this->location);
         }
 
-        eval->value->set(formalParam->type, this->location);
-        eval->value->assigned = true;
-        this->scope->valueStore->set(formalParam->identifier, eval->value);
+        Value *paramValue = new Value(*actualValue);
+        paramValue->assigned = true;
+        functionScope->valueStore->set(formalParam->identifier, paramValue);
 
         formalParam = (VarDeclarationNode*)formalParam->getNext();
         actualParam = actualParam->getNext();
     }
 
     // Funktionskörper ausführen
+    resetReturnNodes(body);
     AstNode* stmt = body->childListHead;
     while (stmt) {
         stmt->evaluate();
@@ -94,7 +124,6 @@ AstNode* FnCallNode::evaluate() {
 
 ReturnNode::ReturnNode(AstNode *scope) : AstNode() {
     this->scope = scope;
-    this->statementType = RETURN;  // Direkt hier setzen
 };
 
 AstNode* ReturnNode::evaluate() {

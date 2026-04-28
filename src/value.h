@@ -2,6 +2,7 @@
 #define VALUE_H
 #include <map>
 #include <string>
+#include <vector>
 #include "commons.h"
 
 class AstNode;
@@ -19,6 +20,7 @@ public:
     int intValue;
     float floatValue;
     char *stringValue;
+    std::vector<Value*> arrayValue;
     bool boolValue;
     char *identValue;
     bool assigned = true;
@@ -29,6 +31,7 @@ public:
     void set(int value, YYLTYPE location);
     void set(float value, YYLTYPE location);
     void set(bool value, YYLTYPE location);
+    void set(std::vector<Value*> value, YYLTYPE location);
     void setIdent(char *value, AstNode *scope, YYLTYPE location);
     void setFn(char *identifier, AstNode *scope, FnDeclarationNode *functionBody, YYLTYPE location);
     void setFnCall(char *value, AstNode *retNode, AstNode *scope, YYLTYPE location);

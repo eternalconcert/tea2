@@ -1,9 +1,25 @@
 #include <string.h>
 #include <cmath>
+#include <string>
 #include "exceptions.h"
 #include "ast/ast.h"
 #include "valuestore.h"
 #include "value.h"
+
+static char* copyString(const std::string &value) {
+    char *copy = new char[value.size() + 1];
+    strcpy(copy, value.c_str());
+    return copy;
+}
+
+static void reprArrayItem(Value *value) {
+    if (value->getTrueType() == STR) {
+        printf("\"%s\"", value->stringValue);
+        return;
+    }
+
+    value->repr();
+}
 
 void Value::set(typeId type, YYLTYPE location) {
     this->type = type;
@@ -36,6 +52,13 @@ void Value::set(bool value, YYLTYPE location) {
     this->type = BOOL;
     this->location = location;
     this->boolValue = value;
+};
+
+void Value::set(std::vector<Value*> value, YYLTYPE location) {
+    this->type = ARRAY;
+    this->location = location;
+    this->boolValue = value.size() > 0;
+    this->arrayValue = value;
 };
 
 void Value::setIdent(char *value, AstNode *scope, YYLTYPE location) {
@@ -102,6 +125,16 @@ void Value::repr() {
         case BOOL:
             printf("%s", this->boolValue ? "true" : "false");
             break;
+        case ARRAY:
+            printf("[");
+            for (int i = 0; i < this->arrayValue.size(); i++) {
+                if (i > 0) {
+                    printf(", ");
+                }
+                reprArrayItem(this->arrayValue[i]);
+            }
+            printf("]");
+            break;
         case IDENTIFIER:
             getFromValueStore(this->scope, this->identValue, this->location)->repr();
             break;
@@ -134,9 +167,7 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
         // 1 + "A" = "1A"
         std::string tempStr = std::to_string(lVal.intValue);
-        char* cStr = new char[tempStr.length() + strlen(rVal->stringValue)];
-        strcpy(cStr, tempStr.c_str());
-        strcat(cStr, rVal->stringValue);
+        char* cStr = copyString(tempStr + rVal->stringValue);
         nVal->set(cStr, lVal.location);
     }
 
@@ -153,35 +184,27 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
         // 1.0 + "A" = "1.0A"
         std::string tempStr = std::to_string(lVal.floatValue);
-        char* cStr = new char[tempStr.length() + strlen(rVal->stringValue)];
-        strcpy(cStr, tempStr.c_str());
-        strcat(cStr, rVal->stringValue);
+        char* cStr = copyString(tempStr + rVal->stringValue);
         nVal->set(cStr, lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "A" + 1 = "A1"
         std::string tempStr = std::to_string(rVal->intValue);
-        char* cStr = new char[tempStr.length() + strlen(lVal.stringValue)];
-        strcpy(cStr, lVal.stringValue);
-        strcat(cStr, tempStr.c_str());
+        char* cStr = copyString(std::string(lVal.stringValue) + tempStr);
         nVal->set(cStr, lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
         // "A" + 1.0 = "A1.0"
         std::string tempStr = std::to_string(rVal->floatValue);
-        char* cStr = new char[tempStr.length() + strlen(lVal.stringValue)];
-        strcpy(cStr, lVal.stringValue);
-        strcat(cStr, tempStr.c_str());
+        char* cStr = copyString(std::string(lVal.stringValue) + tempStr);
         nVal->set(cStr, lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
         // "A" + "B" = "AB"
-        char* cStr = new char[strlen(lVal.stringValue) + strlen(rVal->stringValue)];
-        strcpy(cStr, lVal.stringValue);
-        strcat(cStr, rVal->stringValue);
+        char* cStr = copyString(std::string(lVal.stringValue) + rVal->stringValue);
         nVal->set(cStr, lVal.location);
     }
 
@@ -274,11 +297,12 @@ Value* operator*(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
         // 3 + "A" = "AAA"
-        char* cStr = new char[(strlen(rVal->stringValue) * lVal.intValue)];
+        std::string repeated;
 
-        for (int i=1; i <= lVal.intValue; i++) {
-            strcat(cStr, rVal->stringValue);
+        for (int i=0; i < lVal.intValue; i++) {
+            repeated += rVal->stringValue;
         }
+        char* cStr = copyString(repeated);
         nVal->set(cStr, lVal.location);
     }
 
@@ -299,11 +323,12 @@ Value* operator*(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "A" * 3 = "AAA"
-        char* cStr = new char[(strlen(lVal.stringValue) * rVal->intValue)];
+        std::string repeated;
 
-        for (int i=1; i <= rVal->intValue; i++) {
-            strcat(cStr, lVal.stringValue);
+        for (int i=0; i < rVal->intValue; i++) {
+            repeated += lVal.stringValue;
         }
+        char* cStr = copyString(repeated);
         nVal->set(cStr, lVal.location);
     }
 
@@ -477,6 +502,24 @@ Value* operator==(Value &lVal, Value *rVal) {
         return nVal;
     }
 
+    if (lVal.getTrueType() == ARRAY and rVal->getTrueType() == ARRAY) {
+        if (lVal.arrayValue.size() != rVal->arrayValue.size()) {
+            nVal->set(false, lVal.location);
+            return nVal;
+        }
+
+        for (int i = 0; i < lVal.arrayValue.size(); i++) {
+            Value *itemsEqual = operator==(*lVal.arrayValue[i], rVal->arrayValue[i]);
+            if (!itemsEqual->boolValue) {
+                nVal->set(false, lVal.location);
+                return nVal;
+            }
+        }
+
+        nVal->set(true, lVal.location);
+        return nVal;
+    }
+
     return nVal;
 };
 
@@ -544,7 +587,7 @@ Value* operator>(Value &lVal, Value *rVal) {
     }
 
     if (lVal.getTrueType() == BOOL and rVal->getTrueType() == INT) {
-        throw (TypeError("Size comparisons are not implemented for BOOL and INT", lVal.location));
+        nVal->set(lVal.boolValue && rVal->intValue > 0, lVal.location);
     }
 
     if (lVal.getTrueType() == INT and rVal->getTrueType() == BOOL) {

@@ -7,6 +7,12 @@
 #include "../utils/utils.h"
 #include "unistd.h"
 
+static char* copyString(const std::string &value) {
+    char *copy = new char[value.size() + 1];
+    strcpy(copy, value.c_str());
+    return copy;
+}
+
 
 PrintNode::PrintNode(AstNode *paramsHead, AstNode *scope, bool newLine) {
     this->scope = scope;
@@ -141,7 +147,6 @@ ReadFileNode::ReadFileNode(Value *pathValue, AstNode *scope) {
     AstNode();
 };
 
-
 std::string ReadFileNode::readFile(std::string path) {
     std::ifstream file(path);
 
@@ -174,11 +179,166 @@ AstNode* ReadFileNode::evaluate() {
         default:
             throw TypeError("Unsupported type for read function", this->location);
     }
-    char* cStr = new char[sizeof(fromFile)];
-    strcpy(cStr, fromFile.c_str());
+    char* cStr = copyString(fromFile);
     this->value->set(cStr, this->location);
     return this->getNext();
 };
+
+
+WriteFileNode::WriteFileNode(AstNode *pathExpression, AstNode *contentExpression, AstNode *scope) {
+    this->pathExpression = pathExpression;
+    this->contentExpression = contentExpression;
+    this->scope = scope;
+    AstNode();
+};
+
+AstNode* WriteFileNode::evaluate() {
+    ExpressionNode *pathEval = (ExpressionNode*)this->pathExpression;
+    ExpressionNode *contentEval = (ExpressionNode*)this->contentExpression;
+
+    pathEval->evaluate();
+    contentEval->evaluate();
+
+    if (pathEval->value->getTrueType() != STR) {
+        throw TypeError("Wrong type for write path", this->location);
+    }
+
+    if (contentEval->value->getTrueType() != STR) {
+        throw TypeError("Wrong type for write content", this->location);
+    }
+
+    std::ofstream file(pathEval->value->stringValue);
+    if (!file) {
+        throw SystemError("Could not open file for writing");
+    }
+
+    file << contentEval->value->stringValue;
+    file.close();
+    return this->getNext();
+};
+
+SplitNode::SplitNode(AstNode *stringExpression, AstNode *separatorExpression, AstNode *scope) {
+    this->stringExpression = stringExpression;
+    this->separatorExpression = separatorExpression;
+    this->scope = scope;
+    AstNode();
+};
+
+AstNode* SplitNode::evaluate() {
+    ExpressionNode *stringEval = (ExpressionNode*)this->stringExpression;
+    ExpressionNode *separatorEval = (ExpressionNode*)this->separatorExpression;
+
+    stringEval->evaluate();
+    separatorEval->evaluate();
+
+    if (stringEval->value->getTrueType() != STR) {
+        throw TypeError("Wrong type for split string", this->location);
+    }
+
+    if (separatorEval->value->getTrueType() != STR) {
+        throw TypeError("Wrong type for split separator", this->location);
+    }
+
+    std::string input = stringEval->value->stringValue;
+    std::string separator = separatorEval->value->stringValue;
+    if (separator.empty()) {
+        throw TypeError("Split separator cannot be empty", this->location);
+    }
+
+    std::vector<Value*> parts;
+    size_t start = 0;
+    size_t end = input.find(separator);
+
+    while (end != std::string::npos) {
+        Value *part = new Value();
+        part->set(copyString(input.substr(start, end - start)), this->location);
+        parts.push_back(part);
+        start = end + separator.size();
+        end = input.find(separator, start);
+    }
+
+    Value *part = new Value();
+    part->set(copyString(input.substr(start)), this->location);
+    parts.push_back(part);
+
+    this->value->set(parts, this->location);
+    return this->getNext();
+};
+
+FindNode::FindNode(AstNode *stringExpression, AstNode *patternExpression, AstNode *scope) {
+    this->stringExpression = stringExpression;
+    this->patternExpression = patternExpression;
+    this->scope = scope;
+    AstNode();
+};
+
+AstNode* FindNode::evaluate() {
+    ExpressionNode *stringEval = (ExpressionNode*)this->stringExpression;
+    ExpressionNode *patternEval = (ExpressionNode*)this->patternExpression;
+
+    stringEval->evaluate();
+    patternEval->evaluate();
+
+    if (stringEval->value->getTrueType() != STR) {
+        throw TypeError("Wrong type for find string", this->location);
+    }
+
+    if (patternEval->value->getTrueType() != STR) {
+        throw TypeError("Wrong type for find pattern", this->location);
+    }
+
+    std::string input = stringEval->value->stringValue;
+    std::string pattern = patternEval->value->stringValue;
+    if (pattern.empty()) {
+        throw TypeError("Find pattern cannot be empty", this->location);
+    }
+
+    std::vector<Value*> matches;
+    size_t start = 0;
+    size_t found = input.find(pattern, start);
+
+    while (found != std::string::npos) {
+        Value *match = new Value();
+        match->set((int)found, this->location);
+        matches.push_back(match);
+        start = found + 1;
+        found = input.find(pattern, start);
+    }
+
+    this->value->set(matches, this->location);
+    return this->getNext();
+};
+
+LenNode::LenNode(AstNode *stringExpression, AstNode *scope) : ExpressionNode(scope) {
+    this->stringExpression = stringExpression;
+    this->scope = scope;
+};
+
+AstNode* LenNode::evaluate() {
+    ExpressionNode *stringEval = (ExpressionNode*)this->stringExpression;
+    stringEval->evaluate();
+
+    if (stringEval->value->getTrueType() == STR) {
+        this->value->set((int)strlen(stringEval->value->stringValue), this->location);
+        if (this->childListHead != NULL && this->childListHead != this) {
+            this->initialValue = new Value(*this->value);
+            return ExpressionNode::evaluate();
+        }
+        return this->getNext();
+    }
+
+    if (stringEval->value->getTrueType() == ARRAY) {
+        this->value->set((int)stringEval->value->arrayValue.size(), this->location);
+        if (this->childListHead != NULL && this->childListHead != this) {
+            this->initialValue = new Value(*this->value);
+            return ExpressionNode::evaluate();
+        }
+        return this->getNext();
+    }
+
+    throw TypeError("Wrong type for len", this->location);
+};
+
 
 InputNode::InputNode(AstNode *scope) {
     this->scope = scope;
@@ -190,8 +350,7 @@ void InputNode::readInput() {};
 AstNode* InputNode::evaluate() {
     std::string in;
     std::getline(std::cin, in);
-    char* cStr = new char[sizeof(in)];
-    strcpy(cStr, in.c_str());
+    char* cStr = copyString(in);
     this->value->set(cStr, this->location);
     return this->getNext();
 };
@@ -204,20 +363,29 @@ AssertNode::AssertNode(AstNode *paramsHead, AstNode *scope) {
 
 AstNode* AssertNode::evaluate() {
     AstNode *cur = this->paramsHead;
-    AstNode *prev = NULL;
+    std::vector<Value*> values;
     while (cur != NULL) {
         ExpressionNode *eval = (ExpressionNode*)cur;
         eval->evaluate();
-        if (prev) {
-            Value& lVal = *eval->value;
-            Value *rVal = prev->value;
-            if (operator!=(lVal, rVal)->boolValue) {
-                throw AssertionError(prev->value, eval->value, this->location);
-            }
-        }
-        prev = eval;
+        values.push_back(eval->value);
         cur = cur->getNext();
     }
+
+    bool hasMessage = values.size() == 3 && values[2]->getTrueType() == STR;
+    size_t compareCount = hasMessage ? 2 : values.size();
+    std::string message = hasMessage ? values[2]->stringValue : "";
+
+    for (size_t i = 1; i < compareCount; i++) {
+        Value& lVal = *values[i];
+        Value *rVal = values[i - 1];
+        if (operator!=(lVal, rVal)->boolValue) {
+            if (hasMessage) {
+                throw AssertionError(rVal, values[i], message, this->location);
+            }
+            throw AssertionError(rVal, values[i], this->location);
+        }
+    }
+
     return this->getNext();
 };
 
@@ -286,8 +454,7 @@ AstNode* CmdNode::evaluate() {
         default:
             throw TypeError("Unsupported type for cmd function", this->location);
     }
-    char* cStr = new char[sizeof(result)];
-    strcpy(cStr, result.c_str());
+    char* cStr = copyString(result);
     this->value->set(cStr, this->location);
     return this->getNext();
 };

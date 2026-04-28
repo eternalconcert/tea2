@@ -9,9 +9,13 @@ int maxId = 0;
 AstNode::AstNode() {
     this->id = maxId;
     maxId++;
+    this->childListHead = NULL;
+    this->parent = NULL;
+    this->next = NULL;
     this->valueStore = new ValueStore();
     this->value = new Value();  // evaluated value in case of expressions
     this->statementType = OTHER;
+    this->exported = false;
 };
 
 

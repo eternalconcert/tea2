@@ -5,9 +5,19 @@
     #include "src/commons.h"
     #include "src/exceptions.h"
     #include <string.h>
+    #include <filesystem>
+    #include <fstream>
+    #include <map>
+    #include <set>
+    #include <sstream>
+    #include <vector>
 
     AstNode *root = new AstNode();
     AstNode *curScope = root;
+    std::vector<std::string> parseFileStack;
+    std::set<std::string> importedTeaModules;
+    std::set<std::string> importingTeaModules;
+    std::map<std::string, std::map<std::string, Value*>> importedTeaModuleValues;
 
     void pushScope() {
         AstNode *newScope = new AstNode();
@@ -19,12 +29,91 @@
         curScope = curScope->parent;
     };
 
+    typedef struct yy_buffer_state *YY_BUFFER_STATE;
     extern FILE *yyin;
     extern int yylineno;
     extern char *yytext;
         int yyparse(void);
         int yylex(void);
-        int yy_scan_string(const char* instream);
+        YY_BUFFER_STATE yy_scan_string(const char* instream);
+        void yy_delete_buffer(YY_BUFFER_STATE buffer);
+
+    std::string resolveTeaPath(std::string path, std::string baseDir) {
+        std::filesystem::path importPath(path);
+        if (importPath.is_relative()) {
+            importPath = std::filesystem::path(baseDir) / importPath;
+        }
+        return std::filesystem::weakly_canonical(importPath).string();
+    }
+
+    std::string currentParseDir() {
+        if (parseFileStack.empty()) {
+            return std::filesystem::current_path().string();
+        }
+        return std::filesystem::path(parseFileStack.back()).parent_path().string();
+    }
+
+    std::string readTeaSource(std::string path) {
+        std::ifstream file(path);
+        if (!file) {
+            printf("ImportError: Could not open %s\n", path.c_str());
+            exit(10);
+        }
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return buffer.str();
+    }
+
+    AstNode *parseTeaSourceIntoScope(std::string source, std::string sourceName, AstNode *scope) {
+        AstNode *previousScope = curScope;
+        curScope = scope;
+        parseFileStack.push_back(sourceName);
+        yylineno = 1;
+
+        YY_BUFFER_STATE buffer = yy_scan_string(source.c_str());
+        yyparse();
+        yy_delete_buffer(buffer);
+
+        parseFileStack.pop_back();
+        curScope = previousScope;
+        return scope;
+    }
+
+    AstNode *parseTeaFileIntoScope(std::string path, AstNode *scope) {
+        std::string absolutePath = resolveTeaPath(path, currentParseDir());
+        return parseTeaSourceIntoScope(readTeaSource(absolutePath), absolutePath, scope);
+    }
+
+    bool isTeaModuleImported(std::string path) {
+        return importedTeaModules.count(path) > 0;
+    }
+
+    bool beginTeaModuleImport(std::string path) {
+        if (importingTeaModules.count(path) > 0) {
+            return false;
+        }
+        importingTeaModules.insert(path);
+        return true;
+    }
+
+    void finishTeaModuleImport(std::string path) {
+        importingTeaModules.erase(path);
+        importedTeaModules.insert(path);
+    }
+
+    void markTeaModuleImported(std::string path) {
+        importedTeaModules.insert(path);
+    }
+
+    void registerImportedTeaModuleValue(std::string path, std::string ident, Value *value) {
+        importedTeaModuleValues[path][ident] = value;
+    }
+
+    void copyImportedTeaModuleValues(std::string path, AstNode *scope) {
+        for (auto const& item : importedTeaModuleValues[path]) {
+            scope->valueStore->set(item.first, item.second);
+        }
+    }
 
         int yywrap() {
             return 1;
@@ -36,13 +125,17 @@
     }
 
 int main(int argc, char *argv[0]) {
+    std::string mainSource;
+    std::string mainSourceName;
+
     if (argc <= 1) {
         printf("%s\n", "No file or command specified");
         exit(1);
     }
 
     else if (argc >= 3 and !strcmp(argv[1], "-c")) {
-        yy_scan_string(argv[2]);
+        mainSource = argv[2];
+        mainSourceName = std::filesystem::current_path().string() + "/<command>";
     }
 
     else if (argc == 2 and !strcmp(argv[1], "-v")) {
@@ -51,12 +144,15 @@ int main(int argc, char *argv[0]) {
     }
 
     else if (argc >= 2) {
-        FILE *inFile = fopen(argv[1], "r");
+        mainSourceName = resolveTeaPath(argv[1], std::filesystem::current_path().string());
+        std::ifstream inFile(mainSourceName);
         if (!inFile) {
             printf("tea: /%s: No such file or directory\n", argv[1]);
             exit(1);
         }
-        yyin = inFile;
+        std::stringstream buffer;
+        buffer << inFile.rdbuf();
+        mainSource = buffer.str();
     }
 
     else {
@@ -64,7 +160,16 @@ int main(int argc, char *argv[0]) {
         exit(1);
     }
 
-    yyparse();
+    std::string stdlibPath = resolveTeaPath("lib/common.t", std::filesystem::current_path().string());
+    if (!std::filesystem::exists(stdlibPath)) {
+        stdlibPath = resolveTeaPath("common/string.t", std::filesystem::current_path().string());
+    }
+    if (std::filesystem::exists(stdlibPath)) {
+        ImportNode *stdlibImport = new ImportNode(strdup(stdlibPath.c_str()), root, std::filesystem::current_path().string());
+        stdlibImport->evaluate();
+    }
+
+    parseTeaSourceIntoScope(mainSource, mainSourceName, root);
     root->init(argc, argv);
 }
 
@@ -81,8 +186,8 @@ int main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE
-%token TOKPRINT TOKOUT TOKREADFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST
+%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKIMPORT TOKEXPORT
+%token TOKPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -95,10 +200,10 @@ int main(int argc, char *argv[0]) {
 %token <sval> TOKIDENT
 
 %type <sval> operator
-%type <node> expression literal fn_call
-%type <node> statement statements if_statement fn_declaration return_stmt while_loop
+%type <node> expression literal array_literal array_items array_index fn_call
+%type <node> statement statements if_statement fn_declaration return_stmt while_loop import_statement export_statement
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print out read input quit sleep assert cmd sysargs lastrc cast
+%type <node> print out read write split find len input quit sleep assert cmd sysargs lastrc cast
 
 %start statements
 
@@ -148,6 +253,36 @@ statement:
     | return_stmt {
         $$ = $1;
     }
+    | import_statement {
+        $$ = $1;
+    }
+    | export_statement {
+        $$ = $1;
+    }
+    ;
+
+import_statement:
+    TOKIMPORT TOKSTRING {
+        ImportNode *importNode = new ImportNode($2, curScope, currentParseDir());
+        $$ = importNode;
+    }
+    ;
+
+export_statement:
+    TOKEXPORT fn_declaration {
+        $2->exported = true;
+        $$ = $2;
+    }
+    |
+    TOKEXPORT var_declaration {
+        $2->exported = true;
+        $$ = $2;
+    }
+    |
+    TOKEXPORT var_declaration_assignment {
+        $2->exported = true;
+        $$ = $2;
+    }
     ;
 
 expressions:
@@ -175,8 +310,19 @@ expression:
         $$ = expNode;
     }
     |
+    array_index {
+        $$ = $1;
+    }
+    |
     fn_call {
         $$ = $1;
+    }
+    ;
+
+array_index:
+    TOKIDENT '[' expressions ']' {
+        ArrayIndexNode *arrayIndex = new ArrayIndexNode($1, $3, curScope);
+        $$ = arrayIndex;
     }
     ;
 
@@ -217,15 +363,21 @@ return_stmt:
     ;
 
 act_params: /* empty */ {
-        $$ = new AstNode();
+        $$ = NULL;
     }
     |
     act_param {
         $1->addToChildList($1);
+        $$ = $1;
     }
     |
     act_params ',' act_param {
-        $1->addToChildList($3);
+        if ($1 == NULL) {
+            $$ = $3;
+        } else {
+            $1->addToChildList($3);
+            $$ = $1;
+        }
     }
     ;
 
@@ -236,15 +388,21 @@ act_param:
     ;
 
 formal_params: /* empty */ {
-        $$ = new AstNode();
+        $$ = NULL;
     }
     |
     var_declaration {
         $1->addToChildList($1);
+        $$ = $1;
     }
     |
     formal_params ',' var_declaration {
-        $1->addToChildList($3);
+        if ($1 == NULL) {
+            $$ = $3;
+        } else {
+            $1->addToChildList($3);
+            $$ = $1;
+        }
     }
     ;
 
@@ -279,6 +437,33 @@ literal:
         valueObj->set($1, @1);
         expNode->value = valueObj;
         $$ = expNode;
+    }
+    |
+    array_literal {
+        $$ = $1;
+    }
+    ;
+
+array_literal:
+    '[' array_items ']' {
+        ArrayLiteralNode *arrayLiteral = new ArrayLiteralNode($2, curScope);
+        $$ = arrayLiteral;
+    }
+    ;
+
+array_items: /* empty */ {
+        $$ = new AstNode();
+    }
+    |
+    expressions {
+        AstNode *items = new AstNode();
+        items->addToChildList($1);
+        $$ = items;
+    }
+    |
+    array_items ',' expressions {
+        $1->addToChildList($3);
+        $$ = $1;
     }
     ;
 
@@ -354,6 +539,14 @@ builtin_function:  // Causes reduce/reduce conflict
     |
     read
     |
+    write
+    |
+    split
+    |
+    find
+    |
+    len
+    |
     input
     |
     quit
@@ -399,6 +592,34 @@ read:
 
         ReadFileNode *readFile = new ReadFileNode(valueObj, curScope);
         $$ = readFile;
+    }
+    ;
+
+write:
+    TOKWRITEFILE '(' expressions ',' expressions ')' {
+        WriteFileNode *writeFile = new WriteFileNode($3, $5, curScope);
+        $$ = writeFile;
+    }
+    ;
+
+split:
+    TOKSPLIT '(' expressions ',' expressions ')' {
+        SplitNode *split = new SplitNode($3, $5, curScope);
+        $$ = split;
+    }
+    ;
+
+find:
+    TOKFIND '(' expressions ',' expressions ')' {
+        FindNode *find = new FindNode($3, $5, curScope);
+        $$ = find;
+    }
+    ;
+
+len:
+    TOKLEN '(' expressions ')' {
+        LenNode *len = new LenNode($3, curScope);
+        $$ = len;
     }
     ;
 
