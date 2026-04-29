@@ -43,6 +43,8 @@ public:
     char *toStr(YYLTYPE location);
 };
 
+Value *copyValueDeep(const Value *src);
+
 
 Value* operator+(Value &lVal, Value *rVal);
 Value* operator-(Value &lVal, Value *rVal);

@@ -1,4 +1,5 @@
 #include <string.h>
+#include <string>
 #include "ast.h"
 #include "../exceptions.h"
 #include "../value.h"
@@ -24,7 +25,7 @@ AstNode* VarNode::evaluate() {
         throw (TypeError("Types did not match", this->location));
     }
 
-    this->scope->valueStore->set(this->identifier, val);
+    this->scope->valueStore->set(this->identifier, copyValueDeep(val));
     return this->getNext();
 };
 
@@ -63,7 +64,7 @@ AstNode* VarAssignmentNode::evaluate() {
     if (val->type != ownType) {
         throw (TypeError("Types did not match", this->location));
     }
-    valScope->valueStore->set(this->identifier, val);
+    valScope->valueStore->set(this->identifier, copyValueDeep(val));
     return this->getNext();
 };
 
@@ -76,12 +77,42 @@ ArrayAssignmentNode::ArrayAssignmentNode(char *identifier, AstNode *indexExpress
 };
 
 AstNode* ArrayAssignmentNode::evaluate() {
-    // Evaluate array index
     ExpressionNode *indexEval = (ExpressionNode*)this->indexExpression;
     indexEval->evaluate();
     Value *indexValue = indexEval->value;
     if (indexValue->type == IDENTIFIER) {
         indexValue = getFromValueStore(this->scope, indexValue->identValue, this->location);
+    }
+
+    Value *lhsVal = getFromValueStore(this->scope, this->identifier, this->location);
+
+    ExpressionNode *rhsEval = (ExpressionNode*)this->rExp;
+    rhsEval->evaluate();
+    Value *rhsVal = rhsEval->value;
+    if (rhsVal->type == IDENTIFIER) {
+        rhsVal = getFromValueStore(this->scope, rhsVal->identValue, this->location);
+    }
+
+    if (lhsVal->getTrueType() == DICT) {
+        std::string key;
+        switch (indexValue->getTrueType()) {
+            case STR:
+                key = indexValue->stringValue;
+                break;
+            case INT:
+                key = std::to_string(indexValue->intValue);
+                break;
+            case FLOAT:
+                key = std::to_string(indexValue->floatValue);
+                break;
+            case BOOL:
+                key = indexValue->boolValue ? "true" : "false";
+                break;
+            default:
+                throw TypeError("Dictionary index must be string, int, float or bool", this->location);
+        }
+        lhsVal->dictValue[key] = new Value(*rhsVal);
+        return this->getNext();
     }
 
     if (indexValue->getTrueType() != INT) {
@@ -93,25 +124,14 @@ AstNode* ArrayAssignmentNode::evaluate() {
         throw TypeError("Array index out of range", this->location);
     }
 
-    // Get target array from scope
-    Value *arrayVal = getFromValueStore(this->scope, this->identifier, this->location);
-    if (arrayVal->getTrueType() != ARRAY) {
+    if (lhsVal->getTrueType() != ARRAY) {
         throw TypeError("Left side of array assignment must be an array", this->location);
     }
 
-    // Evaluate RHS
-    ExpressionNode *rhsEval = (ExpressionNode*)this->rExp;
-    rhsEval->evaluate();
-    Value *rhsVal = rhsEval->value;
-    if (rhsVal->type == IDENTIFIER) {
-        rhsVal = getFromValueStore(this->scope, rhsVal->identValue, this->location);
+    while (lhsVal->arrayValue.size() <= (size_t)index) {
+        lhsVal->arrayValue.push_back(new Value());
     }
 
-    // Auto-resize so `array items = []; items[i] = ...` works.
-    while (arrayVal->arrayValue.size() <= (size_t)index) {
-        arrayVal->arrayValue.push_back(new Value());
-    }
-
-    arrayVal->arrayValue[index] = new Value(*rhsVal);
+    lhsVal->arrayValue[index] = new Value(*rhsVal);
     return this->getNext();
 };

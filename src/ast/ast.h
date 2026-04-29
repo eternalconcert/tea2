@@ -17,6 +17,7 @@ public:
 
     void setLocation(YYLTYPE location);
     void addToChildList(AstNode *newNode);
+    void appendNextSibling(AstNode *newNode);
     virtual AstNode* evaluate();
     AstNode *init(int argc, char **args);
     virtual AstNode* getNext();
@@ -288,6 +289,18 @@ public:
     AstNode* evaluate();
 };
 
+class BreakNode: public AstNode {
+public:
+    AstNode* evaluate();
+    BreakNode();
+};
+
+class ContinueNode: public AstNode {
+public:
+    AstNode* evaluate();
+    ContinueNode();
+};
+
 class FnDeclarationNode: public AstNode {
 public:
     typeId type;
@@ -302,11 +315,11 @@ public:
     FnDeclarationNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope);
 };
 
-class FnCallNode: public AstNode {
+class FnCallNode: public ExpressionNode {
 public:
-    AstNode *scope;
     AstNode *paramsHead;
     char *identifier;
+    Value *pendingFnReturn;
     AstNode* evaluate();
     FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope);
 };
@@ -328,6 +341,11 @@ public:
     ThrowNode(char *identifier, AstNode *msgExpression, AstNode *scope);
 };
 
+enum TeaBCKind { TEA_BC_NONE, TEA_BC_BREAK, TEA_BC_CONTINUE };
+
+TeaBCKind teaFindBreakContinue(AstNode *n);
+void teaResetBreakContinueFlags(AstNode *n);
+
 Value *getFromValueStore(AstNode *scope, char* ident, YYLTYPE location);
 Value *getVariableFromValueStore(AstNode *scope, char *ident);
 AstNode *getValueScope(AstNode *scope, char* ident, YYLTYPE location);
@@ -335,6 +353,8 @@ struct TeaImportResolved {
     std::string path;
     bool lowPriorityExports;
 };
+
+AstNode *teaFindReturnExecuted(AstNode *node);
 
 AstNode *parseTeaFileIntoScope(std::string path, AstNode *scope);
 std::string resolveTeaPath(std::string path, std::string baseDir);

@@ -1,5 +1,6 @@
 #include <string.h>
 #include "ast.h"
+
 #include "../exceptions.h"
 #include "../value.h"
 
@@ -192,72 +193,100 @@ AstNode* ExpressionNode::evaluate() {
             return this->getNext();
         }
 
-        Value *rVal;
-        if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<DictLiteralNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL) {
-            cur->evaluate();
-            rVal = cur->value;
-        } else {
-            if (cur->initialValue == NULL) {
-                cur->initialValue = new Value(*cur->value);
+        bool shortCircuit = false;
+        if (cur->op != NULL) {
+            if (!strcmp(cur->op, "and") || !strcmp(cur->op, "&") || !strcmp(cur->op, "&&")) {
+                if (lVal.getTrueType() == BOOL && !lVal.boolValue) {
+                    this->value = new Value();
+                    this->value->set(false, cur->location);
+                    shortCircuit = true;
+                }
+            } else if (!strcmp(cur->op, "or") || !strcmp(cur->op, "|") || !strcmp(cur->op, "||")) {
+                if (lVal.getTrueType() == BOOL && lVal.boolValue) {
+                    this->value = new Value();
+                    this->value->set(true, cur->location);
+                    shortCircuit = true;
+                }
             }
-            rVal = resolveExpressionValue(cur, cur->initialValue);
         }
 
-        if (cur->op == NULL) {
-            this->value = new Value(lVal);
-            return this->getNext();
-        }
+        Value *rVal = NULL;
+        if (!shortCircuit) {
+            if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<DictLiteralNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL || dynamic_cast<KeysNode*>(cur) != NULL || dynamic_cast<ValuesNode*>(cur) != NULL) {
+                cur->evaluate();
+                rVal = cur->value;
+            } else if (dynamic_cast<FnCallNode*>(cur) != NULL) {
+                cur->evaluate();
+                rVal = cur->value;
+            } else {
+                ExpressionNode *ce = dynamic_cast<ExpressionNode*>(cur);
+                if (ce != NULL && ce->childListHead != NULL) {
+                    ce->evaluate();
+                    rVal = ce->value;
+                } else {
+                    if (cur->initialValue == NULL) {
+                        cur->initialValue = new Value(*cur->value);
+                    }
+                    rVal = resolveExpressionValue(cur, cur->initialValue);
+                }
+            }
 
-        if (!strcmp(cur->op, "+")) {
-            this->value = lVal + rVal;
-        }
+            if (cur->op == NULL) {
+                this->value = new Value(lVal);
+                return this->getNext();
+            }
 
-        if (!strcmp(cur->op, "-")) {
-            this->value = lVal - rVal;
-        }
+            if (!strcmp(cur->op, "+")) {
+                this->value = lVal + rVal;
+            }
 
-        if (!strcmp(cur->op, "*")) {
-            this->value = lVal * rVal;
-        }
+            if (!strcmp(cur->op, "-")) {
+                this->value = lVal - rVal;
+            }
 
-        if (!strcmp(cur->op, "/")) {
-            this->value = lVal / rVal;
-        }
+            if (!strcmp(cur->op, "*")) {
+                this->value = lVal * rVal;
+            }
 
-        if (!strcmp(cur->op, "%")) {
-            this->value = lVal % rVal;
-        }
+            if (!strcmp(cur->op, "/")) {
+                this->value = lVal / rVal;
+            }
 
-        if (!strcmp(cur->op, "==")) {
-            this->value = lVal == rVal;
-        }
+            if (!strcmp(cur->op, "%")) {
+                this->value = lVal % rVal;
+            }
 
-        if (!strcmp(cur->op, "!=")) {
-            this->value = lVal != rVal;
-        }
+            if (!strcmp(cur->op, "==")) {
+                this->value = lVal == rVal;
+            }
 
-        if (!strcmp(cur->op, ">")) {
-            this->value = lVal > rVal;
-        }
+            if (!strcmp(cur->op, "!=")) {
+                this->value = lVal != rVal;
+            }
 
-        if (!strcmp(cur->op, "<")) {
-            this->value = lVal < rVal;
-        }
+            if (!strcmp(cur->op, ">")) {
+                this->value = lVal > rVal;
+            }
 
-        if (!strcmp(cur->op, ">=")) {
-            this->value = lVal >= rVal;
-        }
+            if (!strcmp(cur->op, "<")) {
+                this->value = lVal < rVal;
+            }
 
-        if (!strcmp(cur->op, "<=")) {
-            this->value = lVal <= rVal;
-        }
+            if (!strcmp(cur->op, ">=")) {
+                this->value = lVal >= rVal;
+            }
 
-        if (!strcmp(cur->op, "and") || !strcmp(cur->op, "&") || !strcmp(cur->op, "&&")) {
-            this->value = lVal && rVal;
-        }
+            if (!strcmp(cur->op, "<=")) {
+                this->value = lVal <= rVal;
+            }
 
-        if (!strcmp(cur->op, "or") || !strcmp(cur->op, "|") || !strcmp(cur->op, "||")) {
-            this->value = lVal || rVal;
+            if (!strcmp(cur->op, "and") || !strcmp(cur->op, "&") || !strcmp(cur->op, "&&")) {
+                this->value = lVal && rVal;
+            }
+
+            if (!strcmp(cur->op, "or") || !strcmp(cur->op, "|") || !strcmp(cur->op, "||")) {
+                this->value = lVal || rVal;
+            }
         }
 
         lVal = *this->value;

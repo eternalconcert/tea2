@@ -1,10 +1,34 @@
+#include <stdio.h>
 #include <string.h>
+#include <string>
 #include "ast.h"
 #include "../exceptions.h"
 #include "../value.h"
 #include "../utils/utils.h"
 
 int maxId = 0;
+
+AstNode *teaFindReturnExecuted(AstNode *node) {
+    if (!node) {
+        return nullptr;
+    }
+    if (node->statementType == RETURN) {
+        return node;
+    }
+    AstNode *child = node->childListHead;
+    while (child) {
+        AstNode *found = teaFindReturnExecuted(child);
+        if (found) {
+            return found;
+        }
+        child = child->getNext();
+    }
+    IfNode *ifNode = dynamic_cast<IfNode*>(node);
+    if (ifNode != nullptr) {
+        return teaFindReturnExecuted(ifNode->elseBlock);
+    }
+    return nullptr;
+}
 
 AstNode::AstNode() {
     this->id = maxId;
@@ -28,7 +52,11 @@ AstNode* AstNode::init(int argc, char **args) {
 AstNode* AstNode::evaluate() {
     AstNode *cur = this->childListHead;
     while (cur != NULL) {
-        cur = cur->evaluate();
+        AstNode *after = cur->evaluate();
+        if (teaFindReturnExecuted(cur) != nullptr) {
+            break;
+        }
+        cur = after;
     }
     return this->getNext();
 }
@@ -51,18 +79,29 @@ void AstNode::addToChildList(AstNode *newNode) {
     }
 };
 
+void AstNode::appendNextSibling(AstNode *newNode) {
+    AstNode *cur = this;
+    while (cur->next != NULL) {
+        cur = cur->next;
+    }
+    cur->next = newNode;
+}
+
 
 AstNode *AstNode::getNext() {
     return this->next;
 };
 
 Value *getVariableFromValueStore(AstNode *scope, char *ident) {
-    Value *val = scope->valueStore->values[ident];
-    while (val == NULL and scope != NULL) {
-        val = scope->valueStore->values[ident];
+    std::string key(ident);
+    while (scope != NULL) {
+        auto it = scope->valueStore->values.find(key);
+        if (it != scope->valueStore->values.end() && it->second != NULL) {
+            return it->second;
+        }
         scope = scope->parent;
     }
-    return val;
+    return nullptr;
 }
 
 
@@ -79,7 +118,9 @@ Value *getFromValueStore(AstNode *scope, char *ident, YYLTYPE location) {
 
 
 AstNode *getValueScope(AstNode *scope, char* ident, YYLTYPE location) {
-    if (scope->valueStore->values[ident] != NULL) {
+    std::string key(ident);
+    auto it = scope->valueStore->values.find(key);
+    if (it != scope->valueStore->values.end() && it->second != NULL) {
         return scope;
     }
     else {

@@ -22,7 +22,10 @@ test: clean parser
 	./tea tests/tests_comparisons.t
 	./tea tests/tests_conditions.t
 	./tea tests/tests_loops.t
+	./tea tests/tests_precedence.t
+	./tea tests/tests_break_continue.t
 	./tea tests/tests_dicts.t
+	./tea tests/tests_json.t
 	./tea tests/tests_cast.t
 	mkdir -p coverage
 	mv *.gcda coverage

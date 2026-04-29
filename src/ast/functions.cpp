@@ -1,7 +1,46 @@
 #include <iostream>
+#include <stdio.h>
 #include <string.h>
+#include <utility>
+#include <vector>
 #include "../exceptions.h"
 #include "ast.h"
+
+static thread_local std::vector<FnCallNode*> teaActiveFnCallStack;
+
+static void teaSwapValueStoresRec(
+    AstNode *node,
+    std::vector<std::pair<AstNode *, ValueStore *>> &saved
+) {
+    if (!node) return;
+
+    saved.push_back({node, node->valueStore});
+    node->valueStore = new ValueStore();
+
+    AstNode *child = node->childListHead;
+    while (child) {
+        teaSwapValueStoresRec(child, saved);
+        child = child->getNext();
+    }
+
+    IfNode *ifNode = dynamic_cast<IfNode *>(node);
+    if (ifNode != nullptr) {
+        teaSwapValueStoresRec(ifNode->elseBlock, saved);
+    }
+}
+
+static void teaRestoreValueStores(
+    std::vector<std::pair<AstNode *, ValueStore *>> &saved
+) {
+    for (auto it = saved.rbegin(); it != saved.rend(); ++it) {
+        AstNode *node = it->first;
+        ValueStore *oldStore = it->second;
+        ValueStore *tmp = node->valueStore;
+        node->valueStore = oldStore;
+        delete tmp;
+    }
+    saved.clear();
+}
 
 
 FnDeclarationNode::FnDeclarationNode(typeId type, char *identifier, AstNode *paramsHead, AstNode *scope) {
@@ -20,11 +59,11 @@ AstNode* FnDeclarationNode::evaluate() {
 };
 
 
-FnCallNode::FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope) {
-    this->scope = scope;
+FnCallNode::FnCallNode(char *identifier, AstNode *paramsHead, AstNode *scope)
+    : ExpressionNode(scope) {
     this->identifier = identifier;
     this->paramsHead = paramsHead;
-    AstNode();
+    this->pendingFnReturn = nullptr;
 }
 
 
@@ -47,36 +86,17 @@ void resetReturnNodes(AstNode* node) {
     }
 }
 
-// Hilfsfunktion: findet rekursiv den ausgeführten ReturnNode in einem AstNode
-AstNode* findReturnNode(AstNode* node) {
-    if (!node) return nullptr;
-
-    if (node->statementType == RETURN) return node;
-
-    AstNode* child = node->childListHead;
-    while (child) {
-        AstNode* found = findReturnNode(child);
-        if (found) return found;
-        child = child->getNext();
-    }
-
-    IfNode* ifNode = dynamic_cast<IfNode*>(node);
-    if (ifNode != nullptr) {
-        return findReturnNode(ifNode->elseBlock);
-    }
-
-    return nullptr;
-}
 
 AstNode* FnCallNode::evaluate() {
-    // Funktion aus dem ValueStore holen
     Value *val = getFromValueStore(this->scope, this->identifier, this->location);
     FnDeclarationNode *body = val->functionBody;
     AstNode *functionScope = body->childListHead;
 
-    // formale Parameter evaluieren
+    // Aktuelle Argumente zuerst auswerten, solange noch das ValueStore des
+    // laufenden Aufrufs aktiv ist (dieselbe Fn teilt functionScope mit dem Aufrufer).
     VarDeclarationNode *formalParam = (VarDeclarationNode*)body->paramsHead;
     AstNode *actualParam = this->paramsHead;
+    std::vector<Value *> boundArgs;
     while (formalParam != NULL && formalParam->type != UNDEFINED) {
         if (actualParam == NULL) {
             throw ParameterError("Not enough arguments supplied");
@@ -95,28 +115,47 @@ AstNode* FnCallNode::evaluate() {
 
         Value *paramValue = new Value(*actualValue);
         paramValue->assigned = true;
-        functionScope->valueStore->set(formalParam->identifier, paramValue);
+        boundArgs.push_back(paramValue);
 
         formalParam = (VarDeclarationNode*)formalParam->getNext();
         actualParam = actualParam->getNext();
     }
 
-    // Funktionskörper ausführen
+    std::vector<std::pair<AstNode *, ValueStore *>> savedValueStores;
+    teaSwapValueStoresRec(functionScope, savedValueStores);
+
+    formalParam = (VarDeclarationNode*)body->paramsHead;
+    for (size_t i = 0; formalParam != NULL && formalParam->type != UNDEFINED; i++) {
+        functionScope->valueStore->set(formalParam->identifier, boundArgs[i]);
+        formalParam = (VarDeclarationNode*)formalParam->getNext();
+    }
+
     resetReturnNodes(body);
+    this->pendingFnReturn = nullptr;
+    teaActiveFnCallStack.push_back(this);
     AstNode* stmt = body->childListHead;
     while (stmt) {
         stmt->evaluate();
-
-        // Rekursiv nach ReturnNode suchen
-        AstNode* retNode = findReturnNode(stmt);
-        if (retNode) {
-            this->value = ((ReturnNode*)retNode)->value;
-            break;  // Funktion sofort beenden
+        if (this->pendingFnReturn != nullptr) {
+            this->value = this->pendingFnReturn;
+            break;
         }
 
         stmt = stmt->getNext();
     }
+    if (this->pendingFnReturn != nullptr) {
+        this->value = this->pendingFnReturn;
+    }
+    teaActiveFnCallStack.pop_back();
 
+    teaRestoreValueStores(savedValueStores);
+
+    resetReturnNodes(body);
+
+    if (this->childListHead != NULL && this->childListHead != this) {
+        this->initialValue = new Value(*this->value);
+        return ExpressionNode::evaluate();
+    }
     return this->getNext();
 }
 
@@ -133,6 +172,10 @@ AstNode* ReturnNode::evaluate() {
 
     // RETURN explizit setzen
     this->statementType = RETURN;
+
+    if (!teaActiveFnCallStack.empty()) {
+        teaActiveFnCallStack.back()->pendingFnReturn = this->value;
+    }
 
     return this->getNext();
 }

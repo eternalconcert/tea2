@@ -12,6 +12,61 @@ static char* copyString(const std::string &value) {
     return copy;
 }
 
+Value *copyValueDeep(const Value *src) {
+    if (src == nullptr) {
+        return nullptr;
+    }
+    Value *n = new Value();
+    n->location = src->location;
+    n->assigned = src->assigned;
+    switch (src->type) {
+        case STR:
+            n->type = STR;
+            n->boolValue = src->boolValue;
+            n->stringValue = src->stringValue ? copyString(std::string(src->stringValue)) : nullptr;
+            return n;
+        case INT:
+            n->set(src->intValue, src->location);
+            return n;
+        case FLOAT:
+            n->set(src->floatValue, src->location);
+            return n;
+        case BOOL:
+            n->set(src->boolValue, src->location);
+            return n;
+        case DICT: {
+            std::map<std::string, Value *> m;
+            for (const auto &p : src->dictValue) {
+                m[p.first] = copyValueDeep(p.second);
+            }
+            n->set(m, src->location);
+            return n;
+        }
+        case ARRAY: {
+            std::vector<Value *> v;
+            for (Value *x : src->arrayValue) {
+                v.push_back(copyValueDeep(x));
+            }
+            n->set(v, src->location);
+            return n;
+        }
+        case IDENTIFIER:
+            n->type = IDENTIFIER;
+            n->scope = src->scope;
+            n->identValue = src->identValue ? copyString(std::string(src->identValue)) : nullptr;
+            return n;
+        case FUNCTION:
+            n->setFn(src->identValue, src->scope, src->functionBody, src->location);
+            return n;
+        case FUNCTIONCALL:
+            n->setFnCall(src->identValue, src->retNode, src->scope, src->location);
+            return n;
+        default:
+            n->set(src->type, src->location);
+            return n;
+    }
+}
+
 static void reprArrayItem(Value *value) {
     if (value->getTrueType() == STR) {
         printf("\"%s\"", value->stringValue);

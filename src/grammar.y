@@ -44,6 +44,14 @@ struct TeaLocation {
     #include <sstream>
     #include <vector>
 
+    static AstNode *tea_merge_binary(AstNode *left, char *op, AstNode *right) {
+        ExpressionNode *l = (ExpressionNode*)left;
+        ExpressionNode *r = (ExpressionNode*)right;
+        r->op = op;
+        l->addToChildList(r);
+        return l;
+    }
+
     AstNode *root = new AstNode();
     AstNode *curScope = root;
     std::vector<std::string> parseFileStack;
@@ -266,7 +274,7 @@ int main(int argc, char *argv[0]) {
 }
 
 
-%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKIMPORT TOKEXPORT TOKTHROW
+%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKBREAK TOKCONTINUE TOKIMPORT TOKEXPORT TOKTHROW
 %token TOKPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES
 %token TOKLBRACE TOKRBRACE
 
@@ -279,7 +287,7 @@ int main(int argc, char *argv[0]) {
 %token <bval> TOKBOOL
 %token <sval> TOKIDENT
 
-%type <sval> operator
+%type <node> or_expr and_expr eq_expr rel_expr add_expr mul_expr unary_expr
 %type <node> expression literal array_literal array_items dict_literal dict_items dict_item dict_key array_index fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt while_loop for_loop import_statement export_statement throw
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
@@ -350,6 +358,12 @@ statement:
     | throw {
         $$ = $1;
     }
+    | TOKBREAK {
+        $$ = new BreakNode();
+    }
+    | TOKCONTINUE {
+        $$ = new ContinueNode();
+    }
     ;
 
 import_statement:
@@ -377,14 +391,102 @@ export_statement:
     ;
 
 expressions:
-    expression {
+    or_expr {
+        $$ = $1;
+    }
+    ;
+
+or_expr:
+    and_expr {
         $$ = $1;
     }
     |
-    expressions operator expression {
-        ExpressionNode *child = (ExpressionNode*)$3;
-        child->op = $2;
-        $$->addToChildList($3);
+    or_expr TOKOR and_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    ;
+
+and_expr:
+    eq_expr {
+        $$ = $1;
+    }
+    |
+    and_expr TOKAND eq_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    ;
+
+eq_expr:
+    rel_expr {
+        $$ = $1;
+    }
+    |
+    eq_expr TOKEQUAL rel_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    |
+    eq_expr TOKNEQUAL rel_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    ;
+
+rel_expr:
+    add_expr {
+        $$ = $1;
+    }
+    |
+    rel_expr TOKGT add_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    |
+    rel_expr TOKGTE add_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    |
+    rel_expr TOKLT add_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    |
+    rel_expr TOKLTE add_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    ;
+
+add_expr:
+    mul_expr {
+        $$ = $1;
+    }
+    |
+    add_expr TOKPLUS mul_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    |
+    add_expr TOKMINUS mul_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    ;
+
+mul_expr:
+    unary_expr {
+        $$ = $1;
+    }
+    |
+    mul_expr TOKTIMES unary_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    |
+    mul_expr TOKDIVIDE unary_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    |
+    mul_expr TOKMOD unary_expr {
+        $$ = tea_merge_binary($1, $2, $3);
+    }
+    ;
+
+unary_expr:
+    expression {
+        $$ = $1;
     }
     ;
 
@@ -417,34 +519,6 @@ array_index:
     }
     ;
 
-operator:
-    TOKPLUS
-    |
-    TOKMINUS
-    |
-    TOKTIMES
-    |
-    TOKDIVIDE
-    |
-    TOKMOD
-    |
-    TOKEQUAL
-    |
-    TOKNEQUAL
-    |
-    TOKGT
-    |
-    TOKGTE
-    |
-    TOKLT
-    |
-    TOKLTE
-    |
-    TOKAND
-    |
-    TOKOR
-    ;
-
 return_stmt:
     TOKRETURN expressions {
         ReturnNode *n = new ReturnNode(curScope);
@@ -458,7 +532,6 @@ act_params: /* empty */ {
     }
     |
     act_param {
-        $1->addToChildList($1);
         $$ = $1;
     }
     |
@@ -466,7 +539,7 @@ act_params: /* empty */ {
         if ($1 == NULL) {
             $$ = $3;
         } else {
-            $1->addToChildList($3);
+            $1->appendNextSibling($3);
             $$ = $1;
         }
     }
@@ -483,7 +556,6 @@ formal_params: /* empty */ {
     }
     |
     var_declaration {
-        $1->addToChildList($1);
         $$ = $1;
     }
     |
@@ -491,7 +563,7 @@ formal_params: /* empty */ {
         if ($1 == NULL) {
             $$ = $3;
         } else {
-            $1->addToChildList($3);
+            $1->appendNextSibling($3);
             $$ = $1;
         }
     }
@@ -644,7 +716,7 @@ fn_call:
     |
     TOKIDENT '(' act_params ')' {
         FnCallNode *fnCall = new FnCallNode($1, $3, curScope);
-        fnCall->value->setFnCall($1, $$, curScope, @1);
+        fnCall->value->setFnCall($1, fnCall, curScope, @1);
         $$ = fnCall;
     }
     ;
