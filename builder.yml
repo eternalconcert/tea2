@@ -7,14 +7,15 @@ stages:
       apt-get update
       apt-get install -y --no-install-recommends g++ flex bison
       lex src/patterns.l
-      yacc -d src/grammar.y
-      g++ lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static -D BUILDNO=$BUILDER_RUN
+      bison -d -o y.tab.c src/grammar.y
+      g++ -Wno-free-nonheap-object lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static -D BUILDNO=$BUILDER_RUN
       ./tea tests/tests_basics.t
       ./tea tests/tests_cast.t
       ./tea tests/tests_comparisons.t
       ./tea tests/tests_conditions.t
       ./tea tests/tests_functions.t
       ./tea tests/tests_imports.t
+      ./tea tests/tests_teahouse_imports.t
       ./tea tests/tests_loops.t
       ./tea tests/tests_operations.t
       cp tea /out/
@@ -22,6 +23,7 @@ stages:
     run: |
       cp /out/tea tea
       cd example
+      ./install.deps.t
       mkdir -p build/static
       ./app.t
       tar -czvf build.tar.gz build

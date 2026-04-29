@@ -1,3 +1,36 @@
 %templates/header.t.html%
-    <h1>%title%</h1>
+<h1>%title%</h1>
+
+<p>
+  <strong>Tea</strong> is a small, imperative scripting language: C-like syntax, explicit types,
+  functions, arrays, and a set of built-ins for I/O, strings, and shell integration.
+  It is a good fit for quick automation, tiny tools, and teaching—not a replacement for a large
+  general-purpose ecosystem.
+</p>
+
+<h2>Why Tea?</h2>
+<ul>
+  <li>Single binary interpreter, straightforward grammar</li>
+  <li>Call shell commands with <code>cmd(...)</code>, read files with <code>read</code>/<code>write</code></li>
+  <li>Split code across files with <code>import</code> and <code>export</code></li>
+  <li>Enough structure (types, functions, control flow) to grow beyond one-off bash snippets</li>
+</ul>
+
+<h2>Hello world</h2>
+<p>From the repository root, after building the <code>tea</code> binary:</p>
+<pre>./tea -c 'print("hello world");'</pre>
+<p>Or put a program in a file and run it:</p>
+<pre>str greeting = "It's tea time!";
+print(greeting);</pre>
+<pre>./tea first_steps.t</pre>
+
+<h2>Learn more</h2>
+<p>
+  The <a href="/api.html">API</a> page summarizes syntax, types, operators, and built-in functions.
+  For build instructions and more examples, see the project <code>README.md</code> in the Tea2 repository.
+</p>
+<p>
+  Site generator version: <strong>%version%</strong> (built <time>%build_date%</time>).
+</p>
+
 %templates/footer.t.html%

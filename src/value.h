@@ -21,6 +21,7 @@ public:
     float floatValue;
     char *stringValue;
     std::vector<Value*> arrayValue;
+    std::map<std::string, Value*> dictValue;
     bool boolValue;
     char *identValue;
     bool assigned = true;
@@ -32,6 +33,7 @@ public:
     void set(float value, YYLTYPE location);
     void set(bool value, YYLTYPE location);
     void set(std::vector<Value*> value, YYLTYPE location);
+    void set(std::map<std::string, Value*> value, YYLTYPE location);
     void setIdent(char *value, AstNode *scope, YYLTYPE location);
     void setFn(char *identifier, AstNode *scope, FnDeclarationNode *functionBody, YYLTYPE location);
     void setFnCall(char *value, AstNode *retNode, AstNode *scope, YYLTYPE location);

@@ -336,7 +336,70 @@ AstNode* LenNode::evaluate() {
         return this->getNext();
     }
 
+    if (stringEval->value->getTrueType() == DICT) {
+        this->value->set((int)stringEval->value->dictValue.size(), this->location);
+        if (this->childListHead != NULL && this->childListHead != this) {
+            this->initialValue = new Value(*this->value);
+            return ExpressionNode::evaluate();
+        }
+        return this->getNext();
+    }
+
     throw TypeError("Wrong type for len", this->location);
+};
+
+KeysNode::KeysNode(AstNode *dictExpression, AstNode *scope) : ExpressionNode(scope) {
+    this->dictExpression = dictExpression;
+    this->scope = scope;
+};
+
+AstNode* KeysNode::evaluate() {
+    ExpressionNode *dictEval = (ExpressionNode*)this->dictExpression;
+    dictEval->evaluate();
+
+    if (dictEval->value->getTrueType() != DICT) {
+        throw TypeError("Wrong type for keys", this->location);
+    }
+
+    std::vector<Value*> keys;
+    for (auto const& item : dictEval->value->dictValue) {
+        Value *keyVal = new Value();
+        keyVal->set(copyString(item.first), this->location);
+        keys.push_back(keyVal);
+    }
+
+    this->value->set(keys, this->location);
+    if (this->childListHead != NULL && this->childListHead != this) {
+        this->initialValue = new Value(*this->value);
+        return ExpressionNode::evaluate();
+    }
+    return this->getNext();
+};
+
+ValuesNode::ValuesNode(AstNode *dictExpression, AstNode *scope) : ExpressionNode(scope) {
+    this->dictExpression = dictExpression;
+    this->scope = scope;
+};
+
+AstNode* ValuesNode::evaluate() {
+    ExpressionNode *dictEval = (ExpressionNode*)this->dictExpression;
+    dictEval->evaluate();
+
+    if (dictEval->value->getTrueType() != DICT) {
+        throw TypeError("Wrong type for values", this->location);
+    }
+
+    std::vector<Value*> values;
+    for (auto const& item : dictEval->value->dictValue) {
+        values.push_back(new Value(*item.second));
+    }
+
+    this->value->set(values, this->location);
+    if (this->childListHead != NULL && this->childListHead != this) {
+        this->initialValue = new Value(*this->value);
+        return ExpressionNode::evaluate();
+    }
+    return this->getNext();
 };
 
 

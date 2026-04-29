@@ -1,0 +1,125 @@
+%templates/header.t.html%
+<h1>%title%</h1>
+
+<p>
+  Quick reference for the <strong>Tea</strong> language: syntax, built-ins, and core constructs.
+  Tea is meant for small scripts and automation, not as a full “full-stack” language.
+</p>
+
+<h2>Language</h2>
+
+<h3>Syntax</h3>
+<ul>
+  <li>Statements end with a semicolon <code>;</code>.</li>
+  <li>Blocks use curly braces <code>{</code> … <code>}</code>.</li>
+  <li>Strings use double quotes; escapes: <code>\n</code>, <code>\t</code>, <code>\"</code>, <code>\\</code>.</li>
+  <li>Modules: <code>import "path/to/file.t";</code> — exported symbols come from files that use <code>export</code>.</li>
+  <li>Teahouse modules: <code>import "@vendor/module.t";</code> resolves to <code>./teahouse/vendor/module.t</code> (from the current working directory).</li>
+  <li>If names clash, <code>@...</code> imports have lower priority and do not overwrite existing symbols.</li>
+</ul>
+
+<h3>Keywords</h3>
+<p>
+  Control flow: <code>if</code>, <code>else</code>, <code>for</code>, <code>while</code>, <code>return</code>, <code>fn</code>,
+  <code>import</code>, <code>export</code>, <code>throw</code>.
+  Booleans: <code>true</code>, <code>false</code>.
+</p>
+
+<h3>Identifiers</h3>
+<p>
+  Start with a letter or underscore, then letters, digits, or underscores:
+  <code>[A-Za-z_][A-Za-z0-9_]*</code>. Names are case-sensitive.
+</p>
+
+<h3>Literals</h3>
+<ul>
+  <li>Integers: <code>42</code>, <code>-1</code></li>
+  <li>Floating-point: <code>3.14</code>, <code>-0.5</code></li>
+  <li>Strings: <code>"hello"</code></li>
+  <li>Booleans: <code>true</code>, <code>false</code></li>
+  <li>Arrays: <code>[1, 2, "a"]</code> — elements may mix types.</li>
+  <li>Dictionaries: <code>{"key": value}</code> — keys are strings; values may be any Tea expression (including nested dicts/arrays).</li>
+</ul>
+
+<h3>Comments</h3>
+<ul>
+  <li>Line comment: <code>//</code> to end of line</li>
+  <li>Shebang line is ignored: <code>#!</code> …</li>
+  <li>Block comment: <code>/*</code> … <code>*/</code></li>
+</ul>
+
+<h3>Types</h3>
+<p>
+  Explicit types (lowercase, as in the lexer): <code>int</code>, <code>float</code>, <code>str</code>,
+  <code>bool</code>, <code>void</code>, <code>array</code>, <code>dict</code>.
+</p>
+<pre>int n = 10;
+str s = "text";
+bool ok = true;
+array xs = [1, 2, 3];
+dict d = {name: "tea", year: 2026};</pre>
+
+<h3>Variables and functions</h3>
+<p>
+  Declare with a type and optional initializer; functions use <code>fn</code>, return type before the name, or
+  <code>void</code> when there is no return value.
+</p>
+<pre>int x;
+x = 1;
+
+int fn add(int a, int b) {
+    return a + b;
+};
+
+void fn greet(str name) {
+    print("Hello, " + name);
+};</pre>
+
+<h3>Operators</h3>
+<ul>
+  <li>Arithmetic: <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code></li>
+  <li>Comparison: <code>==</code> <code>!=</code> <code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code></li>
+  <li>Logic: <code>and</code> (also <code>&amp;&amp;</code> / <code>&amp;</code>), <code>or</code> (also <code>||</code> / <code>|</code>)</li>
+</ul>
+
+<h3>Control flow</h3>
+
+<h4>Conditionals</h4>
+<pre>if (condition) {
+    // ...
+} else {
+    // ...
+};</pre>
+
+<h4>Loops</h4>
+<pre>for (int i = 0; i &lt; len(xs); i = i + 1) {
+    print(xs[i]);
+};
+
+while (n &gt; 0) {
+    n = n - 1;
+};</pre>
+
+<h2>Built-ins and I/O</h2>
+<p>The runtime provides, among others:</p>
+<ul>
+  <li><code>print(…)</code> — write to stdout</li>
+  <li><code>stdout("text")</code> — write without a trailing newline (e.g. prompts)</li>
+  <li><code>input</code> — read one line from stdin (typical: <code>str name = input;</code>)</li>
+  <li><code>cmd("shell command")</code> — run a shell command, output as a string</li>
+  <li><code>read("path")</code> / <code>write("path", content)</code> — read/write files</li>
+  <li><code>len(x)</code> — length (string, array, or dict)</li>
+  <li><code>split(str, delimiter)</code>, <code>find(str, pattern)</code> — string helpers</li>
+  <li><code>dictKeys(dict)</code> — returns an array of keys (as strings)</li>
+  <li><code>dictValues(dict)</code> — returns an array of values</li>
+  <li><code>sleep(seconds)</code>, <code>quit()</code>, <code>assert(actual, expected[, "message"])</code></li>
+  <li><code>cast(…)</code> — type conversion</li>
+  <li><code>SYSARGS</code>, <code>LRC</code> — command-line args and last return code (see interpreter docs)</li>
+</ul>
+
+<p>
+  More helpers can be pulled in via <code>import</code> from libraries (e.g. <code>common/string.t</code> with
+  <code>replace</code>, <code>replaceMany</code>, and so on).
+</p>
+
+%templates/footer.t.html%

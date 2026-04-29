@@ -66,3 +66,52 @@ AstNode* VarAssignmentNode::evaluate() {
     valScope->valueStore->set(this->identifier, val);
     return this->getNext();
 };
+
+ArrayAssignmentNode::ArrayAssignmentNode(char *identifier, AstNode *indexExpression, AstNode *rExp, AstNode *scope) {
+    this->identifier = identifier;
+    this->indexExpression = indexExpression;
+    this->rExp = rExp;
+    this->scope = scope;
+    AstNode();
+};
+
+AstNode* ArrayAssignmentNode::evaluate() {
+    // Evaluate array index
+    ExpressionNode *indexEval = (ExpressionNode*)this->indexExpression;
+    indexEval->evaluate();
+    Value *indexValue = indexEval->value;
+    if (indexValue->type == IDENTIFIER) {
+        indexValue = getFromValueStore(this->scope, indexValue->identValue, this->location);
+    }
+
+    if (indexValue->getTrueType() != INT) {
+        throw TypeError("Array index must be an int", this->location);
+    }
+
+    int index = indexValue->intValue;
+    if (index < 0) {
+        throw TypeError("Array index out of range", this->location);
+    }
+
+    // Get target array from scope
+    Value *arrayVal = getFromValueStore(this->scope, this->identifier, this->location);
+    if (arrayVal->getTrueType() != ARRAY) {
+        throw TypeError("Left side of array assignment must be an array", this->location);
+    }
+
+    // Evaluate RHS
+    ExpressionNode *rhsEval = (ExpressionNode*)this->rExp;
+    rhsEval->evaluate();
+    Value *rhsVal = rhsEval->value;
+    if (rhsVal->type == IDENTIFIER) {
+        rhsVal = getFromValueStore(this->scope, rhsVal->identValue, this->location);
+    }
+
+    // Auto-resize so `array items = []; items[i] = ...` works.
+    while (arrayVal->arrayValue.size() <= (size_t)index) {
+        arrayVal->arrayValue.push_back(new Value());
+    }
+
+    arrayVal->arrayValue[index] = new Value(*rhsVal);
+    return this->getNext();
+};

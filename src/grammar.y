@@ -1,3 +1,35 @@
+%code requires {
+#include <string>
+struct TeaLocation {
+    int first_line;
+    int first_column;
+    int last_line;
+    int last_column;
+    std::string filename;
+};
+}
+%define api.location.type {struct TeaLocation}
+
+%code provides {
+#undef YYLLOC_DEFAULT
+#define YYLLOC_DEFAULT(Current, Rhs, N)                             \
+    do {                                                            \
+        if (N) {                                                    \
+            (Current).first_line = YYRHSLOC(Rhs, 1).first_line;     \
+            (Current).first_column = YYRHSLOC(Rhs, 1).first_column; \
+            (Current).last_line = YYRHSLOC(Rhs, N).last_line;       \
+            (Current).last_column = YYRHSLOC(Rhs, N).last_column;   \
+            (Current).filename = YYRHSLOC(Rhs, 1).filename;         \
+        } else {                                                    \
+            (Current).first_line = (Current).last_line =             \
+                YYRHSLOC(Rhs, 0).last_line;                        \
+            (Current).first_column = (Current).last_column =        \
+                YYRHSLOC(Rhs, 0).last_column;                      \
+            (Current).filename = YYRHSLOC(Rhs, 0).filename;         \
+        }                                                           \
+    } while (0)
+}
+
 %{
     #include <stdio.h>
     #include <stdlib.h>
@@ -18,6 +50,7 @@
     std::set<std::string> importedTeaModules;
     std::set<std::string> importingTeaModules;
     std::map<std::string, std::map<std::string, Value*>> importedTeaModuleValues;
+    std::map<std::string, bool> importedTeaModuleLowPriority;
 
     void pushScope() {
         AstNode *newScope = new AstNode();
@@ -46,6 +79,34 @@
         return std::filesystem::weakly_canonical(importPath).string();
     }
 
+    TeaImportResolved resolveTeaImport(std::string path, std::string baseDir) {
+        std::error_code ec;
+        if (!path.empty() && path[0] == '@') {
+            std::string rel = path.substr(1);
+            while (!rel.empty() && (rel[0] == '/' || rel[0] == '\\')) {
+                rel.erase(0, 1);
+            }
+            std::filesystem::path teahousePath;
+            if (rel.empty()) {
+                teahousePath = std::filesystem::current_path() / "teahouse";
+            } else {
+                teahousePath = std::filesystem::current_path() / "teahouse" / rel;
+            }
+            std::string canonical = std::filesystem::weakly_canonical(teahousePath, ec).string();
+            return { canonical, true };
+        }
+        return { resolveTeaPath(path, baseDir), false };
+    }
+
+    void setImportedTeaModuleLowPriority(std::string path, bool low) {
+        importedTeaModuleLowPriority[path] = low;
+    }
+
+    bool importedTeaModuleHasLowPriorityExports(std::string path) {
+        auto it = importedTeaModuleLowPriority.find(path);
+        return it != importedTeaModuleLowPriority.end() && it->second;
+    }
+
     std::string currentParseDir() {
         if (parseFileStack.empty()) {
             return std::filesystem::current_path().string();
@@ -69,6 +130,7 @@
         curScope = scope;
         parseFileStack.push_back(sourceName);
         yylineno = 1;
+        tea_reset_lexer_column();
 
         YY_BUFFER_STATE buffer = yy_scan_string(source.c_str());
         yyparse();
@@ -110,8 +172,11 @@
     }
 
     void copyImportedTeaModuleValues(std::string path, AstNode *scope) {
+        bool low = importedTeaModuleHasLowPriorityExports(path);
         for (auto const& item : importedTeaModuleValues[path]) {
-            scope->valueStore->set(item.first, item.second);
+            if (!low || scope->valueStore->get(item.first) == nullptr) {
+                scope->valueStore->set(item.first, item.second);
+            }
         }
     }
 
@@ -120,7 +185,22 @@
         }
 
     void yyerror(const char *str) {
-        fprintf(stderr, "Error: %s: %s on line %d\n", str, yytext, yylineno);
+        const char *tok = yytext;
+        if (!tok || !tok[0]) {
+            tok = "end of file";
+        }
+        int err_line = yylloc.first_line;
+        int err_col = yylloc.first_column;
+        if (!parseFileStack.empty()) {
+            fprintf(stderr, "%s:%d:%d: Error: %s (at %s)\n",
+                    parseFileStack.back().c_str(), err_line, err_col, str, tok);
+        } else if (!yylloc.filename.empty()) {
+            fprintf(stderr, "%s:%d:%d: Error: %s (at %s)\n",
+                    yylloc.filename.c_str(), err_line, err_col, str, tok);
+        } else {
+            fprintf(stderr, "%d:%d: Error: %s (at %s)\n",
+                    err_line, err_col, str, tok);
+        }
         exit(1);
     }
 
@@ -187,7 +267,7 @@ int main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKIMPORT TOKEXPORT TOKTHROW
-%token TOKPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN
+%token TOKPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -200,10 +280,10 @@ int main(int argc, char *argv[0]) {
 %token <sval> TOKIDENT
 
 %type <sval> operator
-%type <node> expression literal array_literal array_items array_index fn_call
+%type <node> expression literal array_literal array_items dict_literal dict_items dict_item dict_key array_index fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt while_loop for_loop import_statement export_statement throw
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print out read write split find len input quit sleep assert cmd sysargs lastrc cast
+%type <node> print out read write split find len dictKeys dictValues input quit sleep assert cmd sysargs lastrc cast
 %type <node> for_init for_condition for_post
 
 %start statements
@@ -235,6 +315,10 @@ statement:
     }
     | var_assignment {
         $$ = $1;
+    }
+    | TOKIDENT '[' expressions ']' '=' expressions {
+        ArrayAssignmentNode *assignment = new ArrayAssignmentNode($1, $3, $6, curScope);
+        $$ = assignment;
     }
     | var_declaration_assignment {
         $$ = $1;
@@ -449,6 +533,10 @@ literal:
     array_literal {
         $$ = $1;
     }
+    |
+    dict_literal {
+        $$ = $1;
+    }
     ;
 
 array_literal:
@@ -471,6 +559,56 @@ array_items: /* empty */ {
     array_items ',' expressions {
         $1->addToChildList($3);
         $$ = $1;
+    }
+    ;
+
+dict_literal:
+    TOKLBRACE dict_items TOKRBRACE {
+        DictLiteralNode *dictLiteral = new DictLiteralNode($2, curScope);
+        $$ = dictLiteral;
+    }
+    ;
+
+dict_items: /* empty */ {
+        $$ = new AstNode();
+    }
+    |
+    dict_item {
+        AstNode *items = new AstNode();
+        items->addToChildList($1);
+        $$ = items;
+    }
+    |
+    dict_items ',' dict_item {
+        $1->addToChildList($3);
+        $$ = $1;
+    }
+    ;
+
+dict_item:
+    dict_key ':' expressions {
+        AstNode *entry = new AstNode();
+        entry->addToChildList($1);
+        entry->addToChildList($3);
+        $$ = entry;
+    }
+    ;
+
+dict_key:
+    TOKSTRING {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
+        Value *valueObj = new Value();
+        valueObj->set($1, @1);
+        expNode->value = valueObj;
+        $$ = expNode;
+    }
+    |
+    TOKIDENT {
+        ExpressionNode *expNode = new ExpressionNode(curScope);
+        Value *valueObj = new Value();
+        valueObj->set($1, @1);
+        expNode->value = valueObj;
+        $$ = expNode;
     }
     ;
 
@@ -601,6 +739,10 @@ builtin_function:  // Causes reduce/reduce conflict
     |
     len
     |
+    dictKeys
+    |
+    dictValues
+    |
     input
     |
     quit
@@ -681,6 +823,20 @@ len:
     TOKLEN '(' expressions ')' {
         LenNode *len = new LenNode($3, curScope);
         $$ = len;
+    }
+    ;
+
+dictKeys:
+    TOKDICTKEYS '(' expressions ')' {
+        KeysNode *keys = new KeysNode($3, curScope);
+        $$ = keys;
+    }
+    ;
+
+dictValues:
+    TOKDICTVALUES '(' expressions ')' {
+        ValuesNode *values = new ValuesNode($3, curScope);
+        $$ = values;
     }
     ;
 

@@ -7,12 +7,18 @@
         yylloc.first_column = colnum; \
         colnum = colnum + yyleng; \
         yylloc.last_column = colnum; \
+        yylloc.filename = parseFileStack.empty() ? "" : parseFileStack.back(); \
     }
 
     #include <stdio.h>
     #include <stdlib.h>
+    #include "src/commons.h"
     #include "src/ast/ast.h"
     #include "y.tab.h"
+
+    void tea_reset_lexer_column(void) {
+        colnum = 1;
+    }
 
     std::string strbuf;
 
@@ -30,6 +36,7 @@
 "="                                     return '=';
 ";"                                     return ';';
 ","                                     return ',';
+":"                                     return ':';
 "+"                                     yylval.sval=strdup(yytext); return TOKPLUS;
 "-"                                     yylval.sval=strdup(yytext); return TOKMINUS;
 "*"                                     yylval.sval=strdup(yytext); return TOKTIMES;
@@ -49,6 +56,7 @@ str                                     yylval.tval=STR; return TYPEIDENT;
 bool                                    yylval.tval=BOOL; return TYPEIDENT;
 void                                    yylval.tval=VOID; return TYPEIDENT;
 array                                   yylval.tval=ARRAY; return TYPEIDENT;
+dict                                    yylval.tval=DICT; return TYPEIDENT;
 if                                      return TOKIF;
 else                                    return TOKELSE;
 true                                    yylval.bval=true; return TOKBOOL;
@@ -67,6 +75,8 @@ write                                   return TOKWRITEFILE;
 split                                   return TOKSPLIT;
 find                                    return TOKFIND;
 len                                     return TOKLEN;
+dictKeys                                return TOKDICTKEYS;
+dictValues                              return TOKDICTVALUES;
 sleep                                   return TOKSLEEP;
 quit                                    return TOKQUIT;
 assert                                  return TOKASSERT;

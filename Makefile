@@ -1,18 +1,20 @@
 BUILDNO ?= 0
 CPPSOURCES = $(shell find src/ -name "*.cpp")
+# Bison: GCC -Wfree-nonheap-object is a false positive (YYSTACK_FREE guarded by yyss != yyssa).
+TEA_CXXFLAGS = -Wno-free-nonheap-object
 
 parser:
 	lex src/patterns.l
-	yacc -d src/grammar.y # --verbose
+	bison -d -o y.tab.c src/grammar.y
 
 tea: clean parser
-	g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static -D BUILDNO=$(BUILDNO)
+	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static -D BUILDNO=$(BUILDNO)
 
 mac-tea: parser
-	clang++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea -D BUILDNO=$(BUILDNO) -D MACOS
+	clang++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea -D BUILDNO=$(BUILDNO) -D MACOS
 
 test: clean parser
-	g++ lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static -D BUILDNO=$(BUILDNO)
+	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static -D BUILDNO=$(BUILDNO)
 	./tea tests/tests_basics.t
 	./tea tests/tests_imports.t
 	./tea tests/tests_functions.t
@@ -20,6 +22,7 @@ test: clean parser
 	./tea tests/tests_comparisons.t
 	./tea tests/tests_conditions.t
 	./tea tests/tests_loops.t
+	./tea tests/tests_dicts.t
 	./tea tests/tests_cast.t
 	mkdir -p coverage
 	mv *.gcda coverage
@@ -28,7 +31,7 @@ test: clean parser
 	genhtml coverage/main_coverage.info --output-directory coverage/out
 
 win-tea: parser
-	x86_64-w64-mingw32-g++ lex.yy.c y.tab.c $(CPPSOURCES) -o tea.exe --static
+	x86_64-w64-mingw32-g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea.exe --static
 
 run:
 	./tea test.t

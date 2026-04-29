@@ -14,6 +14,10 @@ ArrayLiteralNode::ArrayLiteralNode(AstNode *items, AstNode *scope) : ExpressionN
     this->items = items;
 };
 
+DictLiteralNode::DictLiteralNode(AstNode *items, AstNode *scope) : ExpressionNode(scope) {
+    this->items = items;
+};
+
 AstNode* ArrayLiteralNode::evaluate() {
     std::vector<Value*> values;
     AstNode *cur = this->items->childListHead;
@@ -22,6 +26,35 @@ AstNode* ArrayLiteralNode::evaluate() {
         ExpressionNode *eval = (ExpressionNode*)cur;
         eval->evaluate();
         values.push_back(new Value(*eval->value));
+        cur = cur->getNext();
+    }
+
+    this->value->set(values, this->location);
+    if (this->childListHead != NULL && this->childListHead != this) {
+        this->initialValue = new Value(*this->value);
+        return ExpressionNode::evaluate();
+    }
+    return this->getNext();
+};
+
+AstNode* DictLiteralNode::evaluate() {
+    std::map<std::string, Value*> values;
+    AstNode *cur = this->items->childListHead;
+
+    while (cur != NULL) {
+        AstNode *keyNode = cur->childListHead;
+        AstNode *valueNode = keyNode->getNext();
+        ExpressionNode *keyEval = (ExpressionNode*)keyNode;
+        ExpressionNode *valueEval = (ExpressionNode*)valueNode;
+
+        keyEval->evaluate();
+        valueEval->evaluate();
+
+        if (keyEval->value->getTrueType() != STR) {
+            throw TypeError("Dictionary key must be a string", this->location);
+        }
+
+        values[std::string(keyEval->value->stringValue)] = new Value(*valueEval->value);
         cur = cur->getNext();
     }
 
@@ -48,13 +81,11 @@ AstNode* ArrayIndexNode::evaluate() {
         indexValue = getFromValueStore(this->scope, indexValue->identValue, this->location);
     }
 
-    if (indexValue->getTrueType() != INT) {
-        throw TypeError("Index must be an int", this->location);
-    }
-
-    int index = indexValue->intValue;
-
     if (indexedValue->getTrueType() == ARRAY) {
+        if (indexValue->getTrueType() != INT) {
+            throw TypeError("Array index must be an int", this->location);
+        }
+        int index = indexValue->intValue;
         if (index < 0 || index >= indexedValue->arrayValue.size()) {
             throw TypeError("Array index out of range", this->location);
         }
@@ -68,6 +99,10 @@ AstNode* ArrayIndexNode::evaluate() {
     }
 
     if (indexedValue->getTrueType() == STR) {
+        if (indexValue->getTrueType() != INT) {
+            throw TypeError("String index must be an int", this->location);
+        }
+        int index = indexValue->intValue;
         if (index < 0 || index >= strlen(indexedValue->stringValue)) {
             throw TypeError("String index out of range", this->location);
         }
@@ -83,12 +118,43 @@ AstNode* ArrayIndexNode::evaluate() {
         return this->getNext();
     }
 
-    throw TypeError("Index access is only implemented for arrays and strings", this->location);
+    if (indexedValue->getTrueType() == DICT) {
+        std::string key;
+        switch (indexValue->getTrueType()) {
+            case STR:
+                key = indexValue->stringValue;
+                break;
+            case INT:
+                key = std::to_string(indexValue->intValue);
+                break;
+            case FLOAT:
+                key = std::to_string(indexValue->floatValue);
+                break;
+            case BOOL:
+                key = indexValue->boolValue ? "true" : "false";
+                break;
+            default:
+                throw TypeError("Dictionary index must be string, int, float or bool", this->location);
+        }
+
+        if (indexedValue->dictValue.find(key) == indexedValue->dictValue.end()) {
+            throw TypeError("Dictionary key not found", this->location);
+        }
+
+        this->value = new Value(*indexedValue->dictValue[key]);
+        if (this->childListHead != NULL && this->childListHead != this) {
+            this->initialValue = new Value(*this->value);
+            return ExpressionNode::evaluate();
+        }
+        return this->getNext();
+    }
+
+    throw TypeError("Index access is only implemented for arrays, dictionaries and strings", this->location);
 };
 
 
 Value *ExpressionNode::runFunctionAndGetResult(AstNode *scope, Value *functionValue) {
-    Value *startValue = getFromValueStore(scope, functionValue->identValue, this->location);
+    Value *startValue = getFromValueStore(scope, functionValue->identValue, functionValue->location);
     FnCallNode *functionBlock = (FnCallNode*)startValue->functionBody;
     // From here
     functionBlock->evaluate();
@@ -98,7 +164,7 @@ Value *ExpressionNode::runFunctionAndGetResult(AstNode *scope, Value *functionVa
 
 Value *resolveExpressionValue(ExpressionNode *expression, Value *value) {
     if (value->type == IDENTIFIER) {
-        return getFromValueStore(expression->scope, value->identValue, expression->location);
+        return getFromValueStore(expression->scope, value->identValue, value->location);
     }
     if (value->type == FUNCTIONCALL) {
         return expression->runFunctionAndGetResult(expression->scope, value);
@@ -127,7 +193,7 @@ AstNode* ExpressionNode::evaluate() {
         }
 
         Value *rVal;
-        if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL) {
+        if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<DictLiteralNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL) {
             cur->evaluate();
             rVal = cur->value;
         } else {

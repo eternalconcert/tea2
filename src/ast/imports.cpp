@@ -34,7 +34,9 @@ static void collectExportedNames(AstNode *moduleScope, std::set<std::string> *ex
 }
 
 AstNode* ImportNode::evaluate() {
-    std::string resolvedPath = resolveTeaPath(this->importPath, this->baseDir);
+    TeaImportResolved resolved = resolveTeaImport(this->importPath, this->baseDir);
+    std::string resolvedPath = resolved.path;
+    setImportedTeaModuleLowPriority(resolvedPath, resolved.lowPriorityExports);
 
     if (isTeaModuleImported(resolvedPath)) {
         copyImportedTeaModuleValues(resolvedPath, this->scope);
@@ -57,8 +59,10 @@ AstNode* ImportNode::evaluate() {
 
     for (auto const& item : moduleScope->valueStore->values) {
         if (exportedNames.count(item.first) > 0) {
-            this->scope->valueStore->set(item.first, item.second);
             registerImportedTeaModuleValue(resolvedPath, item.first, item.second);
+            if (!resolved.lowPriorityExports || this->scope->valueStore->get(item.first) == nullptr) {
+                this->scope->valueStore->set(item.first, item.second);
+            }
         }
     }
 

@@ -21,6 +21,15 @@ static void reprArrayItem(Value *value) {
     value->repr();
 }
 
+static void reprDictItem(Value *value) {
+    if (value->getTrueType() == STR) {
+        printf("\"%s\"", value->stringValue);
+        return;
+    }
+
+    value->repr();
+}
+
 void Value::set(typeId type, YYLTYPE location) {
     this->type = type;
     this->location = location;
@@ -59,6 +68,13 @@ void Value::set(std::vector<Value*> value, YYLTYPE location) {
     this->location = location;
     this->boolValue = value.size() > 0;
     this->arrayValue = value;
+};
+
+void Value::set(std::map<std::string, Value*> value, YYLTYPE location) {
+    this->type = DICT;
+    this->location = location;
+    this->boolValue = value.size() > 0;
+    this->dictValue = value;
 };
 
 void Value::setIdent(char *value, AstNode *scope, YYLTYPE location) {
@@ -135,6 +151,20 @@ void Value::repr() {
             }
             printf("]");
             break;
+        case DICT: {
+            printf("{");
+            bool first = true;
+            for (auto const& item : this->dictValue) {
+                if (!first) {
+                    printf(", ");
+                }
+                first = false;
+                printf("\"%s\": ", item.first.c_str());
+                reprDictItem(item.second);
+            }
+            printf("}");
+            break;
+        }
         case IDENTIFIER:
             getFromValueStore(this->scope, this->identValue, this->location)->repr();
             break;
@@ -510,6 +540,29 @@ Value* operator==(Value &lVal, Value *rVal) {
 
         for (int i = 0; i < lVal.arrayValue.size(); i++) {
             Value *itemsEqual = operator==(*lVal.arrayValue[i], rVal->arrayValue[i]);
+            if (!itemsEqual->boolValue) {
+                nVal->set(false, lVal.location);
+                return nVal;
+            }
+        }
+
+        nVal->set(true, lVal.location);
+        return nVal;
+    }
+
+    if (lVal.getTrueType() == DICT and rVal->getTrueType() == DICT) {
+        if (lVal.dictValue.size() != rVal->dictValue.size()) {
+            nVal->set(false, lVal.location);
+            return nVal;
+        }
+
+        for (auto const& item : lVal.dictValue) {
+            if (rVal->dictValue.find(item.first) == rVal->dictValue.end()) {
+                nVal->set(false, lVal.location);
+                return nVal;
+            }
+
+            Value *itemsEqual = operator==(*item.second, rVal->dictValue[item.first]);
             if (!itemsEqual->boolValue) {
                 nVal->set(false, lVal.location);
                 return nVal;

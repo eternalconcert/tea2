@@ -168,8 +168,8 @@ void fn test_str_len() {
     assert(len(text), 3);
     assert(len(""), 0);
     assert(len(["hello", "tea", "world"]), 3);
-    array values = split("a,b,c", ",");
-    assert(len(values), 3);
+    array parts = split("a,b,c", ",");
+    assert(len(parts), 3);
     int startIndex = 2;
     assert(startIndex + len(text), 5);
     testCount = testCount + 1;

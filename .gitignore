@@ -13,3 +13,4 @@ syntax: glob
 pythonenv/*
 *.gcda
 example/build/*
+example/teahouse/*

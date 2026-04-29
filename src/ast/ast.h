@@ -180,12 +180,38 @@ public:
     LenNode(AstNode *stringExpression, AstNode *scope);
 };
 
+class KeysNode: public ExpressionNode {
+public:
+    AstNode *dictExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    KeysNode(AstNode *dictExpression, AstNode *scope);
+};
+
+class ValuesNode: public ExpressionNode {
+public:
+    AstNode *dictExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    ValuesNode(AstNode *dictExpression, AstNode *scope);
+};
+
 class ArrayLiteralNode: public ExpressionNode {
 public:
     AstNode *items;
 
     AstNode* evaluate();
     ArrayLiteralNode(AstNode *items, AstNode *scope);
+};
+
+class DictLiteralNode: public ExpressionNode {
+public:
+    AstNode *items;
+
+    AstNode* evaluate();
+    DictLiteralNode(AstNode *items, AstNode *scope);
 };
 
 class ArrayIndexNode: public ExpressionNode {
@@ -229,6 +255,17 @@ public:
     AstNode* evaluate();
 
     VarAssignmentNode(char *identifier, AstNode *exp, AstNode *scope);
+};
+
+class ArrayAssignmentNode: public AstNode {
+public:
+    char *identifier;
+    AstNode *indexExpression;
+    AstNode *rExp;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    ArrayAssignmentNode(char *identifier, AstNode *indexExpression, AstNode *rExp, AstNode *scope);
 };
 
 class IfNode: public AstNode {
@@ -294,8 +331,16 @@ public:
 Value *getFromValueStore(AstNode *scope, char* ident, YYLTYPE location);
 Value *getVariableFromValueStore(AstNode *scope, char *ident);
 AstNode *getValueScope(AstNode *scope, char* ident, YYLTYPE location);
+struct TeaImportResolved {
+    std::string path;
+    bool lowPriorityExports;
+};
+
 AstNode *parseTeaFileIntoScope(std::string path, AstNode *scope);
 std::string resolveTeaPath(std::string path, std::string baseDir);
+TeaImportResolved resolveTeaImport(std::string path, std::string baseDir);
+void setImportedTeaModuleLowPriority(std::string path, bool low);
+bool importedTeaModuleHasLowPriorityExports(std::string path);
 std::string currentParseDir();
 bool isTeaModuleImported(std::string path);
 bool beginTeaModuleImport(std::string path);

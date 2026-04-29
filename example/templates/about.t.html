@@ -1,3 +1,34 @@
 %templates/header.t.html%
-    <h1>%title%</h1>
+<h1>%title%</h1>
+
+<p>
+  This page is part of the <strong>Tea2</strong> project: an implementation of the Tea programming language
+  (lexer, parser, runtime) maintained as open source. The language is deliberately small so the whole
+  system stays understandable and hackable.
+</p>
+
+<h2>Goals</h2>
+<ul>
+  <li>Offer a readable, typed scripting option between shell one-liners and heavier runtimes</li>
+  <li>Keep the implementation maintainable (classic lex/yacc-style pipeline, C++ runtime)</li>
+  <li>Support real workflows: imports, stdlib-style helpers, tests, and documentation in-repo</li>
+</ul>
+
+<h2>This website</h2>
+<p>
+  These HTML pages are not hand-written: they are produced by a tiny Tea program under <code>example/</code>
+  that loads templates, substitutes placeholders (title, version, build date), and writes static files into
+  <code>example/build/</code>. Styling lives in <code>templates/static/main.css</code>.
+</p>
+<p>
+  If you are reading the generated output, the build metadata in the page header reflects how that snapshot
+  was produced (version <strong>%version%</strong>, <time>%build_date%</time>).
+</p>
+
+<h2>Contributing &amp; source</h2>
+<p>
+  Sources, issue tracking, and CI live in the Tea2 repository on GitHub. Tests and robot-based checks help
+  keep the language behavior stable as the grammar and builtins evolve.
+</p>
+
 %templates/footer.t.html%

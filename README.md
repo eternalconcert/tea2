@@ -38,6 +38,22 @@ Run the program with
 ./tea first_steps.t
 ```
 
+## Imports
+
+Tea supports regular file imports:
+```c
+import "lib/renderer.t";
+```
+
+and teahouse imports:
+```c
+import "@vendor/helpers.t";
+```
+
+Teahouse imports are resolved from `./teahouse/...` (relative to the current working directory where `tea` is started).
+
+If exported names clash, teahouse imports have lower priority: existing symbols in the current scope are kept and are not overwritten by `@...` imports.
+
 The following code will list the current directories content:
 ```c
 str directory_content = cmd("ls");
