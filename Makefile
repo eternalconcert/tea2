@@ -2,36 +2,48 @@ BUILDNO ?= 0
 CPPSOURCES = $(shell find src/ -name "*.cpp")
 # Bison: GCC -Wfree-nonheap-object is a false positive (YYSTACK_FREE guarded by yyss != yyssa).
 TEA_CXXFLAGS = -Wno-free-nonheap-object
+TEST_FILES = tests/tests_basics.t tests/tests_imports.t tests/tests_functions.t tests/tests_operations.t tests/tests_comparisons.t tests/tests_conditions.t tests/tests_loops.t tests/tests_precedence.t tests/tests_break_continue.t tests/tests_dicts.t tests/tests_json.t tests/tests_cast.t
 
 parser:
 	lex src/patterns.l
 	bison -d -o y.tab.c src/grammar.y
 
+parser-mac:
+	lex src/patterns.l
+	/opt/homebrew/opt/bison/bin/bison -d -o y.tab.c src/grammar.y
+
 tea: clean parser
 	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static -D BUILDNO=$(BUILDNO)
 
-mac-tea: parser
-	clang++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea -D BUILDNO=$(BUILDNO) -D MACOS
+mac-tea: clean parser-mac
+	clang++ $(TEA_CXXFLAGS) -std=c++17 -Wno-deprecated -Wno-switch lex.yy.c y.tab.c $(CPPSOURCES) -o tea -D BUILDNO=$(BUILDNO) -D MACOS
 
-test: clean parser
+test: clean build-test run-tests coverage
+	@echo "Test coverage completed"
+
+mac-test: clean build-mac-test run-tests coverage
+	@echo "Mac test coverage completed"
+
+build-test: parser
 	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static -D BUILDNO=$(BUILDNO)
-	./tea tests/tests_basics.t
-	./tea tests/tests_imports.t
-	./tea tests/tests_functions.t
-	./tea tests/tests_operations.t
-	./tea tests/tests_comparisons.t
-	./tea tests/tests_conditions.t
-	./tea tests/tests_loops.t
-	./tea tests/tests_precedence.t
-	./tea tests/tests_break_continue.t
-	./tea tests/tests_dicts.t
-	./tea tests/tests_json.t
-	./tea tests/tests_cast.t
+
+build-mac-test: parser-mac
+	clang++ $(TEA_CXXFLAGS) -std=c++17 -Wno-deprecated -Wno-switch lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea -D BUILDNO=$(BUILDNO) -D MACOS
+
+run-tests:
+	$(foreach test,$(TEST_FILES),./tea $(test);)
+
+coverage:
 	mkdir -p coverage
-	mv *.gcda coverage
-	mv *.gcno coverage
-	lcov -c --directory coverage -o coverage/main_coverage.info --exclude "*tea2/lex.yy.c" --exclude "*src/exceptions.h" --exclude "*tea2/y.tab.c" --exclude "/usr/*"
-	genhtml coverage/main_coverage.info --output-directory coverage/out
+	mv *.gcda coverage 2>/dev/null || true
+	mv *.gcno coverage 2>/dev/null || true
+	@if command -v lcov >/dev/null 2>&1; then \
+		lcov -c --directory coverage -o coverage/main_coverage.info --exclude "*tea2/lex.yy.c" --exclude "*src/exceptions.h" --exclude "*tea2/y.tab.c" --exclude "/usr/*" --ignore-errors unsupported,inconsistent; \
+		genhtml coverage/main_coverage.info --output-directory coverage/out --ignore-errors unsupported,missing; \
+		echo "✓ Coverage report generated in coverage/out/index.html"; \
+	else \
+		echo "⚠️  lcov not found. Install with: brew install lcov (on macOS) or apt-get install lcov (on Linux)"; \
+	fi
 
 win-tea: parser
 	x86_64-w64-mingw32-g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea.exe --static
@@ -49,4 +61,4 @@ robot-test:
 	pythonenv/bin/robot robottests
 	./tea tests/tests.t
 
-.PHONY: tea
+.PHONY: tea parser parser-mac mac-tea test mac-test build-test build-mac-test run-tests coverage clean robot-test run
