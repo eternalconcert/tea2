@@ -43,6 +43,7 @@ struct TeaLocation {
     #include <set>
     #include <sstream>
     #include <vector>
+    #include "src/init_code.h"
 
     static AstNode *tea_merge_binary(AstNode *left, char *op, AstNode *right) {
         ExpressionNode *l = (ExpressionNode*)left;
@@ -257,6 +258,11 @@ int main(int argc, char *argv[0]) {
         stdlibImport->evaluate();
     }
 
+    // Execute embedded init code from stdlib/sys.t
+    if (INIT_CODE && strlen(INIT_CODE) > 0) {
+        parseTeaSourceIntoScope(std::string(INIT_CODE), "<embedded-init>", root);
+    }
+
     parseTeaSourceIntoScope(mainSource, mainSourceName, root);
     root->init(argc, argv);
 }
@@ -275,7 +281,7 @@ int main(int argc, char *argv[0]) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKBREAK TOKCONTINUE TOKIMPORT TOKEXPORT TOKTHROW
-%token TOKPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES
+%token TOKSYSPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES TOKELLIPSIS
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -291,7 +297,7 @@ int main(int argc, char *argv[0]) {
 %type <node> expression literal array_literal array_items dict_literal dict_items dict_item dict_key array_index fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt while_loop for_loop import_statement export_statement throw
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> print out read write split find len dictKeys dictValues input quit sleep assert cmd sysargs lastrc cast
+%type <node> sysprint out read write split find len dictKeys dictValues input quit sleep assert cmd sysargs lastrc cast
 %type <node> for_init for_condition for_post
 
 %start statements
@@ -567,6 +573,21 @@ formal_params: /* empty */ {
             $$ = $1;
         }
     }
+    |
+    TOKELLIPSIS TOKIDENT {
+        VarDeclarationNode *variable = new VarDeclarationNode(ARRAY, $2, curScope, true);
+        $$ = variable;
+    }
+    |
+    formal_params ',' TOKELLIPSIS TOKIDENT {
+        VarDeclarationNode *variable = new VarDeclarationNode(ARRAY, $4, curScope, true);
+        if ($1 == NULL) {
+            $$ = variable;
+        } else {
+            $1->appendNextSibling(variable);
+            $$ = $1;
+        }
+    }
     ;
 
 literal:
@@ -797,7 +818,7 @@ for_post: /* empty */ {
 
 
 builtin_function:  // Causes reduce/reduce conflict
-    print
+    sysprint
     |
     out
     |
@@ -839,9 +860,9 @@ throw:
     }
     ;
 
-print:
-    TOKPRINT '(' act_params ')' {
-        PrintNode *print = new PrintNode($3, curScope, true);
+sysprint:
+    TOKSYSPRINT '(' act_params ')' {
+        PrintNode *print = new PrintNode($3, curScope, false);
         $$ = print;
     }
     ;
@@ -920,7 +941,7 @@ input:
     ;
 
 cast:
-    TOKCAST '(' TOKIDENT ',' TYPEIDENT ')' {
+    TOKCAST '(' expressions ',' TYPEIDENT ')' {
         CastNode *cast = new CastNode($3, $5, curScope);
         $$ = cast;
     }
@@ -965,6 +986,11 @@ sysargs:
         valueObj->setIdent($3, curScope, @3);
 
         SystemArgsNode *sysArgs = new SystemArgsNode(valueObj, curScope);
+        $$ = sysArgs;
+    }
+    |
+    TOKSYSARGS {
+        SystemArgsNode *sysArgs = new SystemArgsNode(nullptr, curScope);
         $$ = sysArgs;
     }
     ;

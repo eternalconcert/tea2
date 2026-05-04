@@ -4,11 +4,14 @@ CPPSOURCES = $(shell find src/ -name "*.cpp")
 TEA_CXXFLAGS = -Wno-free-nonheap-object
 TEST_FILES = tests/tests_basics.t tests/tests_imports.t tests/tests_functions.t tests/tests_operations.t tests/tests_comparisons.t tests/tests_conditions.t tests/tests_loops.t tests/tests_precedence.t tests/tests_break_continue.t tests/tests_dicts.t tests/tests_json.t tests/tests_cast.t
 
-parser:
+init-code: stdlib/sys.t
+	bash generate_init_code.sh
+
+parser: init-code
 	lex src/patterns.l
 	bison -d -o y.tab.c src/grammar.y
 
-parser-mac:
+parser-mac: init-code
 	lex src/patterns.l
 	/opt/homebrew/opt/bison/bin/bison -d -o y.tab.c src/grammar.y
 
@@ -31,7 +34,7 @@ build-mac-test: parser-mac
 	clang++ $(TEA_CXXFLAGS) -std=c++17 -Wno-deprecated -Wno-switch lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea -D BUILDNO=$(BUILDNO) -D MACOS
 
 run-tests:
-	$(foreach test,$(TEST_FILES),./tea $(test);)
+	./tea common/testrunner.t
 
 coverage:
 	mkdir -p coverage

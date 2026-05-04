@@ -50,6 +50,21 @@ SystemArgsNode::SystemArgsNode(Value *indexValue, AstNode *scope) {
 
 
 AstNode* SystemArgsNode::evaluate() {
+    // If no indexValue provided, return the whole argv array as an array Value
+    if (this->indexValue == nullptr) {
+        System *sys = System::getSystem();
+        std::vector<Value*> vals;
+        for (int i = 0; i < sys->argc; i++) {
+            Value *v = new Value();
+            v->set(sys->args[i], this->location);
+            v->assigned = true;
+            vals.push_back(v);
+        }
+        this->value->set(vals, this->location);
+        this->value->assigned = true;
+        return this->getNext();
+    }
+
     int idx;
     switch (this->indexValue->type) {
         case INT:
@@ -454,15 +469,64 @@ AstNode* AssertNode::evaluate() {
 
 
 
-CastNode::CastNode(char* identifier, typeId typeName, AstNode* scope) {
-    this->identifier = identifier;
+CastNode::CastNode(AstNode* expr, typeId typeName, AstNode* scope) {
+    this->expr = expr;
     this->typeName = typeName;
     this->scope = scope;
     this->parent = scope;
 }
 
 AstNode* CastNode::evaluate() {
-    Value* value = getFromValueStore(this->scope, this->identifier, this->location);
+    // Evaluate the expression first
+    ExpressionNode *e = dynamic_cast<ExpressionNode*>(this->expr);
+    if (e == NULL) {
+        throw TypeError("Invalid expression for cast", this->location);
+    }
+
+    // If expression is a plain identifier literal (not yet evaluated), mutate stored variable directly
+    if (e->childListHead == NULL && e->value != NULL && e->value->type == IDENTIFIER) {
+        char *ident = e->value->identValue;
+        Value *storeVal = getFromValueStore(this->scope, ident, this->location);
+        if (storeVal == nullptr) {
+            throw UnknownIdentifierError(std::string("Unknown identifier: ") + ident, this->location);
+        }
+        // perform conversion on stored value
+        switch (this->typeName) {
+            case UNDEFINED:
+                break;
+            case INT:
+                storeVal->toInt(this->location);
+                break;
+            case FLOAT:
+                if (storeVal->getTrueType() != STR) {
+                    char *s = storeVal->toStr(this->location);
+                    float num = std::stof(s);
+                    storeVal->set(num, this->location);
+                } else {
+                    float num = std::stof(storeVal->stringValue);
+                    storeVal->set(num, this->location);
+                }
+                break;
+            case STR:
+                storeVal->toStr(this->location);
+                break;
+            case BOOL: {
+                bool b = (strcmp(storeVal->stringValue, "true") == 0 || strcmp(storeVal->stringValue, "1") == 0);
+                storeVal->set(b, this->location);
+                break;
+            }
+        }
+        this->value = new Value(*storeVal);
+        return this->getNext();
+    }
+
+    // Fallback: evaluate expression and work on its value (non-mutating)
+    e->evaluate();
+    Value* value = e->value;
+    // If it's an identifier, resolve it to the stored value pointer
+    if (value->type == IDENTIFIER) {
+        value = getFromValueStore(this->scope, value->identValue, this->location);
+    }
     switch (this->typeName) {
         case UNDEFINED:
             // Nichts zu tun oder Fehler werfen
@@ -474,8 +538,15 @@ AstNode* CastNode::evaluate() {
         }
 
         case FLOAT: {
-            float num = std::stof(value->stringValue);
-            value->set(num, this->location);
+            // Ensure we have a string representation
+            if (value->getTrueType() != STR) {
+                char *s = value->toStr(this->location);
+                float num = std::stof(s);
+                value->set(num, this->location);
+            } else {
+                float num = std::stof(value->stringValue);
+                value->set(num, this->location);
+            }
             break;
         }
 
@@ -490,6 +561,8 @@ AstNode* CastNode::evaluate() {
             break;
         }
     }
+    // Ensure this node's value is set to the (possibly converted) value
+    this->value = new Value(*value);
     return this->getNext();
 }
 

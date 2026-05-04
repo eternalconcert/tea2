@@ -153,10 +153,10 @@ public:
 class CastNode: public AstNode {
 public:
     AstNode *scope;
-    char *identifier;
+    AstNode *expr;
     typeId typeName;
     AstNode* evaluate();
-    CastNode(char *identifier, typeId typeName, AstNode *scope);
+    CastNode(AstNode *expr, typeId typeName, AstNode *scope);
 };
 
 
@@ -240,11 +240,12 @@ class VarDeclarationNode: public AstNode {
 public:
     typeId type;
     char *identifier;
+    bool variadic;
     AstNode *scope;
 
     AstNode* evaluate();
 
-    VarDeclarationNode(typeId type, char *identifier, AstNode *scope);
+    VarDeclarationNode(typeId type, char *identifier, AstNode *scope, bool variadic=false);
 };
 
 class VarAssignmentNode: public AstNode {

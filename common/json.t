@@ -323,11 +323,16 @@ dict fn _parseValue(str s, int i) {
     return _parseNumber(s, i);
 };
 
-export dict fn jsonParseAny(str s) {
+dict fn jsonParseAny(str s) {
     dict r = _parseValue(s, 0);
     int j = _skip(s, r["i"]);
     if (j != len(s)) {
         throw JsonError("trailing data at " + j);
     };
     return {"value": r["v"]};
+};
+
+export dict fn json(str s) {
+    dict container = jsonParseAny(s);
+    return container["value"];
 };

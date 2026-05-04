@@ -98,6 +98,32 @@ AstNode* FnCallNode::evaluate() {
     AstNode *actualParam = this->paramsHead;
     std::vector<Value *> boundArgs;
     while (formalParam != NULL && formalParam->type != UNDEFINED) {
+        // Variadic formal parameter: collect remaining actual params into an array
+        if (formalParam->variadic) {
+            std::vector<Value*> vargs;
+            AstNode *curActual = actualParam;
+            while (curActual != NULL) {
+                ExpressionNode *eval = (ExpressionNode*)curActual;
+                eval->evaluate();
+                Value *actualValue = eval->value;
+                if (actualValue->type == IDENTIFIER) {
+                    actualValue = getFromValueStore(this->scope, actualValue->identValue, this->location);
+                }
+                vargs.push_back(new Value(*actualValue));
+                curActual = curActual->getNext();
+            }
+
+            Value *arrayVal = new Value();
+            arrayVal->set(vargs, this->location);
+            arrayVal->assigned = true;
+            // push array as next bound arg (will be assigned after swapping value stores)
+            boundArgs.push_back(arrayVal);
+            // no more formal params to process
+            formalParam = (VarDeclarationNode*)formalParam->getNext();
+            actualParam = NULL;
+            break;
+        }
+
         if (actualParam == NULL) {
             throw ParameterError("Not enough arguments supplied");
         }

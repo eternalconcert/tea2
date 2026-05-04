@@ -1,5 +1,5 @@
 #!../tea
-import "../common/string.t";
+import "@common/string.t";
 import "lib/renderer.t";
 
 str version = replace(cmd("echo $BUILDER_RUN"), "\n", "");

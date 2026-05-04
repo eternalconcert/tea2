@@ -3,8 +3,7 @@ import "../common/json.t";
 
 str depsFile = "deps.json";
 
-dict depsJson = jsonParseAny(read(depsFile));
-dict depsValue = depsJson["value"];
+dict depsValue = json(read(depsFile));
 dict depsMap = depsValue["dependencies"];
 
 cmd("rm -rf teahouse");

@@ -30,10 +30,11 @@ AstNode* VarNode::evaluate() {
 };
 
 
-VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *scope) {
+VarDeclarationNode::VarDeclarationNode(typeId type, char *identifier, AstNode *scope, bool variadic) {
     this->type = type;
     this->scope = scope;
     this->identifier = identifier;
+    this->variadic = variadic;
     AstNode();
 };
 
