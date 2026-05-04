@@ -249,15 +249,6 @@ int main(int argc, char *argv[0]) {
         exit(1);
     }
 
-    std::string stdlibPath = resolveTeaPath("lib/common.t", std::filesystem::current_path().string());
-    if (!std::filesystem::exists(stdlibPath)) {
-        stdlibPath = resolveTeaPath("common/string.t", std::filesystem::current_path().string());
-    }
-    if (std::filesystem::exists(stdlibPath)) {
-        ImportNode *stdlibImport = new ImportNode(strdup(stdlibPath.c_str()), root, std::filesystem::current_path().string());
-        stdlibImport->evaluate();
-    }
-
     // Execute embedded init code from stdlib/sys.t
     if (INIT_CODE && strlen(INIT_CODE) > 0) {
         parseTeaSourceIntoScope(std::string(INIT_CODE), "<embedded-init>", root);

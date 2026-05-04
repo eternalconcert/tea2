@@ -100,6 +100,7 @@ LRC                                     return TOKLRC;
 <string>[^\\"\n]*                       { strbuf += yytext; }
 <string>\\n                             { strbuf += '\n'; }
 <string>\\t                             { strbuf += '\t'; }
+<string>\\r                             { strbuf += '\r'; }
 <string>\\[\\"]                         { strbuf += yytext[1]; }
 <string>\n                              { strbuf += '\n'; }
 <string>\"                              { yylval.sval = strdup(strbuf.c_str()); BEGIN 0; return TOKSTRING; }

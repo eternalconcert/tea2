@@ -1,7 +1,5 @@
 int testCount = 0;
 
-import "../common/json.t";
-
 void fn test_object_and_array() {
     dict v = json("{\"a\":1,\"b\":\"x\",\"c\":[],\"d\":{\"k\":2}}");
     assert(v["a"], 1);
