@@ -42,6 +42,9 @@ struct TeaLocation {
     #include <map>
     #include <set>
     #include <sstream>
+    #include <iostream>
+    #include <cctype>
+    #include <unistd.h>
     #include <vector>
     #include "src/init_code.h"
 
@@ -213,9 +216,10 @@ struct TeaLocation {
         exit(1);
     }
 
-int main(int argc, char *argv[0]) {
+int main(int argc, char **argv) {
     std::string mainSource;
     std::string mainSourceName;
+    int scriptIndex = -1;
 
     if (argc <= 1) {
         printf("%s\n", "No file or command specified");
@@ -225,6 +229,7 @@ int main(int argc, char *argv[0]) {
     else if (argc >= 3 and !strcmp(argv[1], "-c")) {
         mainSource = argv[2];
         mainSourceName = std::filesystem::current_path().string() + "/<command>";
+        scriptIndex = -2;
     }
 
     else if (argc == 2 and !strcmp(argv[1], "-v")) {
@@ -233,20 +238,83 @@ int main(int argc, char *argv[0]) {
     }
 
     else if (argc >= 2) {
-        mainSourceName = resolveTeaPath(argv[1], std::filesystem::current_path().string());
-        std::ifstream inFile(mainSourceName);
-        if (!inFile) {
-            printf("tea: /%s: No such file or directory\n", argv[1]);
-            exit(1);
+        int i = 1;
+        while (i < argc && argv[i] != nullptr && argv[i][0] == '-'
+               && strcmp(argv[i], "-c") != 0) {
+            /* Do not treat deps.json (etc.) as the script after -i / --install. */
+            if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--install")) {
+                i++;
+                if (i < argc && argv[i] != nullptr && argv[i][0] != '-') {
+                    i++;
+                }
+                continue;
+            }
+            i++;
         }
-        std::stringstream buffer;
-        buffer << inFile.rdbuf();
-        mainSource = buffer.str();
+        if (i >= argc) {
+            mainSourceName = std::filesystem::current_path().string() + "/<stdin>";
+            if (isatty(STDIN_FILENO)) {
+                /* Interactive terminal: do not block on stdin; run stdlib startup(). */
+                mainSource = "startup();";
+            } else {
+                std::stringstream buffer;
+                buffer << std::cin.rdbuf();
+                mainSource = buffer.str();
+                bool stdinEmpty = true;
+                for (char c : mainSource) {
+                    if (!std::isspace(static_cast<unsigned char>(c))) {
+                        stdinEmpty = false;
+                        break;
+                    }
+                }
+                if (stdinEmpty) {
+                    mainSource = "startup();";
+                }
+            }
+            scriptIndex = -1;
+        } else {
+            scriptIndex = i;
+            mainSourceName = resolveTeaPath(argv[scriptIndex],
+                                            std::filesystem::current_path().string());
+            std::ifstream inFile(mainSourceName);
+            if (!inFile) {
+                printf("tea: /%s: No such file or directory\n", argv[scriptIndex]);
+                exit(1);
+            }
+            std::stringstream buffer;
+            buffer << inFile.rdbuf();
+            mainSource = buffer.str();
+        }
     }
 
     else {
         printf("tea: Problem during startup\n");
         exit(1);
+    }
+
+    std::vector<char *> teaArgv;
+    teaArgv.push_back(argv[0]);
+    if (scriptIndex == -2) {
+        teaArgv.push_back(const_cast<char *>(mainSourceName.c_str()));
+        for (int j = 3; j < argc; j++) {
+            if (argv[j] != nullptr) {
+                teaArgv.push_back(argv[j]);
+            }
+        }
+    } else if (scriptIndex == -1) {
+        teaArgv.push_back(const_cast<char *>(mainSourceName.c_str()));
+        for (int j = 1; j < argc; j++) {
+            if (argv[j] != nullptr) {
+                teaArgv.push_back(argv[j]);
+            }
+        }
+    } else {
+        teaArgv.push_back(argv[scriptIndex]);
+        for (int j = 1; j < argc; j++) {
+            if (j != scriptIndex && argv[j] != nullptr) {
+                teaArgv.push_back(argv[j]);
+            }
+        }
     }
 
     // Execute embedded init code from stdlib/sys.t
@@ -255,7 +323,7 @@ int main(int argc, char *argv[0]) {
     }
 
     parseTeaSourceIntoScope(mainSource, mainSourceName, root);
-    root->init(argc, argv);
+    root->init((int)teaArgv.size(), teaArgv.data());
 }
 
 %}

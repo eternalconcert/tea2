@@ -5,7 +5,6 @@ void fn print(...arguments) {
     return sysprint("\n");
 };
 
-
 str fn _jc(str s, int i) {
     return s[i];
 };
@@ -342,6 +341,56 @@ export dict fn json(str s) {
     return container["value"];
 };
 
+export str fn getSubstring(str invalue, int startIndex, int endIndex) {
+  str result = "";
+  int i = startIndex;
+  while (i < endIndex) {
+    result = result + invalue[i];
+    i = i + 1;
+  };
+  return result;
+};
+
+
+export str fn replace(str invalue, str pattern, str replacement) {
+    array startIndexes = find(invalue, pattern);
+    int numberOfMatches = len(startIndexes);
+    int i = 0;
+    int offset = 0;
+    while (i < numberOfMatches) {
+      int startIndex = startIndexes[i] + offset;
+      int endIndex = startIndex + len(pattern);
+      str before = getSubstring(invalue, 0, startIndex);
+      str after = getSubstring(invalue, endIndex, len(invalue));
+      invalue = before + replacement + after;
+      offset = offset + len(replacement) - len(pattern);
+      i = i + 1;
+    };
+    return invalue;
+};
+
+
+export str fn replaceMany(str invalue, array patterns, array replacements) {
+    int numberOfPatterns = len(patterns);
+    int numberOfReplacements = len(replacements);
+
+    if (numberOfPatterns != numberOfReplacements) {
+      str message = replace(
+          replace("Number of patterns (%numberOfPatterns%) and replacements (%numberOfReplacements%) must be equal.", "%numberOfPatterns%", "" + numberOfPatterns),
+          "%numberOfReplacements%", "" + numberOfReplacements
+       );
+       throw StringError(message);
+    };
+
+    int i = 0;
+    while (i < numberOfPatterns) {
+      invalue = replace(invalue, patterns[i], replacements[i]);
+      i = i + 1;
+    };
+    return invalue;
+};
+
+
 void fn installDeps(str depsFile) {
   dict depsValue = json(read(depsFile));
   dict depsMap = depsValue["dependencies"];
@@ -354,8 +403,28 @@ void fn installDeps(str depsFile) {
       str depName = depNames[i];
       dict depInfo = depsMap[depName];
       str depOrigin = depInfo["origin"];
-      str command = "cp -r " + depOrigin + " " + "teahouse/" + depName;
-      cmd(command);
+      if (len(split(depOrigin, "://")) > 1) {
+        str command = "wget " + depOrigin + " -O " + "teahouse/" + depName + ".t";
+        cmd(command);
+      } else {
+        str command = "cp -r " + depOrigin + " " + "teahouse/" + depName;
+        cmd(command);
+      };
       print("Installed dependency: ", depName);
   };
+};
+
+void fn startup() {
+    str arg2 = SYSARGS[2];
+    if (arg2 == "-h" or arg2 == "--help") {
+        print("help is on the way..");
+    };
+    if (arg2 == "-i" or arg2 == "--install") {
+        str depsFile = "deps.json";
+        if (len(SYSARGS) > 3) {
+            depsFile = SYSARGS[3];
+        };
+        print("Installing dependencies from ", depsFile);
+        installDeps(depsFile);
+    };
 };

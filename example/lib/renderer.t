@@ -1,4 +1,3 @@
-import "@common/string.t";
 import "@common/iterable.t";
 
 export str fn render(str template, dict context, array includes) {
