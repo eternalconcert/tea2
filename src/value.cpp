@@ -8,8 +8,13 @@
 
 static char* copyString(const std::string &value) {
     char *copy = new char[value.size() + 1];
-    strcpy(copy, value.c_str());
+    memcpy(copy, value.data(), value.size());
+    copy[value.size()] = '\0';
     return copy;
+}
+
+static std::string valueString(Value *value) {
+    return std::string(value->stringValue, value->stringLength);
 }
 
 Value *copyValueDeep(const Value *src) {
@@ -23,7 +28,8 @@ Value *copyValueDeep(const Value *src) {
         case STR:
             n->type = STR;
             n->boolValue = src->boolValue;
-            n->stringValue = src->stringValue ? copyString(std::string(src->stringValue)) : nullptr;
+            n->stringLength = src->stringLength;
+            n->stringValue = src->stringValue ? copyString(std::string(src->stringValue, src->stringLength)) : nullptr;
             return n;
         case INT:
             n->set(src->intValue, src->location);
@@ -69,7 +75,9 @@ Value *copyValueDeep(const Value *src) {
 
 static void reprArrayItem(Value *value) {
     if (value->getTrueType() == STR) {
-        printf("\"%s\"", value->stringValue);
+        printf("\"");
+        fwrite(value->stringValue, 1, value->stringLength, stdout);
+        printf("\"");
         return;
     }
 
@@ -78,7 +86,9 @@ static void reprArrayItem(Value *value) {
 
 static void reprDictItem(Value *value) {
     if (value->getTrueType() == STR) {
-        printf("\"%s\"", value->stringValue);
+        printf("\"");
+        fwrite(value->stringValue, 1, value->stringLength, stdout);
+        printf("\"");
         return;
     }
 
@@ -94,8 +104,17 @@ void Value::set(typeId type, YYLTYPE location) {
 void Value::set(char *value, YYLTYPE location) {
     this->type = STR;
     this->location = location;
-    this->boolValue = strlen(value) > 0;
+    this->stringLength = strlen(value);
+    this->boolValue = this->stringLength > 0;
     this->stringValue = value;
+};
+
+void Value::set(const std::string &value, YYLTYPE location) {
+    this->type = STR;
+    this->location = location;
+    this->stringLength = value.size();
+    this->boolValue = this->stringLength > 0;
+    this->stringValue = copyString(value);
 };
 
 void Value::set(int value, YYLTYPE location) {
@@ -172,9 +191,8 @@ char* Value::toStr(YYLTYPE location) {
     switch (this->type) {
         case INT:
             std::string temp = std::to_string(this->intValue);
-            str = new char[temp.size() + 1];
-            strcpy(str, temp.c_str());
-            this->set(str, location);
+            this->set(temp, location);
+            str = this->stringValue;
             this->type = STR;
             break;
     }
@@ -185,7 +203,7 @@ char* Value::toStr(YYLTYPE location) {
 void Value::repr() {
     switch (this->type) {
         case STR:
-            printf("%s", this->stringValue);
+            fwrite(this->stringValue, 1, this->stringLength, stdout);
             break;
         case INT:
             printf("%i", this->intValue);
@@ -252,8 +270,7 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
         // 1 + "A" = "1A"
         std::string tempStr = std::to_string(lVal.intValue);
-        char* cStr = copyString(tempStr + rVal->stringValue);
-        nVal->set(cStr, lVal.location);
+        nVal->set(tempStr + valueString(rVal), lVal.location);
     }
 
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
@@ -269,28 +286,24 @@ Value* operator+(Value &lVal, Value *rVal) {
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
         // 1.0 + "A" = "1.0A"
         std::string tempStr = std::to_string(lVal.floatValue);
-        char* cStr = copyString(tempStr + rVal->stringValue);
-        nVal->set(cStr, lVal.location);
+        nVal->set(tempStr + valueString(rVal), lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "A" + 1 = "A1"
         std::string tempStr = std::to_string(rVal->intValue);
-        char* cStr = copyString(std::string(lVal.stringValue) + tempStr);
-        nVal->set(cStr, lVal.location);
+        nVal->set(valueString(&lVal) + tempStr, lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
         // "A" + 1.0 = "A1.0"
         std::string tempStr = std::to_string(rVal->floatValue);
-        char* cStr = copyString(std::string(lVal.stringValue) + tempStr);
-        nVal->set(cStr, lVal.location);
+        nVal->set(valueString(&lVal) + tempStr, lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
         // "A" + "B" = "AB"
-        char* cStr = copyString(std::string(lVal.stringValue) + rVal->stringValue);
-        nVal->set(cStr, lVal.location);
+        nVal->set(valueString(&lVal) + valueString(rVal), lVal.location);
     }
 
     if (lVal.getTrueType() == BOOL or rVal->getTrueType() == BOOL) {
@@ -337,15 +350,9 @@ Value* operator-(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "Hello" - 1 = "Hell"
-        if(strlen(lVal.stringValue) <= rVal->intValue) {
-            for (int i = 0; i <= strlen(lVal.stringValue); i++) {
-                lVal.stringValue[i] = 0;
-            }
-        }
-        else {
-            lVal.stringValue[strlen(lVal.stringValue) - rVal->intValue] = 0;
-        }
-            nVal->set(lVal.stringValue, lVal.location);
+        size_t removeCount = rVal->intValue < 0 ? 0 : (size_t)rVal->intValue;
+        size_t newLength = removeCount >= lVal.stringLength ? 0 : lVal.stringLength - removeCount;
+        nVal->set(std::string(lVal.stringValue, newLength), lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
@@ -385,10 +392,9 @@ Value* operator*(Value &lVal, Value *rVal) {
         std::string repeated;
 
         for (int i=0; i < lVal.intValue; i++) {
-            repeated += rVal->stringValue;
+            repeated += valueString(rVal);
         }
-        char* cStr = copyString(repeated);
-        nVal->set(cStr, lVal.location);
+        nVal->set(repeated, lVal.location);
     }
 
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == INT) {
@@ -411,10 +417,9 @@ Value* operator*(Value &lVal, Value *rVal) {
         std::string repeated;
 
         for (int i=0; i < rVal->intValue; i++) {
-            repeated += lVal.stringValue;
+            repeated += valueString(&lVal);
         }
-        char* cStr = copyString(repeated);
-        nVal->set(cStr, lVal.location);
+        nVal->set(repeated, lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
@@ -470,9 +475,11 @@ Value* operator/(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "Hello" / 2 = "Hel"
-
-        lVal.stringValue[(strlen(lVal.stringValue) / rVal->intValue) + 1] = 0;
-        nVal->set(lVal.stringValue, lVal.location);
+        size_t newLength = (lVal.stringLength / rVal->intValue) + 1;
+        if (newLength > lVal.stringLength) {
+            newLength = lVal.stringLength;
+        }
+        nVal->set(std::string(lVal.stringValue, newLength), lVal.location);
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
@@ -577,7 +584,7 @@ Value* operator==(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
         // "A" == "A" = true
-        nVal->set((strcmp(lVal.stringValue, rVal->stringValue) == 0), lVal.location);
+        nVal->set(lVal.stringLength == rVal->stringLength && memcmp(lVal.stringValue, rVal->stringValue, lVal.stringLength) == 0, lVal.location);
         return nVal;
     }
 
@@ -654,7 +661,7 @@ Value* operator>(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == INT and rVal->getTrueType() == STR) {
         // 1 > "AA" = false
-        nVal->set(lVal.intValue > strlen(rVal->stringValue), lVal.location);
+        nVal->set(lVal.intValue > rVal->stringLength, lVal.location);
         return nVal;
     }
 
@@ -672,25 +679,25 @@ Value* operator>(Value &lVal, Value *rVal) {
 
     if (lVal.getTrueType() == FLOAT and rVal->getTrueType() == STR) {
         // 2.0 > "A" = true
-        nVal->set(lVal.floatValue > strlen(rVal->stringValue), lVal.location);
+        nVal->set(lVal.floatValue > rVal->stringLength, lVal.location);
         return nVal;
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == INT) {
         // "A" > 3 = false
-        nVal->set(strlen(lVal.stringValue) > rVal->intValue, lVal.location);
+        nVal->set(lVal.stringLength > rVal->intValue, lVal.location);
         return nVal;
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == FLOAT) {
         // "A" > 3.0 = false
-        nVal->set(strlen(lVal.stringValue) > rVal->floatValue, lVal.location);
+        nVal->set(lVal.stringLength > rVal->floatValue, lVal.location);
         return nVal;
     }
 
     if (lVal.getTrueType() == STR and rVal->getTrueType() == STR) {
         // "AB" > "C" = true
-        nVal->set(strlen(lVal.stringValue) > strlen(rVal->stringValue), lVal.location);
+        nVal->set(lVal.stringLength > rVal->stringLength, lVal.location);
         return nVal;
     }
 

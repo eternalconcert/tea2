@@ -155,6 +155,18 @@ void fn test_str_index_in_expression() {
     testCount = testCount + 1;
 };
 
+void fn test_nested_index() {
+    array nested = [1, 2, ["Hello", "World"]];
+    assert(nested[2][0], "Hello");
+
+    dict wrapped = {"items": ["tea", "cup"]};
+    assert(wrapped["items"][1], "cup");
+
+    str word = nested[2][1];
+    assert(word[0], "W");
+    testCount = testCount + 1;
+};
+
 void fn test_str_find() {
     assert(find("hello hello", "lo"), [3, 9]);
     assert(find("hello", "x"), []);
@@ -208,6 +220,7 @@ test_write_file_ident();
 test_split();
 test_str_index();
 test_str_index_in_expression();
+test_nested_index();
 test_str_find();
 test_str_len();
 test_system_exec_success(); // Causes succeeding tests to fail

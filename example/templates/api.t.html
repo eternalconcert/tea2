@@ -1,6 +1,6 @@
-%templates/header.t.html%
-<h1>%title%</h1>
-
+{%extends templates/_base.t.html%}
+<h1>{%block title%}API{%endblock%}</h1>
+{%block content%}
 <p>
   Quick reference for the <strong>Tea</strong> language: syntax, built-ins, and core constructs.
   Tea is meant for small scripts and automation, not as a full “full-stack” language.
@@ -21,7 +21,7 @@
 <h3>Keywords</h3>
 <p>
   Control flow: <code>if</code>, <code>else</code>, <code>for</code>, <code>while</code>, <code>return</code>, <code>fn</code>,
-  <code>import</code>, <code>export</code>, <code>throw</code>.
+  <code>break</code>, <code>continue</code>, <code>import</code>, <code>export</code>, <code>throw</code>.
   Booleans: <code>true</code>, <code>false</code>.
 </p>
 
@@ -62,7 +62,7 @@ dict d = {name: "tea", year: 2026};</pre>
 <h3>Variables and functions</h3>
 <p>
   Declare with a type and optional initializer; functions use <code>fn</code>, return type before the name, or
-  <code>void</code> when there is no return value.
+  <code>void</code> when there is no return value. Variadic functions use <code>...name</code>.
 </p>
 <pre>int x;
 x = 1;
@@ -73,6 +73,10 @@ int fn add(int a, int b) {
 
 void fn greet(str name) {
     print("Hello, " + name);
+};
+
+void fn log(...parts) {
+    print(parts);
 };</pre>
 
 <h3>Operators</h3>
@@ -93,12 +97,26 @@ void fn greet(str name) {
 
 <h4>Loops</h4>
 <pre>for (int i = 0; i &lt; len(xs); i = i + 1) {
+    if (i == 10) {
+        break;
+    };
     print(xs[i]);
 };
 
 while (n &gt; 0) {
     n = n - 1;
 };</pre>
+
+<h3>Indexing</h3>
+<p>
+  Arrays and strings use integer indexes; dictionaries use keys. Indexing can be nested.
+</p>
+<pre>array xs = ["tea", "cup"];
+dict page = {title: "Home", tags: xs};
+
+print(xs[0]);              // tea
+print(page["tags"][1]);    // cup
+print("tea"[0]);           // t</pre>
 
 <h2>Built-ins and I/O</h2>
 <p>The runtime provides, among others:</p>
@@ -112,14 +130,50 @@ while (n &gt; 0) {
   <li><code>split(str, delimiter)</code>, <code>find(str, pattern)</code> — string helpers</li>
   <li><code>dictKeys(dict)</code> — returns an array of keys (as strings)</li>
   <li><code>dictValues(dict)</code> — returns an array of values</li>
+  <li><code>json(str)</code> — parse JSON strings; objects become dicts, arrays become arrays, and <code>null</code> becomes an empty dict</li>
   <li><code>sleep(seconds)</code>, <code>quit()</code>, <code>assert(actual, expected[, "message"])</code></li>
   <li><code>cast(…)</code> — type conversion</li>
   <li><code>SYSARGS</code>, <code>LRC</code> — command-line args and last return code (see interpreter docs)</li>
 </ul>
 
+<h3>HTTP client</h3>
 <p>
-  More helpers can be pulled in via <code>import</code> from libraries (e.g. <code>common/string.t</code> with
+  <code>http</code> sends plain <code>http://</code> requests and returns a dictionary with
+  <code>status</code>, <code>body</code>, <code>headers</code>, and <code>error</code>.
+  Convenience wrappers are available as <code>request</code>, <code>get</code>, <code>post</code>,
+  <code>put</code>, <code>patch</code>, and <code>delete</code>.
+</p>
+<pre>dict response = get("http://127.0.0.1:8080/hello");
+assert(response["status"], 200);
+
+dict created = post("http://127.0.0.1:8080/items", "{\"ok\":true}");
+dict payload = json(created["body"]);
+
+dict custom = http({
+    method: "PUT",
+    url: "http://127.0.0.1:8080/items/1",
+    headers: {"Content-Type": "application/json"},
+    body: "{\"name\":\"tea\"}"
+});</pre>
+
+<h3>HTTP server</h3>
+<p>
+  <code>serve</code> starts a simple HTTP server. The handler receives a request dict
+  (<code>method</code>, <code>path</code>, <code>query</code>, <code>body</code>, <code>headers</code>)
+  and returns a response dict (<code>status</code>, <code>headers</code>, <code>body</code>).
+</p>
+<pre>dict fn app(dict req) {
+    return {
+        status: 200,
+        headers: {"Content-Type": "text/plain"},
+        body: "hello from tea"
+    };
+};
+
+serve({port: 8080, handler: app});</pre>
+
+<p>
+  More helpers can be pulled in via <code>import</code> from libraries (for example <code>common/string.t</code> with
   <code>replace</code>, <code>replaceMany</code>, and so on).
 </p>
-
-%templates/footer.t.html%
+{%endblock%}

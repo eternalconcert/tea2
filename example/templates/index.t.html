@@ -1,9 +1,10 @@
-%templates/header.t.html%
-<h1>%title%</h1>
-
+{%extends templates/_base.t.html%}
+<h1>{%block title%}The Tea Programming Language{%endblock%}</h1>
+{%block content%}
 <p>
   <strong>Tea</strong> is a small, imperative scripting language: C-like syntax, explicit types,
-  functions, arrays, and a set of built-ins for I/O, strings, and shell integration.
+  functions, arrays, dictionaries, and built-ins for I/O, strings, shell integration, JSON,
+  and simple HTTP client/server workflows.
   It is a good fit for quick automation, tiny tools, and teaching—not a replacement for a large
   general-purpose ecosystem.
 </p>
@@ -12,6 +13,7 @@
 <ul>
   <li>Single binary interpreter, straightforward grammar</li>
   <li>Call shell commands with <code>cmd(...)</code>, read files with <code>read</code>/<code>write</code></li>
+  <li>Parse JSON with <code>json(...)</code> and talk to HTTP services with <code>get</code>/<code>post</code>/<code>serve</code></li>
   <li>Split code across files with <code>import</code> and <code>export</code></li>
   <li>Enough structure (types, functions, control flow) to grow beyond one-off bash snippets</li>
 </ul>
@@ -30,7 +32,6 @@ print(greeting);</pre>
   For build instructions and more examples, see the project <code>README.md</code> in the Tea2 repository.
 </p>
 <p>
-  Site generator version: <strong>%version%</strong> (built <time>%build_date%</time>).
+  Site generator version: <strong>{%version%}</strong> (built <time>{%build_date%}</time>).
 </p>
-
-%templates/footer.t.html%
+{%endblock%}

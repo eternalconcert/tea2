@@ -1,6 +1,6 @@
-%templates/header.t.html%
-<h1>%title%</h1>
-
+{%extends templates/_base.t.html%}
+<h1>{%block title%}About{%endblock%}</h1>
+{%block content%}
 <p>
   This page is part of the <strong>Tea2</strong> project: an implementation of the Tea programming language
   (lexer, parser, runtime) maintained as open source. The language is deliberately small so the whole
@@ -17,8 +17,9 @@
 <h2>This website</h2>
 <p>
   These HTML pages are not hand-written: they are produced by a tiny Tea program under <code>example/</code>
-  that loads templates, substitutes placeholders (title, version, build date), and writes static files into
-  <code>example/build/</code>. Styling lives in <code>templates/static/main.css</code>.
+  that serves the templates over Tea's built-in HTTP server, substitutes placeholders (title, version,
+  build date), and can write static files into <code>example/build/</code>. Styling lives in
+  <code>templates/static/main.css</code>.
 </p>
 <p>
   If you are reading the generated output, the build metadata in the page header reflects how that snapshot
@@ -31,4 +32,4 @@
   keep the language behavior stable as the grammar and builtins evolve.
 </p>
 
-%templates/footer.t.html%
+{%endblock%}

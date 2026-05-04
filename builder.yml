@@ -3,28 +3,27 @@ image: docker.softcreate.de/eternalconcert/builder-default
 stages:
   - name: build
     run: |
+      set -e
       export DEBIAN_FRONTEND=noninteractive
       apt-get update
       apt-get install -y --no-install-recommends g++ flex bison
       lex src/patterns.l
       bison -d -o y.tab.c src/grammar.y
       g++ -Wno-free-nonheap-object lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static -D BUILDNO=$BUILDER_RUN
-      ./tea tests/tests_basics.t
-      ./tea tests/tests_cast.t
-      ./tea tests/tests_comparisons.t
-      ./tea tests/tests_conditions.t
-      ./tea tests/tests_functions.t
-      ./tea tests/tests_imports.t
-      ./tea tests/tests_teahouse_imports.t
-      ./tea tests/tests_loops.t
-      ./tea tests/tests_operations.t
+      ./tea common/testrunner.t --skip=tests/tests_http.t
       cp tea /out/
   - name: build-website
     run: |
-      cp /out/tea tea
+      cp /out/tea tea.bin
+      cp /out/tea example/templates/static/tea.bin
       cd example
-      ./install.deps.t
-      mkdir -p build/static
-      ./app.t
-      tar -czvf build.tar.gz build
-      cp build.tar.gz /out/build.tar.gz
+      docker login docker.softcreate.de --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+      export DEBIAN_FRONTEND=noninteractive
+      docker build --build-arg BUILD_NO=$BUILDER_RUN -f ../Dockerfile .. -t docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN
+      docker tag docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN
+      docker tag docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN docker.softcreate.de/eternalconcert/tea2:latest
+      docker push docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN
+      docker push docker.softcreate.de/eternalconcert/tea2:latest
+    env:
+      DOCKER_USERNAME: ${DOCKER_USERNAME}
+      DOCKER_PASSWORD: ${DOCKER_PASSWORD}

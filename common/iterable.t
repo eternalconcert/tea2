@@ -7,3 +7,12 @@ export array fn dictItems(dict dictionaies) {
   };
   return items;
 };
+
+export array fn arrayContains(array arrayToCheck, str item) {
+  for (int i = 0; i < len(arrayToCheck); i = i + 1) {
+    if (arrayToCheck[i] == item) {
+      return true;
+    };
+  };
+  return false;
+};

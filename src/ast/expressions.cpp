@@ -67,13 +67,18 @@ AstNode* DictLiteralNode::evaluate() {
     return this->getNext();
 };
 
-ArrayIndexNode::ArrayIndexNode(char *identifier, AstNode *indexExpression, AstNode *scope) : ExpressionNode(scope) {
-    this->identifier = identifier;
+ArrayIndexNode::ArrayIndexNode(AstNode *indexedExpression, AstNode *indexExpression, AstNode *scope) : ExpressionNode(scope) {
+    this->indexedExpression = indexedExpression;
     this->indexExpression = indexExpression;
 };
 
 AstNode* ArrayIndexNode::evaluate() {
-    Value *indexedValue = getFromValueStore(this->scope, this->identifier, this->location);
+    ExpressionNode *indexedEval = (ExpressionNode*)this->indexedExpression;
+    indexedEval->evaluate();
+    Value *indexedValue = indexedEval->value;
+    if (indexedValue->type == IDENTIFIER) {
+        indexedValue = getFromValueStore(this->scope, indexedValue->identValue, this->location);
+    }
 
     ExpressionNode *indexEval = (ExpressionNode*)this->indexExpression;
     indexEval->evaluate();
@@ -104,14 +109,11 @@ AstNode* ArrayIndexNode::evaluate() {
             throw TypeError("String index must be an int", this->location);
         }
         int index = indexValue->intValue;
-        if (index < 0 || index >= strlen(indexedValue->stringValue)) {
+        if (index < 0 || index >= indexedValue->stringLength) {
             throw TypeError("String index out of range", this->location);
         }
 
-        char *character = new char[2];
-        character[0] = indexedValue->stringValue[index];
-        character[1] = '\0';
-        this->value->set(character, this->location);
+        this->value->set(std::string(indexedValue->stringValue + index, 1), this->location);
         if (this->childListHead != NULL && this->childListHead != this) {
             this->initialValue = new Value(*this->value);
             return ExpressionNode::evaluate();
@@ -212,7 +214,7 @@ AstNode* ExpressionNode::evaluate() {
 
         Value *rVal = NULL;
         if (!shortCircuit) {
-            if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<DictLiteralNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL || dynamic_cast<KeysNode*>(cur) != NULL || dynamic_cast<ValuesNode*>(cur) != NULL) {
+            if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<DictLiteralNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL || dynamic_cast<KeysNode*>(cur) != NULL || dynamic_cast<ValuesNode*>(cur) != NULL || dynamic_cast<HttpNode*>(cur) != NULL || dynamic_cast<ServeNode*>(cur) != NULL) {
                 cur->evaluate();
                 rVal = cur->value;
             } else if (dynamic_cast<FnCallNode*>(cur) != NULL) {

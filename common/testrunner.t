@@ -1,10 +1,30 @@
+import "iterable.t";
+
+array fn skippedTests() {
+    for (int i = 0; i < len(SYSARGS); i = i + 1) {
+        str arg = SYSARGS[i];
+        if (split(arg, "=")[0] == "--skip") {
+            return split(split(arg, "=")[1], ",");
+        };
+    };
+    return [];
+};
+
+
 array fn findTests() {
+    array skipped = skippedTests();
+    if (len(skipped) > 0) {
+        print("Skipping testfiles: ", skipped, "\n");
+    };
+
     str lsOutput = cmd("ls -1 tests/*.t");
     array files = split(lsOutput, "\n");
     array testFiles = [];
     for (int i = 0; i < len(files); i = i + 1) {
         if (len(files[i]) > 0) {
-            testFiles[len(testFiles)] = files[i];
+            if (arrayContains(skipped, files[i]) == false) {
+                testFiles[len(testFiles)] = files[i];
+            };
         };
     };
     return testFiles;

@@ -1,5 +1,6 @@
 #ifndef VALUE_H
 #define VALUE_H
+#include <cstddef>
 #include <map>
 #include <string>
 #include <vector>
@@ -20,6 +21,7 @@ public:
     int intValue;
     float floatValue;
     char *stringValue;
+    size_t stringLength = 0;
     std::vector<Value*> arrayValue;
     std::map<std::string, Value*> dictValue;
     bool boolValue;
@@ -29,6 +31,7 @@ public:
 
     void set(typeId type, YYLTYPE location);  // Set emp, YYLTYPE locationty
     void set(char *value, YYLTYPE location);
+    void set(const std::string &value, YYLTYPE location);
     void set(int value, YYLTYPE location);
     void set(float value, YYLTYPE location);
     void set(bool value, YYLTYPE location);

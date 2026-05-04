@@ -2,6 +2,9 @@
   "dependencies": {
     "common": {
       "origin": "../common/"
+    },
+    "from_internet": {
+      "origin": "https://raw.githubusercontent.com/eternalconcert/tea2/refs/heads/master/example.t"
     }
   }
 }
