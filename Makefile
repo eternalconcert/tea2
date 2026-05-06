@@ -16,6 +16,9 @@ parser-mac: init-code
 	/opt/homebrew/opt/bison/bin/bison -d -o y.tab.c src/grammar.y
 
 tea: clean parser
+	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea -D BUILDNO=$(BUILDNO)
+
+static-tea: clean parser
 	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -o tea --static -D BUILDNO=$(BUILDNO)
 
 mac-tea: clean parser-mac
@@ -28,7 +31,7 @@ mac-test: clean build-mac-test run-tests coverage
 	@echo "Mac test coverage completed"
 
 build-test: parser
-	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea --static -D BUILDNO=$(BUILDNO)
+	g++ $(TEA_CXXFLAGS) lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea -D BUILDNO=$(BUILDNO)
 
 build-mac-test: parser-mac
 	clang++ $(TEA_CXXFLAGS) -std=c++17 -Wno-deprecated -Wno-switch lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea -D BUILDNO=$(BUILDNO) -D MACOS
@@ -64,4 +67,4 @@ robot-test:
 	pythonenv/bin/robot robottests
 	./tea tests/tests.t
 
-.PHONY: tea parser parser-mac mac-tea test mac-test build-test build-mac-test run-tests coverage clean robot-test run
+.PHONY: tea static-tea parser parser-mac mac-tea test mac-test build-test build-mac-test run-tests coverage clean robot-test run

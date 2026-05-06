@@ -80,6 +80,8 @@ find                                    return TOKFIND;
 len                                     return TOKLEN;
 dictKeys                                return TOKDICTKEYS;
 dictValues                              return TOKDICTVALUES;
+http                                    return TOKHTTP;
+serve                                   return TOKSERVE;
 sleep                                   return TOKSLEEP;
 quit                                    return TOKQUIT;
 assert                                  return TOKASSERT;

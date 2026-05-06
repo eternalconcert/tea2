@@ -340,7 +340,7 @@ int main(int argc, char **argv) {
 
 
 %token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKBREAK TOKCONTINUE TOKIMPORT TOKEXPORT TOKTHROW
-%token TOKSYSPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES TOKELLIPSIS
+%token TOKSYSPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES TOKHTTP TOKSERVE TOKELLIPSIS
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -356,7 +356,7 @@ int main(int argc, char **argv) {
 %type <node> expression literal array_literal array_items dict_literal dict_items dict_item dict_key array_index fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt while_loop for_loop import_statement export_statement throw
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> sysprint out read write split find len dictKeys dictValues input quit sleep assert cmd sysargs lastrc cast
+%type <node> sysprint out read write split find len dictKeys dictValues http serve input quit sleep assert cmd sysargs lastrc cast
 %type <node> for_init for_condition for_post
 
 %start statements
@@ -578,7 +578,7 @@ expression:
     ;
 
 array_index:
-    TOKIDENT '[' expressions ']' {
+    expression '[' expressions ']' {
         ArrayIndexNode *arrayIndex = new ArrayIndexNode($1, $3, curScope);
         $$ = arrayIndex;
     }
@@ -895,6 +895,10 @@ builtin_function:  // Causes reduce/reduce conflict
     |
     dictValues
     |
+    http
+    |
+    serve
+    |
     input
     |
     quit
@@ -989,6 +993,20 @@ dictValues:
     TOKDICTVALUES '(' expressions ')' {
         ValuesNode *values = new ValuesNode($3, curScope);
         $$ = values;
+    }
+    ;
+
+http:
+    TOKHTTP '(' expressions ')' {
+        HttpNode *http = new HttpNode($3, curScope);
+        $$ = http;
+    }
+    ;
+
+serve:
+    TOKSERVE '(' expressions ')' {
+        ServeNode *serve = new ServeNode($3, curScope);
+        $$ = serve;
     }
     ;
 

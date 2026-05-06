@@ -199,6 +199,24 @@ public:
     ValuesNode(AstNode *dictExpression, AstNode *scope);
 };
 
+class HttpNode: public ExpressionNode {
+public:
+    AstNode *requestExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    HttpNode(AstNode *requestExpression, AstNode *scope);
+};
+
+class ServeNode: public ExpressionNode {
+public:
+    AstNode *configExpression;
+    AstNode *scope;
+
+    AstNode* evaluate();
+    ServeNode(AstNode *configExpression, AstNode *scope);
+};
+
 class ArrayLiteralNode: public ExpressionNode {
 public:
     AstNode *items;
@@ -217,11 +235,11 @@ public:
 
 class ArrayIndexNode: public ExpressionNode {
 public:
-    char *identifier;
+    AstNode *indexedExpression;
     AstNode *indexExpression;
 
     AstNode* evaluate();
-    ArrayIndexNode(char *identifier, AstNode *indexExpression, AstNode *scope);
+    ArrayIndexNode(AstNode *indexedExpression, AstNode *indexExpression, AstNode *scope);
 };
 
 class VarNode: public AstNode {

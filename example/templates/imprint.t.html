@@ -1,5 +1,6 @@
-%templates/header.t.html%
-<h1>%title%</h1>
+{%extends templates/_base.t.html%}
+<h1>{%block title%}Imprint{%endblock%}</h1>
+{%block content%}
 <p>
     The Tea Programming Language is a project by <a href="https://github.com/eternalconcert/tea2">Eternalconcert</a>.
 </p>
@@ -18,4 +19,4 @@
     Verbindung zu setzen. Für alle geschäftlichen Beziehungen und Kontakte gelten ausschließlich unsere AGB.
   </p>
 </p>
-%templates/footer.t.html%
+{%endblock%}

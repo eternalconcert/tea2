@@ -1,6 +1,6 @@
-%templates/header.t.html%
-<h1>%title%</h1>
-
+{%extends templates/_base.t.html%}
+<h1>{%block title%}About{%endblock%}</h1>
+{%block content%}
 <p>
   This page is part of the <strong>Tea2</strong> project: an implementation of the Tea programming language
   (lexer, parser, runtime) maintained as open source. The language is deliberately small so the whole
@@ -31,4 +31,4 @@
   keep the language behavior stable as the grammar and builtins evolve.
 </p>
 
-%templates/footer.t.html%
+{%endblock%}

@@ -8,7 +8,7 @@ stages:
       apt-get install -y --no-install-recommends g++ flex bison
       lex src/patterns.l
       bison -d -o y.tab.c src/grammar.y
-      g++ -Wno-free-nonheap-object lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static -D BUILDNO=$BUILDER_RUN
+      g++ -Wno-free-nonheap-object lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea -D BUILDNO=$BUILDER_RUN
       ./tea tests/tests_basics.t
       ./tea tests/tests_cast.t
       ./tea tests/tests_comparisons.t

@@ -1,6 +1,6 @@
-%templates/header.t.html%
-<h1>%title%</h1>
-
+{%extends templates/_base.t.html%}
+<h1>{%block title%}API{%endblock%}</h1>
+{%block content%}
 <p>
   Quick reference for the <strong>Tea</strong> language: syntax, built-ins, and core constructs.
   Tea is meant for small scripts and automation, not as a full “full-stack” language.
@@ -121,5 +121,4 @@ while (n &gt; 0) {
   More helpers can be pulled in via <code>import</code> from libraries (e.g. <code>common/string.t</code> with
   <code>replace</code>, <code>replaceMany</code>, and so on).
 </p>
-
-%templates/footer.t.html%
+{%endblock%}

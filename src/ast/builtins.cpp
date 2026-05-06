@@ -9,7 +9,8 @@
 
 static char* copyString(const std::string &value) {
     char *copy = new char[value.size() + 1];
-    strcpy(copy, value.c_str());
+    memcpy(copy, value.data(), value.size());
+    copy[value.size()] = '\0';
     return copy;
 }
 
@@ -163,7 +164,7 @@ ReadFileNode::ReadFileNode(Value *pathValue, AstNode *scope) {
 };
 
 std::string ReadFileNode::readFile(std::string path) {
-    std::ifstream file(path);
+    std::ifstream file(path, std::ios::binary);
 
     if (!file) {
         throw FileNotFoundException(path, this->location);
@@ -194,8 +195,7 @@ AstNode* ReadFileNode::evaluate() {
         default:
             throw TypeError("Unsupported type for read function", this->location);
     }
-    char* cStr = copyString(fromFile);
-    this->value->set(cStr, this->location);
+    this->value->set(fromFile, this->location);
     return this->getNext();
 };
 
@@ -222,12 +222,12 @@ AstNode* WriteFileNode::evaluate() {
         throw TypeError("Wrong type for write content", this->location);
     }
 
-    std::ofstream file(pathEval->value->stringValue);
+    std::ofstream file(pathEval->value->stringValue, std::ios::binary);
     if (!file) {
         throw SystemError("Could not open file for writing");
     }
 
-    file << contentEval->value->stringValue;
+    file.write(contentEval->value->stringValue, contentEval->value->stringLength);
     file.close();
     return this->getNext();
 };
@@ -254,8 +254,8 @@ AstNode* SplitNode::evaluate() {
         throw TypeError("Wrong type for split separator", this->location);
     }
 
-    std::string input = stringEval->value->stringValue;
-    std::string separator = separatorEval->value->stringValue;
+    std::string input(stringEval->value->stringValue, stringEval->value->stringLength);
+    std::string separator(separatorEval->value->stringValue, separatorEval->value->stringLength);
     if (separator.empty()) {
         throw TypeError("Split separator cannot be empty", this->location);
     }
@@ -266,14 +266,14 @@ AstNode* SplitNode::evaluate() {
 
     while (end != std::string::npos) {
         Value *part = new Value();
-        part->set(copyString(input.substr(start, end - start)), this->location);
+        part->set(input.substr(start, end - start), this->location);
         parts.push_back(part);
         start = end + separator.size();
         end = input.find(separator, start);
     }
 
     Value *part = new Value();
-    part->set(copyString(input.substr(start)), this->location);
+    part->set(input.substr(start), this->location);
     parts.push_back(part);
 
     this->value->set(parts, this->location);
@@ -302,8 +302,8 @@ AstNode* FindNode::evaluate() {
         throw TypeError("Wrong type for find pattern", this->location);
     }
 
-    std::string input = stringEval->value->stringValue;
-    std::string pattern = patternEval->value->stringValue;
+    std::string input(stringEval->value->stringValue, stringEval->value->stringLength);
+    std::string pattern(patternEval->value->stringValue, patternEval->value->stringLength);
     if (pattern.empty()) {
         throw TypeError("Find pattern cannot be empty", this->location);
     }
@@ -334,7 +334,7 @@ AstNode* LenNode::evaluate() {
     stringEval->evaluate();
 
     if (stringEval->value->getTrueType() == STR) {
-        this->value->set((int)strlen(stringEval->value->stringValue), this->location);
+        this->value->set((int)stringEval->value->stringLength, this->location);
         if (this->childListHead != NULL && this->childListHead != this) {
             this->initialValue = new Value(*this->value);
             return ExpressionNode::evaluate();

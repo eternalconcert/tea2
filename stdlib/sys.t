@@ -341,6 +341,45 @@ export dict fn json(str s) {
     return container["value"];
 };
 
+export dict fn request(dict req) {
+    return http(req);
+};
+
+export dict fn get(str url) {
+    return http({method: "GET", url: url, headers: {}, body: ""});
+};
+
+export dict fn post(str url, str body) {
+    return http({
+        method: "POST",
+        url: url,
+        headers: {"Content-Type": "application/json"},
+        body: body
+    });
+};
+
+export dict fn put(str url, str body) {
+    return http({
+        method: "PUT",
+        url: url,
+        headers: {"Content-Type": "application/json"},
+        body: body
+    });
+};
+
+export dict fn patch(str url, str body) {
+    return http({
+        method: "PATCH",
+        url: url,
+        headers: {"Content-Type": "application/json"},
+        body: body
+    });
+};
+
+export dict fn delete(str url) {
+    return http({method: "DELETE", url: url, headers: {}, body: ""});
+};
+
 export str fn getSubstring(str invalue, int startIndex, int endIndex) {
   str result = "";
   int i = startIndex;
