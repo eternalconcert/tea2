@@ -16,8 +16,8 @@ stages:
     run: |
       cp /out/tea tea.bin
       cp /out/tea example/templates/static/tea.bin
-      cd example
       docker login docker.softcreate.de --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+      cd example
       export DEBIAN_FRONTEND=noninteractive
       docker build --build-arg BUILD_NO=$BUILDER_RUN -f ../Dockerfile .. -t docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN
       docker tag docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN
