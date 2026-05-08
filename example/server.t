@@ -97,37 +97,37 @@ dict fn app(dict req) {
       body: read(filePath)
     };
   };
-  if (path == "/upload" and req["method"] == "POST") {
-    str body = req["body"];
-    str boundary = split(req["headers"]["content-type"], "boundary=")[1];
-    str marker = "--" + boundary;
-    str part = split(body, marker)[1];
-
-    str headerSeparator = "\r\n\r\n";
-    if (len(find(part, headerSeparator)) == 0) {
-      headerSeparator = "\n\n";
-    };
-
-    str fileHeaders = split(part, headerSeparator)[0];
-    str fileName = split(split(fileHeaders, "filename=\"")[1], "\"")[0];
-
-    int contentStart = find(part, headerSeparator)[0] + len(headerSeparator);
-    str fileContent = getSubstring(part, contentStart, len(part));
-    if (len(fileContent) > 1 and fileContent[len(fileContent) - 2] == "\r" and fileContent[len(fileContent) - 1] == "\n") {
-      fileContent = getSubstring(fileContent, 0, len(fileContent) - 2);
-    };
-    if (len(fileContent) > 0 and fileContent[len(fileContent) - 1] == "\n") {
-      fileContent = getSubstring(fileContent, 0, len(fileContent) - 1);
-    };
-    str mkdirCommand = "mkdir -p " + uploadDirectory;
-    cmd(mkdirCommand);
-    write(joinPath(uploadDirectory, fileName), fileContent);
-    return {
-      status: 200,
-      headers: getHeaders("text/plain"),
-      body: "I got your file: " + fileName + " with content: " + fileContent
-    };
-  };
+  // if (path == "/upload" and req["method"] == "POST") {
+  //   str body = req["body"];
+  //   str boundary = split(req["headers"]["content-type"], "boundary=")[1];
+  //   str marker = "--" + boundary;
+  //   str part = split(body, marker)[1];
+  //
+  //   str headerSeparator = "\r\n\r\n";
+  //   if (len(find(part, headerSeparator)) == 0) {
+  //     headerSeparator = "\n\n";
+  //   };
+  //
+  //   str fileHeaders = split(part, headerSeparator)[0];
+  //   str fileName = split(split(fileHeaders, "filename=\"")[1], "\"")[0];
+  //
+  //   int contentStart = find(part, headerSeparator)[0] + len(headerSeparator);
+  //   str fileContent = getSubstring(part, contentStart, len(part));
+  //   if (len(fileContent) > 1 and fileContent[len(fileContent) - 2] == "\r" and fileContent[len(fileContent) - 1] == "\n") {
+  //     fileContent = getSubstring(fileContent, 0, len(fileContent) - 2);
+  //   };
+  //   if (len(fileContent) > 0 and fileContent[len(fileContent) - 1] == "\n") {
+  //     fileContent = getSubstring(fileContent, 0, len(fileContent) - 1);
+  //   };
+  //   str mkdirCommand = "mkdir -p " + uploadDirectory;
+  //   cmd(mkdirCommand);
+  //   write(joinPath(uploadDirectory, fileName), fileContent);
+  //   return {
+  //     status: 200,
+  //     headers: getHeaders("text/plain"),
+  //     body: "I got your file: " + fileName + " with content: " + fileContent
+  //   };
+  // };
 
   if (path == "/download") {
     str fileName = split(req["query"], "file=")[1];
