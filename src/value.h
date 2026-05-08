@@ -26,6 +26,7 @@ public:
     std::map<std::string, Value*> dictValue;
     bool boolValue;
     char *identValue;
+    bool negatedFunction = false;
     bool assigned = true;
     YYLTYPE location;
 

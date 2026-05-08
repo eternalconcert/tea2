@@ -339,8 +339,8 @@ int main(int argc, char **argv) {
 }
 
 
-%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKBREAK TOKCONTINUE TOKIMPORT TOKEXPORT TOKTHROW
-%token TOKSYSPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES TOKHTTP TOKSERVE TOKELLIPSIS
+%token TOKIF TOKELSE TOKFN TOKRETURN TOKWHILE TOKFOR TOKBREAK TOKCONTINUE TOKIMPORT TOKEXPORT TOKTHROW TOKNOT
+%token TOKSYSPRINT TOKOUT TOKREADFILE TOKWRITEFILE TOKQUIT TOKSLEEP TOKASSERT TOKCMD TOKENV TOKSYSARGS TOKLRC TOKINPUT TOKCAST TOKSPLIT TOKFIND TOKLEN TOKDICTKEYS TOKDICTVALUES TOKHTTP TOKSERVE TOKELLIPSIS
 %token TOKLBRACE TOKRBRACE
 
 %token <sval> TOKPLUS TOKMINUS TOKTIMES TOKDIVIDE TOKMOD
@@ -352,11 +352,14 @@ int main(int argc, char **argv) {
 %token <bval> TOKBOOL
 %token <sval> TOKIDENT
 
+%precedence INDEXABLE_ATOM
+%precedence '['
+
 %type <node> or_expr and_expr eq_expr rel_expr add_expr mul_expr unary_expr
 %type <node> expression literal array_literal array_items dict_literal dict_items dict_item dict_key array_index fn_call
 %type <node> statement statements if_statement fn_declaration return_stmt while_loop for_loop import_statement export_statement throw
 %type <node> var_declaration var_declaration_assignment var_assignment  expressions act_params act_param formal_params builtin_function
-%type <node> sysprint out read write split find len dictKeys dictValues http serve input quit sleep assert cmd sysargs lastrc cast
+%type <node> sysprint out read write split find len dictKeys dictValues http serve input quit sleep assert cmd env sysargs lastrc cast
 %type <node> for_init for_condition for_post
 
 %start statements
@@ -550,6 +553,11 @@ mul_expr:
     ;
 
 unary_expr:
+    TOKNOT unary_expr {
+        NotNode *notNode = new NotNode($2, curScope);
+        $$ = notNode;
+    }
+    |
     expression {
         $$ = $1;
     }
@@ -566,7 +574,7 @@ expression:
         valueObj->setIdent($1, curScope, @1);
         expNode->value = valueObj;
         $$ = expNode;
-    }
+    } %prec INDEXABLE_ATOM
     |
     array_index {
         $$ = $1;
@@ -769,6 +777,11 @@ var_declaration:
         VarDeclarationNode *variable = new VarDeclarationNode($1, $2, curScope);
         $$ = variable;
     }
+    |
+    TOKFN TOKIDENT {
+        VarDeclarationNode *variable = new VarDeclarationNode(FUNCTION, $2, curScope);
+        $$ = variable;
+    }
     ;
 
 var_assignment:
@@ -908,6 +921,8 @@ builtin_function:  // Causes reduce/reduce conflict
     assert
     |
     cmd
+    |
+    env
     |
     sysargs
     |
@@ -1049,23 +1064,25 @@ cmd:
     }
     ;
 
-sysargs:
-    TOKSYSARGS '[' TOKINTEGER ']' {
+env:
+    TOKENV '(' TOKSTRING ')' {
         Value *valueObj = new Value();
         valueObj->set($3, @3);
 
-        SystemArgsNode *sysArgs = new SystemArgsNode(valueObj, curScope);
-        $$ = sysArgs;
+        EnvNode *env = new EnvNode(valueObj, curScope);
+        $$ = env;
     }
     |
-    TOKSYSARGS '[' TOKIDENT ']' {
+    TOKENV '(' TOKIDENT ')' {
         Value *valueObj = new Value();
         valueObj->setIdent($3, curScope, @3);
 
-        SystemArgsNode *sysArgs = new SystemArgsNode(valueObj, curScope);
-        $$ = sysArgs;
+        EnvNode *env = new EnvNode(valueObj, curScope);
+        $$ = env;
     }
-    |
+    ;
+
+sysargs:
     TOKSYSARGS {
         SystemArgsNode *sysArgs = new SystemArgsNode(nullptr, curScope);
         $$ = sysArgs;

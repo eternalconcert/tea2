@@ -4,7 +4,7 @@
 <p>
   <strong>Tea</strong> is a small, imperative scripting language: C-like syntax, explicit types,
   functions, arrays, dictionaries, and built-ins for I/O, strings, shell integration, JSON,
-  and simple HTTP client/server workflows.
+  higher-order helpers, and simple HTTP client/server workflows.
   It is a good fit for quick automation, tiny tools, and teaching—not a replacement for a large
   general-purpose ecosystem.
 </p>
@@ -15,6 +15,7 @@
   <li>Call shell commands with <code>cmd(...)</code>, read files with <code>read</code>/<code>write</code></li>
   <li>Parse JSON with <code>json(...)</code> and talk to HTTP services with <code>get</code>/<code>post</code>/<code>serve</code></li>
   <li>Split code across files with <code>import</code> and <code>export</code></li>
+  <li>Pass predicates to helpers such as <code>filter(...)</code>, including negated predicates with <code>not</code></li>
   <li>Enough structure (types, functions, control flow) to grow beyond one-off bash snippets</li>
 </ul>
 

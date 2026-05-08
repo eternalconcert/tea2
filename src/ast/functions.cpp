@@ -172,6 +172,15 @@ AstNode* FnCallNode::evaluate() {
     if (this->pendingFnReturn != nullptr) {
         this->value = this->pendingFnReturn;
     }
+
+    if (val->negatedFunction) {
+        if (this->value->getTrueType() != BOOL) {
+            throw TypeError("Negated function must return BOOL", this->location);
+        }
+        Value *negatedValue = new Value();
+        negatedValue->set(!this->value->boolValue, this->location);
+        this->value = negatedValue;
+    }
     teaActiveFnCallStack.pop_back();
 
     teaRestoreValueStores(savedValueStores);

@@ -172,6 +172,24 @@ public:
     ExpressionNode(AstNode *scope);
 };
 
+class NotNode: public ExpressionNode {
+public:
+    AstNode *expr;
+
+    AstNode* evaluate();
+    NotNode(AstNode *expr, AstNode *scope);
+};
+
+class EnvNode: public ExpressionNode {
+public:
+    Value *nameValue;
+    AstNode *scope;
+
+    AstNode* evaluate();
+
+    EnvNode(Value *nameValue, AstNode *scope);
+};
+
 class LenNode: public ExpressionNode {
 public:
     AstNode *stringExpression;

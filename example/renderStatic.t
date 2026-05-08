@@ -1,7 +1,7 @@
 #!../tea
 import "lib/renderer.t";
 
-str version = replace(cmd("echo $BUILDER_RUN"), "\n", "");
+str version = env("BUILDER_RUN");
 if (len(version) == 0) {
     version = "dev";
 };

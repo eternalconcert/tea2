@@ -24,6 +24,7 @@ Value *copyValueDeep(const Value *src) {
     Value *n = new Value();
     n->location = src->location;
     n->assigned = src->assigned;
+    n->negatedFunction = src->negatedFunction;
     switch (src->type) {
         case STR:
             n->type = STR;
@@ -63,6 +64,7 @@ Value *copyValueDeep(const Value *src) {
             return n;
         case FUNCTION:
             n->setFn(src->identValue, src->scope, src->functionBody, src->location);
+            n->negatedFunction = src->negatedFunction;
             return n;
         case FUNCTIONCALL:
             n->setFnCall(src->identValue, src->retNode, src->scope, src->location);

@@ -11,6 +11,32 @@ ExpressionNode::ExpressionNode(AstNode *scope) {
     this->initialValue = NULL;
 };
 
+NotNode::NotNode(AstNode *expr, AstNode *scope) : ExpressionNode(scope) {
+    this->expr = expr;
+};
+
+AstNode* NotNode::evaluate() {
+    ExpressionNode *eval = (ExpressionNode*)this->expr;
+    eval->evaluate();
+    Value *operand = eval->value;
+    if (operand->type == IDENTIFIER) {
+        operand = getFromValueStore(this->scope, operand->identValue, this->location);
+    }
+
+    if (operand->getTrueType() == BOOL) {
+        this->value->set(!operand->boolValue, this->location);
+        return this->getNext();
+    }
+
+    if (operand->getTrueType() == FUNCTION) {
+        this->value = new Value(*operand);
+        this->value->negatedFunction = !operand->negatedFunction;
+        return this->getNext();
+    }
+
+    throw TypeError("not is only implemented for BOOL and FN", this->location);
+};
+
 ArrayLiteralNode::ArrayLiteralNode(AstNode *items, AstNode *scope) : ExpressionNode(scope) {
     this->items = items;
 };
@@ -214,7 +240,7 @@ AstNode* ExpressionNode::evaluate() {
 
         Value *rVal = NULL;
         if (!shortCircuit) {
-            if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<DictLiteralNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL || dynamic_cast<KeysNode*>(cur) != NULL || dynamic_cast<ValuesNode*>(cur) != NULL || dynamic_cast<HttpNode*>(cur) != NULL || dynamic_cast<ServeNode*>(cur) != NULL) {
+            if (dynamic_cast<ArrayIndexNode*>(cur) != NULL || dynamic_cast<ArrayLiteralNode*>(cur) != NULL || dynamic_cast<DictLiteralNode*>(cur) != NULL || dynamic_cast<EnvNode*>(cur) != NULL || dynamic_cast<LenNode*>(cur) != NULL || dynamic_cast<KeysNode*>(cur) != NULL || dynamic_cast<ValuesNode*>(cur) != NULL || dynamic_cast<HttpNode*>(cur) != NULL || dynamic_cast<ServeNode*>(cur) != NULL) {
                 cur->evaluate();
                 rVal = cur->value;
             } else if (dynamic_cast<FnCallNode*>(cur) != NULL) {

@@ -31,10 +31,22 @@ void fn test_gte() {
     testCount = testCount + 1;
 };
 
+void fn test_not() {
+    bool result = false;
+
+    if (not false) {
+      result = true;
+    };
+    assert(result, true);
+    assert(not true, false);
+    testCount = testCount + 1;
+};
+
 // Running tests
 test_eq();
 test_gt();
 test_gte();
+test_not();
 
 // Printing results
 print("Run ", testCount, " tests successfully (test_conditions.t)");

@@ -1,6 +1,7 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 #include "ast.h"
 #include "../exceptions.h"
 #include "../value.h"
@@ -592,5 +593,37 @@ AstNode* CmdNode::evaluate() {
     }
     char* cStr = copyString(result);
     this->value->set(cStr, this->location);
+    return this->getNext();
+};
+
+EnvNode::EnvNode(Value *nameValue, AstNode *scope) : ExpressionNode(scope) {
+    this->nameValue = nameValue;
+    this->scope = scope;
+};
+
+AstNode* EnvNode::evaluate() {
+    std::string name;
+    switch (this->nameValue->type) {
+        case STR:
+            name = std::string(nameValue->stringValue, nameValue->stringLength);
+            break;
+        case IDENTIFIER: {
+            Value *val = getFromValueStore(this->scope, this->nameValue->identValue, this->location);
+            if (val->getTrueType() != STR) {
+                throw (TypeError("Wrong type for env function", this->location));
+            }
+            name = std::string(val->stringValue, val->stringLength);
+            break;
+        }
+        default:
+            throw TypeError("Unsupported type for env function", this->location);
+    }
+
+    const char *result = std::getenv(name.c_str());
+    this->value->set(result == nullptr ? std::string("") : std::string(result), this->location);
+    if (this->childListHead != NULL && this->childListHead != this) {
+        this->initialValue = new Value(*this->value);
+        return ExpressionNode::evaluate();
+    }
     return this->getNext();
 };

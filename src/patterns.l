@@ -50,6 +50,7 @@
 "<="                                    yylval.sval=strdup(yytext); return TOKLTE;
 "and"|"&&"|"&"                          yylval.sval=strdup(yytext); return TOKAND;
 "or"|"||"|"|"                           yylval.sval=strdup(yytext); return TOKOR;
+not                                     return TOKNOT;
 int                                     yylval.tval=INT; return TYPEIDENT;
 float                                   yylval.tval=FLOAT; return TYPEIDENT;
 str                                     yylval.tval=STR; return TYPEIDENT;
@@ -86,6 +87,7 @@ sleep                                   return TOKSLEEP;
 quit                                    return TOKQUIT;
 assert                                  return TOKASSERT;
 cmd                                     return TOKCMD;
+env                                     return TOKENV;
 input                                   return TOKINPUT;
 cast                                    return TOKCAST;
 SYSARGS                                 return TOKSYSARGS;

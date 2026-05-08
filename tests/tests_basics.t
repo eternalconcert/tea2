@@ -92,6 +92,15 @@ void fn test_sysargs_index_ident() {
     testCount = testCount + 1;
 };
 
+void fn test_env() {
+    str path = env("PATH");
+    assert(len(path) > 0, true);
+
+    str envName = "__TEA_TEST_ENV_VAR_THAT_SHOULD_NOT_EXIST__";
+    assert(env(envName), "");
+    testCount = testCount + 1;
+};
+
 void fn test_read_file() {
     str result = read("tests/file.txt");
     assert(result, "hello world");
@@ -213,6 +222,7 @@ test_scoped_reassignment();
 test_else_block();
 test_sysargs();
 test_sysargs_index_ident();
+test_env();
 test_read_file();
 test_read_file_ident();
 test_write_file();

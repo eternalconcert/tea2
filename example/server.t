@@ -1,6 +1,8 @@
 #!../tea
 import "lib/renderer.t";
-str version = replace(cmd("echo $BUILD_NO"), "\n", "");
+import "@common/iterable.t";
+str version = env("BUILD_NO");
+
 if (len(version) == 0) {
     version = "dev";
 };
@@ -10,14 +12,40 @@ if (len(buildDate) == 0) {
     buildDate = "unknown";
 };
 
-bool fn isValidStaticFile(str path) {
-  array files = split(cmd("ls templates/static/"), "\n");
+str uploadDirectory = env("TEA_UPLOAD_DIR");
+if (len(uploadDirectory) == 0) {
+  uploadDirectory = "/tmp/tea-upload";
+};
+
+str fn joinPath(str directory, str fileName) {
+  if (directory[len(directory) - 1] == "/") {
+    return directory + fileName;
+  };
+  return directory + "/" + fileName;
+};
+
+bool fn hasFile(str directory, str fileName) {
+  str listCommand = "ls " + directory;
+  array files = split(cmd(listCommand), "\n");
   for (int i = 0; i < len(files); i = i + 1) {
-    if ("/static/" + files[i] == path) {
+    if (files[i] == fileName) {
       return true;
     };
   };
   return false;
+};
+
+bool fn isEmptyString(str string) {
+  return len(string) == 0;
+};
+
+bool fn isValidStaticFile(str path) {
+  str fileName = replace(path, "/static/", "");
+  return hasFile("templates/static/", fileName);
+};
+
+bool fn isValidUploadFile(str fileName) {
+  return hasFile(uploadDirectory, fileName);
 };
 
 str fn getMimeType(str path) {
@@ -43,6 +71,9 @@ str fn getTemplatePath(str path) {
   };
   array files = split(cmd("ls templates/"), "\n");
   array requestedFileNamePathParts = split(replace(path, "/", ""), ".");
+  if(len(requestedFileNamePathParts) != 2) {
+    return "";
+  };
   str requestedTemplateName = requestedFileNamePathParts[0] + ".t." + requestedFileNamePathParts[1];
   for (int i = 0; i < len(files); i = i + 1) {
     if (files[i] == requestedTemplateName) {
@@ -53,7 +84,6 @@ str fn getTemplatePath(str path) {
 };
 
 dict fn app(dict req) {
-
   dict fn getHeaders(str contentType) {
     return {"Content-Type": contentType, "Server": "Tea 2", "x-tea-version": version, "x-tea-build-date": buildDate};
   };
@@ -67,10 +97,72 @@ dict fn app(dict req) {
       body: read(filePath)
     };
   };
+  if (path == "/upload" and req["method"] == "POST") {
+    str body = req["body"];
+    str boundary = split(req["headers"]["content-type"], "boundary=")[1];
+    str marker = "--" + boundary;
+    str part = split(body, marker)[1];
+
+    str headerSeparator = "\r\n\r\n";
+    if (len(find(part, headerSeparator)) == 0) {
+      headerSeparator = "\n\n";
+    };
+
+    str fileHeaders = split(part, headerSeparator)[0];
+    str fileName = split(split(fileHeaders, "filename=\"")[1], "\"")[0];
+
+    int contentStart = find(part, headerSeparator)[0] + len(headerSeparator);
+    str fileContent = getSubstring(part, contentStart, len(part));
+    if (len(fileContent) > 1 and fileContent[len(fileContent) - 2] == "\r" and fileContent[len(fileContent) - 1] == "\n") {
+      fileContent = getSubstring(fileContent, 0, len(fileContent) - 2);
+    };
+    if (len(fileContent) > 0 and fileContent[len(fileContent) - 1] == "\n") {
+      fileContent = getSubstring(fileContent, 0, len(fileContent) - 1);
+    };
+    str mkdirCommand = "mkdir -p " + uploadDirectory;
+    cmd(mkdirCommand);
+    write(joinPath(uploadDirectory, fileName), fileContent);
+    return {
+      status: 200,
+      headers: getHeaders("text/plain"),
+      body: "I got your file: " + fileName + " with content: " + fileContent
+    };
+  };
+
+  if (path == "/download") {
+    str fileName = split(req["query"], "file=")[1];
+    str amendedFileName = replace(fileName, "%20", " ");
+    str filePath = joinPath(uploadDirectory, amendedFileName);
+    if (not isValidUploadFile(amendedFileName)) {
+      return {
+        status: 404,
+        headers: getHeaders("text/plain"),
+        body: "file not found"
+      };
+    };
+    str fileContent = read(filePath);
+    dict headers = getHeaders("application/octet-stream");
+    headers["Content-Disposition"] = "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + fileName;
+    return {
+      status: 200,
+      headers: headers,
+      body: fileContent
+    };
+  };
 
   str templatePath = getTemplatePath(path);
   if (len(templatePath) > 0) {
     str result = renderTemplate(read(templatePath), {version: version, build_date: buildDate});
+    if (templatePath == "templates/downloads.t.html") {
+      str listCommand = "ls " + uploadDirectory;
+      array files = filter(split(cmd(listCommand), "\n"), not isEmptyString);
+      str filesResult = "<ul>";
+      for (int i = 0; i < len(files); i = i + 1) {
+        filesResult = filesResult + "<li><a href=\"/download?file=" + files[i] + "\">" + files[i] + "</a></li>";
+      };
+      filesResult = filesResult + "</ul>";
+      result = renderTemplate(read(templatePath), {version: version, build_date: buildDate, files: filesResult});
+    };
     return {
       status: 200,
       headers: getHeaders("text/html"),

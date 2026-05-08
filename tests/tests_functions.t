@@ -75,6 +75,23 @@ void fn test_fn_call_as_argument() {
 };
 
 
+void fn test_fn_as_argument() {
+    bool fn isEven(int value) {
+        return value % 2 == 0;
+    };
+
+    bool fn applyPredicate(int value, fn predicate) {
+        return predicate(value);
+    };
+
+    assert(applyPredicate(4, isEven), true);
+    assert(applyPredicate(5, isEven), false);
+    assert(applyPredicate(4, not isEven), false);
+    assert(applyPredicate(5, not isEven), true);
+    testCount = testCount + 1;
+};
+
+
 void fn test_fn_return_from_if_else_branch() {
     str fn combine(str a, str b, bool separator) {
         if (separator) {
@@ -98,6 +115,7 @@ test_fn_return_with_params_from_nested_scope();
 test_fn_return_without_params();
 test_fn_return_str_with_param();
 test_fn_call_as_argument();
+test_fn_as_argument();
 test_fn_return_from_if_else_branch();
 
 // Printing results

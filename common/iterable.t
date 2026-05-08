@@ -16,3 +16,13 @@ export array fn arrayContains(array arrayToCheck, str item) {
   };
   return false;
 };
+
+export array fn filter(array arrayToFilter, fn predicate) {
+  array result = [];
+  for (int i = 0; i < len(arrayToFilter); i = i + 1) {
+    if (predicate(arrayToFilter[i])) {
+      result[len(result)] = arrayToFilter[i];
+    };
+  };
+  return result;
+};
