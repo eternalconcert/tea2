@@ -158,7 +158,15 @@ dict fn app(dict req) {
     };
       str fileHeaders = split(part, headerSeparator)[0];
     str fileName = split(split(fileHeaders, "filename=\"")[1], "\"")[0];
-      int contentStart = find(part, headerSeparator)[0] + len(headerSeparator);
+    array fileNameParts = regexCapture(fileName, "^(.+)-(\\d+\\.\\d+\\.\\d+)(\\.t)$");
+    if (len(fileNameParts) != 3) {
+      return {
+        status: 400,
+        headers: getHeaders("text/plain"),
+        body: "Bad Request"
+      };
+    };
+    int contentStart = find(part, headerSeparator)[0] + len(headerSeparator);
     str fileContent = getSubstring(part, contentStart, len(part));
     if (len(fileContent) > 1 and fileContent[len(fileContent) - 2] == "\r" and fileContent[len(fileContent) - 1] == "\n") {
       fileContent = getSubstring(fileContent, 0, len(fileContent) - 2);
@@ -168,6 +176,18 @@ dict fn app(dict req) {
     };
     str mkdirCommand = "mkdir -p " + uploadDirectory;
     cmd(mkdirCommand);
+    str command = "ls " + uploadDirectory;
+    str uploadDirectoryContent = cmd(command);
+    array filesInUploadDirectory = split(uploadDirectoryContent, "\n");
+    for (int i = 0; i < len(filesInUploadDirectory); i = i + 1) {
+      if (filesInUploadDirectory[i] == fileName) {
+        return {
+          status: 409,
+          headers: getHeaders("text/plain"),
+          body: "File already exists"
+        };
+      };
+    };
     write(joinPath(uploadDirectory, fileName), fileContent);
     return {
       status: 200,
