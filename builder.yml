@@ -14,6 +14,8 @@ stages:
       cp tea /out/
   - name: build-website
     run: |
+      apt-get update
+      apt-get install -y --no-install-recommends wget
       cp /out/tea tea.bin
       cp /out/tea example/templates/static/tea.bin
       chmod +x example/templates/static/tea.bin
