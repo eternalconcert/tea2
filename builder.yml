@@ -19,7 +19,7 @@ stages:
 
       docker login docker.softcreate.de --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
       cd example
-      tempates/static/tea.bin --install
+      templates/static/tea.bin --install
       export DEBIAN_FRONTEND=noninteractive
       docker build --build-arg BUILD_NO=$BUILDER_RUN -f ../Dockerfile .. -t docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN
       docker tag docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN docker.softcreate.de/eternalconcert/tea2:$BUILDER_RUN
