@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 ARG BUILD_NO
 ENV BUILD_NO=${BUILD_NO}
-
+ENV TEA_API_TOKEN=${TEA_API_TOKEN}
 WORKDIR /app
 ADD tea .
 ADD example/ /app/example/
