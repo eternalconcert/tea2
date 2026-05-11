@@ -135,6 +135,7 @@ dict fn app(dict req) {
     };
     str authToken = authHeaderParts[1];
     print("Received upload request with auth token: ", authToken, " and content type: ", headers["content-type"]);
+    print("Api token from environment variable: ", env("TEA_API_TOKEN"));
     if (authHeader == "" or authToken != env("TEA_API_TOKEN")) {
       return {
         status: 401,
