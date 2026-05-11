@@ -16,7 +16,7 @@ stages:
     run: |
       cp /out/tea tea.bin
       cp /out/tea example/templates/static/tea.bin
-
+      chmod +x example/templates/static/tea.bin
       docker login docker.softcreate.de --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
       cd example
       templates/static/tea.bin --install

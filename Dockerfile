@@ -5,7 +5,6 @@ ENV BUILD_NO=${BUILD_NO}
 WORKDIR /app
 ADD tea .
 ADD example/ /app/example/
-ADD common/ /app/example/teahouse/common/
 
 WORKDIR /app/example
 
