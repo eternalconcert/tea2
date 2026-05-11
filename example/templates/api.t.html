@@ -149,6 +149,7 @@ print("tea"[0]);           // t</pre>
   <li><code>read("path")</code> / <code>write("path", content)</code> — read/write files</li>
   <li><code>len(x)</code> — length (string, array, or dict)</li>
   <li><code>split(str, delimiter)</code>, <code>find(str, pattern)</code> — string helpers</li>
+  <li><code>regexTest</code>, <code>regexMatch</code>, <code>regexFind</code>, <code>regexCapture</code>, <code>regexCaptureAll</code> — lightweight regular expression helpers</li>
   <li><code>dictKeys(dict)</code> — returns an array of keys (as strings)</li>
   <li><code>dictValues(dict)</code> — returns an array of values</li>
   <li><code>json(str)</code> — parse JSON strings; objects become dicts, arrays become arrays, and <code>null</code> becomes an empty dict</li>
@@ -156,6 +157,33 @@ print("tea"[0]);           // t</pre>
   <li><code>cast(…)</code> — type conversion</li>
   <li><code>SYSARGS</code>, <code>LRC</code> — command-line args and last return code (see interpreter docs)</li>
 </ul>
+
+<h3>Regular expressions</h3>
+<p>
+  Tea includes a small regex engine for common string matching. It supports anchors
+  <code>^</code>/<code>$</code>, character classes, negated classes, <code>.</code>, quantifiers
+  <code>*</code>/<code>+</code>/<code>?</code>, escapes such as <code>\d</code>, <code>\w</code>,
+  <code>\s</code>, and capture groups.
+</p>
+<pre>assert(regexTest("hello tea", "tea"), true);
+assert(regexMatch("tea42", "tea\\d+"), true);
+assert(regexFind("one two three", "(t\\w+)"), [4, 8]);
+
+array first = regexCapture("name: tea, count: 42", "name:\\s*(\\w+),\\s*count:\\s*(\\d+)");
+assert(first, ["tea", "42"]);
+
+array all = regexCaptureAll("name: tea; name: cup", "name:\\s*(\\w+)");
+assert(all, [["tea"], ["cup"]]);</pre>
+<p>
+  <code>regexFind</code> returns start indexes. If the pattern contains capture groups, they are used for
+  matching but ignored in the result. Use <code>regexCapture</code> for the first match's groups and
+  <code>regexCaptureAll</code> for all matches. Each entry from <code>regexCaptureAll</code> is an array of
+  captured groups, so a pattern with two groups returns values like <code>[["tea", "42"], ["cup", "7"]]</code>.
+</p>
+<p>
+  <code>\w</code> only matches letters, digits, and underscores. For paths or template names that may contain
+  slashes or dots, use a character class such as <code>[^%]+</code> and trim the result if needed.
+</p>
 
 <h3>Common helpers</h3>
 <p>

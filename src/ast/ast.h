@@ -326,6 +326,14 @@ public:
     AstNode* evaluate();
 };
 
+class ForEachNode: public AstNode {
+public:
+    char *identifier;
+    AstNode *iterableExpression;
+    AstNode* evaluate();
+    ForEachNode(char *identifier, AstNode *iterableExpression);
+};
+
 class BreakNode: public AstNode {
 public:
     AstNode* evaluate();

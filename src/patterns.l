@@ -66,6 +66,7 @@ fn                                      return TOKFN;
 return                                  return TOKRETURN;
 while                                   return TOKWHILE;
 for                                     return TOKFOR;
+in                                      return TOKIN;
 break                                   return TOKBREAK;
 continue                                return TOKCONTINUE;
 import                                  return TOKIMPORT;

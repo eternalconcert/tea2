@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "../commons.h"
+#include "../exceptions.h"
 
 void teaResetBreakContinueFlags(AstNode *n) {
     if (n == NULL) {
@@ -21,6 +22,13 @@ void teaResetBreakContinueFlags(AstNode *n) {
         teaResetBreakContinueFlags(f->init);
         teaResetBreakContinueFlags(f->condition);
         teaResetBreakContinueFlags(f->post);
+        teaResetBreakContinueFlags(f->childListHead);
+        return;
+    }
+
+    if (dynamic_cast<ForEachNode*>(n) != nullptr) {
+        ForEachNode *f = (ForEachNode*)n;
+        teaResetBreakContinueFlags(f->iterableExpression);
         teaResetBreakContinueFlags(f->childListHead);
         return;
     }
@@ -70,6 +78,15 @@ TeaBCKind teaFindBreakContinue(AstNode *n) {
             return k;
         }
         k = teaFindBreakContinue(f->post);
+        if (k != TEA_BC_NONE) {
+            return k;
+        }
+        return teaFindBreakContinue(f->childListHead);
+    }
+
+    if (dynamic_cast<ForEachNode*>(n) != nullptr) {
+        ForEachNode *f = (ForEachNode*)n;
+        TeaBCKind k = teaFindBreakContinue(f->iterableExpression);
         if (k != TEA_BC_NONE) {
             return k;
         }
@@ -139,6 +156,63 @@ AstNode* WhileNode::evaluate() {
     }
 
     return this->getNext();
+}
+
+ForEachNode::ForEachNode(char *identifier, AstNode *iterableExpression) {
+    this->identifier = identifier;
+    this->iterableExpression = iterableExpression;
+    AstNode();
+}
+
+AstNode* ForEachNode::evaluate() {
+    ExpressionNode *iterable = (ExpressionNode*)this->iterableExpression;
+    iterable->evaluate();
+    Value *iterableValue = iterable->value;
+    if (iterableValue->type == IDENTIFIER) {
+        iterableValue = getFromValueStore(iterable->scope, iterableValue->identValue, this->location);
+    }
+
+    if (iterableValue->getTrueType() == ARRAY) {
+        for (Value *item : iterableValue->arrayValue) {
+            if (this->childListHead != NULL) {
+                this->childListHead->valueStore->set(this->identifier, copyValueDeep(item));
+                teaResetBreakContinueFlags(this->childListHead);
+                this->childListHead->evaluate();
+                if (teaFindReturnExecuted(this->childListHead) != nullptr) {
+                    break;
+                }
+                TeaBCKind bc = teaFindBreakContinue(this->childListHead);
+                teaResetBreakContinueFlags(this->childListHead);
+                if (bc == TEA_BC_BREAK) {
+                    break;
+                }
+            }
+        }
+        return this->getNext();
+    }
+
+    if (iterableValue->getTrueType() == STR) {
+        for (size_t i = 0; i < iterableValue->stringLength; i++) {
+            Value *item = new Value();
+            item->set(std::string(iterableValue->stringValue + i, 1), this->location);
+            if (this->childListHead != NULL) {
+                this->childListHead->valueStore->set(this->identifier, item);
+                teaResetBreakContinueFlags(this->childListHead);
+                this->childListHead->evaluate();
+                if (teaFindReturnExecuted(this->childListHead) != nullptr) {
+                    break;
+                }
+                TeaBCKind bc = teaFindBreakContinue(this->childListHead);
+                teaResetBreakContinueFlags(this->childListHead);
+                if (bc == TEA_BC_BREAK) {
+                    break;
+                }
+            }
+        }
+        return this->getNext();
+    }
+
+    throw TypeError("for-in is only implemented for arrays and strings", this->location);
 }
 
 AstNode* ForNode::evaluate() {

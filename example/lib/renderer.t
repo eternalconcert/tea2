@@ -13,29 +13,28 @@ export str fn addContext(str templateContent, dict context) {
 
 array fn getBaseTemplateNames(str template) {
   array result = [];
-  array startIndexes = find(template, "%extends ");
-  for (int i = 0; i < len(startIndexes); i = i + 1) {
-    int baseTemplateNameStart = startIndexes[i] + len("%extends ");
-    str substring = getSubstring(template, baseTemplateNameStart, len(template));
-    int baseTemplateNameEnd = find(substring, "%")[0];
-    str baseTemplateName = getSubstring(substring, 0, baseTemplateNameEnd);
-    result[i] = baseTemplateName;
+  for (item in enumerate(regexCaptureAll(template, "\\{%\\s*extends\\s+([^%]+)\\s*%\\}"))) {
+    int idx = item[0];
+    result[idx] = item[1][0];
   };
   return result;
 };
 
 dict fn getBlocks(str template) {
+  str blockPattern = "\\{%\\s*block\\s+(\\w+)\\s*%\\}";
+  str endBlockPattern = "\\{%\\s*endblock\\s*%\\}";
+  array blockStarts = regexFind(template, blockPattern);
+  array blockNames = regexCaptureAll(template, blockPattern);
+  array blockEnds = regexFind(template, endBlockPattern);
   dict result = {};
-  array startIndexes = find(template, "{%block ");
-  for (int i = 0; i < len(startIndexes); i = i + 1) {
-    int blockNameStart = startIndexes[i] + len("{%block ");
-    str substring = getSubstring(template, blockNameStart, len(template));
-    int blockNameEnd = find(substring, "%}")[0];
-    str blockName = getSubstring(substring, 0, blockNameEnd);
-
-    int blockContentEnd = find(substring, "{%endblock%}")[0];
-    str blockContent = getSubstring(substring, blockNameEnd + 2, blockContentEnd);
-    result[blockName] = blockContent;
+  for (int i = 0; i < len(blockStarts); i = i + 1) {
+    int blockStart = blockStarts[i];
+    str blockName = blockNames[i][0];
+    str fromBlockStart = getSubstring(template, blockStart, len(template));
+    int openingTagEnd = find(fromBlockStart, "%}")[0] + len("%}");
+    int contentStart = blockStart + openingTagEnd;
+    int contentEnd = blockEnds[i];
+    result[blockName] = getSubstring(template, contentStart, contentEnd);
   };
   return result;
 };

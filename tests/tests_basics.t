@@ -183,6 +183,25 @@ void fn test_str_find() {
     testCount = testCount + 1;
 };
 
+void fn test_regex_support() {
+    assert(regexTest("hello tea", "tea"), true);
+    assert(regexTest("hello tea", "^tea"), false);
+    assert(regexMatch("tea42", "tea\\d+"), true);
+    assert(regexMatch("tea", "tea\\d+"), false);
+    assert(regexFind("one two three", "t\\w+"), [4, 8]);
+    assert(regexFind("one two three", "(t\\w+)"), [4, 8]);
+    assert(regexTest("tea", "t[ea]+"), true);
+    assert(regexTest("tea", "t[^x]+"), true);
+    assert(regexTest("tea", "t.?a"), true);
+    assert(regexCapture("hello tea", "(\\w+)"), ["hello"]);
+    assert(regexCapture("hello {% start something %} world", "\\{%\\s*start\\s+(\\w+)\\s*%\\}"), ["something"]);
+    assert(regexCapture("name: tea, count: 42", "name:\\s*(\\w+),\\s*count:\\s*(\\d+)"), ["tea", "42"]);
+    assert(regexCaptureAll("{%block title%}T{%endblock%}{%block content%}C{%endblock%}", "\\{%\\s*block\\s+(\\w+)\\s*%\\}"), [["title"], ["content"]]);
+    assert(regexCaptureAll("name: tea, count: 42; name: cup, count: 7", "name:\\s*(\\w+),\\s*count:\\s*(\\d+)"), [["tea", "42"], ["cup", "7"]]);
+    assert(regexCapture("hello tea", "missing:\\s*(\\w+)"), []);
+    testCount = testCount + 1;
+};
+
 void fn test_str_len() {
     assert(len("hello"), 5);
     str text = "tea";
@@ -232,6 +251,7 @@ test_str_index();
 test_str_index_in_expression();
 test_nested_index();
 test_str_find();
+test_regex_support();
 test_str_len();
 test_system_exec_success(); // Causes succeeding tests to fail
 
