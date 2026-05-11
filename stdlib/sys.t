@@ -1133,7 +1133,7 @@ void fn installDeps(str depsFile) {
       dict depInfo = depsMap[depName];
       str depOrigin = depInfo["origin"];
       if (len(split(depOrigin, "://")) > 1) {
-        str command = "wget " + depOrigin + " -O " + "teahouse/" + depName + ".t";
+        str command = "wget " + depOrigin + " -O " + "teahouse/" + depName + ".t --no-check-certificate";
         str result = cmd(command);
         print(result);
       } else {
