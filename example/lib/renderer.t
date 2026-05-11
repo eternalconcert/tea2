@@ -1,4 +1,4 @@
-import "@iterable.t";
+import "@common/iterable.t";
 
 export str fn addContext(str templateContent, dict context) {
     array contextItems = dictItems(context);

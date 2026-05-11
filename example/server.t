@@ -1,6 +1,6 @@
 #!../tea
 import "lib/renderer.t";
-import "@iterable.t";
+import "@common/iterable.t";
 str version = env("BUILD_NO");
 
 if (len(version) == 0) {
