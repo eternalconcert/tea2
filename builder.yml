@@ -10,7 +10,7 @@ stages:
       lex src/patterns.l
       bison -d -o y.tab.c src/grammar.y
       g++ -Wno-free-nonheap-object lex.yy.c y.tab.c $(find src/ -name "*.cpp") -o tea --static -D BUILDNO=$BUILDER_RUN
-      ./tea common/testrunner.t --skip=tests/tests_http.t
+      ./tea common/testrunner-1.0.0.t --skip=tests/tests_http.t
       cp tea /out/
   - name: build-website
     run: |

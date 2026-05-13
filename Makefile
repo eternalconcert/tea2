@@ -37,7 +37,7 @@ build-mac-test: parser-mac
 	clang++ $(TEA_CXXFLAGS) -std=c++17 -Wno-deprecated -Wno-switch lex.yy.c y.tab.c $(CPPSOURCES) -fprofile-arcs -ftest-coverage -o tea -D BUILDNO=$(BUILDNO) -D MACOS
 
 run-tests:
-	./tea common/testrunner.t
+	./tea common/testrunner-1.0.0.t
 
 coverage:
 	mkdir -p coverage
