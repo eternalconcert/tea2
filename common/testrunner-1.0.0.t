@@ -1,4 +1,4 @@
-import "iterable.t";
+import "iterable-1.0.0.t";
 
 array fn skippedTests() {
   for (int i = 0; i < len(SYSARGS); i = i + 1) {
