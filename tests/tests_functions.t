@@ -1,112 +1,103 @@
 int testCount = 0;
 
-
 void fn test_fn_declaration_with_params() {
-    void fn test(int a, str b) {
-        assert(a, 5);
-        assert(b, "hello");
-    };
+  void fn test(int a, str b) {
+    assert(a, 5);
+    assert(b, "hello");
+  };
 
-    test(5, "hello");
-    testCount = testCount + 1;
+  test(5, "hello");
+  testCount = testCount + 1;
 };
-
 
 void fn test_fn_call_with_params_available_in_scope() {
-    void fn test(int a, str b) {
-        a = a + 1;
-        assert(a, 6);
-        b = b + " world";
-        assert(b, "hello world");
-    };
-    test(5, "hello");
-    testCount = testCount + 1;
+  void fn test(int a, str b) {
+    a = a + 1;
+    assert(a, 6);
+    b = b + " world";
+    assert(b, "hello world");
+  };
+  test(5, "hello");
+  testCount = testCount + 1;
 };
-
 
 void fn test_fn_return_with_params_from_nested_scope() {
-    int fn add(int a, int b) {
-        return a + b;
-    };
+  int fn add(int a, int b) {
+    return a + b;
+  };
 
-    int x = 1;
-    while (x <= 10) {
-        x = add(x, x);
-    };
-    assert(x, 16);
-    testCount = testCount + 1;
+  int x = 1;
+  while (x <= 10) {
+    x = add(x, x);
+  };
+  assert(x, 16);
+  testCount = testCount + 1;
 };
-
 
 void fn test_fn_return_without_params() {
-    int fn answer() {
-        return 42;
-    };
+  int fn answer() {
+    return 42;
+  };
 
-    int result = answer();
-    assert(result, 42);
-    testCount = testCount + 1;
+  int result = answer();
+  assert(result, 42);
+  testCount = testCount + 1;
 };
-
 
 void fn test_fn_return_str_with_param() {
-    str fn greet(str name) {
-        return "hello " + name;
-    };
+  str fn greet(str name) {
+    return "hello " + name;
+  };
 
-    str greeting = greet("tea");
-    assert(greeting, "hello tea");
-    testCount = testCount + 1;
+  str greeting = greet("tea");
+  assert(greeting, "hello tea");
+  testCount = testCount + 1;
 };
-
 
 void fn test_fn_call_as_argument() {
-    int fn double(int value) {
-        return value * 2;
-    };
+  int fn double(int value) {
+    return value * 2;
+  };
 
-    int fn add(int a, int b) {
-        return a + b;
-    };
+  int fn add(int a, int b) {
+    return a + b;
+  };
 
-    int result = add(double(3), 4);
-    assert(result, 10);
-    testCount = testCount + 1;
+  int result = add(double(3), 4);
+  assert(result, 10);
+  testCount = testCount + 1;
 };
-
 
 void fn test_fn_as_argument() {
-    bool fn isEven(int value) {
-        return value % 2 == 0;
-    };
+  bool fn isEven(int value) {
+    return value % 2 == 0;
+  };
 
-    bool fn applyPredicate(int value, fn predicate) {
-        return predicate(value);
-    };
+  bool fn applyPredicate(int value, fn predicate) {
+    return predicate(value);
+  };
 
-    assert(applyPredicate(4, isEven), true);
-    assert(applyPredicate(5, isEven), false);
-    assert(applyPredicate(4, not isEven), false);
-    assert(applyPredicate(5, not isEven), true);
-    testCount = testCount + 1;
+  assert(applyPredicate(4, isEven), true);
+  assert(applyPredicate(5, isEven), false);
+  assert(applyPredicate(4, not isEven), false);
+  assert(applyPredicate(5, not isEven), true);
+  testCount = testCount + 1;
 };
-
 
 void fn test_fn_return_from_if_else_branch() {
-    str fn combine(str a, str b, bool separator) {
-        if (separator) {
-            return a + " " + b;
-        }
-        else {
-            return a + b;
-        };
+  str fn combine(str a, str b, bool separator) {
+    if (separator) {
+      return a + " " + b;
+    }
+    else {
+      return a + b;
     };
+  };
 
-    assert(combine("hello", "world", true), "hello world");
-    assert(combine("hello", "world", false), "helloworld");
-    testCount = testCount + 1;
+  assert(combine("hello", "world", true), "hello world");
+  assert(combine("hello", "world", false), "helloworld");
+  testCount = testCount + 1;
 };
-
 
 // Running tests
 test_fn_declaration_with_params();

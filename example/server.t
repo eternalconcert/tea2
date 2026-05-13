@@ -4,12 +4,12 @@ import "@iterable.t";
 str version = env("BUILD_NO");
 
 if (len(version) == 0) {
-    version = "dev";
+  version = "dev";
 };
 
 str buildDate = replace(cmd("date '+%Y-%m-%d %H:%M:%S'"), "\n", "");
 if (len(buildDate) == 0) {
-    buildDate = "unknown";
+  buildDate = "unknown";
 };
 
 str uploadDirectory = env("TEA_UPLOAD_DIR");
@@ -152,11 +152,11 @@ dict fn app(dict req) {
     str boundary = contentTypeParts[1];
     str marker = "--" + boundary;
     str part = split(body, marker)[1];
-      str headerSeparator = "\r\n\r\n";
+    str headerSeparator = "\r\n\r\n";
     if (len(find(part, headerSeparator)) == 0) {
       headerSeparator = "\n\n";
     };
-      str fileHeaders = split(part, headerSeparator)[0];
+    str fileHeaders = split(part, headerSeparator)[0];
     str fileName = split(split(fileHeaders, "filename=\"")[1], "\"")[0];
     array fileNameParts = regexCapture(fileName, "^(.+)-(\\d+\\.\\d+\\.\\d+)(\\.t)$");
     if (len(fileNameParts) != 3) {

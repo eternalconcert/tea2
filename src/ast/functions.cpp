@@ -3,10 +3,28 @@
 #include <string.h>
 #include <utility>
 #include <vector>
+#include <climits>
+#include <cstdlib>
 #include "../exceptions.h"
 #include "ast.h"
 
 static thread_local std::vector<FnCallNode*> teaActiveFnCallStack;
+static const int TEA_DEFAULT_MAX_FN_CALL_DEPTH = 1024;
+
+static int teaMaxFnCallDepth() {
+    const char *raw = getenv("TEA_MAX_CALL_DEPTH");
+    if (raw == nullptr || raw[0] == '\0') {
+        return TEA_DEFAULT_MAX_FN_CALL_DEPTH;
+    }
+
+    char *end = nullptr;
+    long parsed = strtol(raw, &end, 10);
+    if (end == raw || *end != '\0' || parsed <= 0 || parsed > INT_MAX) {
+        return TEA_DEFAULT_MAX_FN_CALL_DEPTH;
+    }
+
+    return (int)parsed;
+}
 
 static void teaSwapValueStoresRec(
     AstNode *node,
@@ -88,6 +106,11 @@ void resetReturnNodes(AstNode* node) {
 
 
 AstNode* FnCallNode::evaluate() {
+    int maxCallDepth = teaMaxFnCallDepth();
+    if ((int)teaActiveFnCallStack.size() >= maxCallDepth) {
+        throw RuntimeError("maximum function call depth exceeded", this->location);
+    }
+
     Value *val = getFromValueStore(this->scope, this->identifier, this->location);
     FnDeclarationNode *body = val->functionBody;
     AstNode *functionScope = body->childListHead;

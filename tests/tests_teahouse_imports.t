@@ -5,13 +5,13 @@ import "@vendor/clash_export.t";
 import "@nested/pkg.t";
 
 void fn test_teahouse_path() {
-    assert(teahousePkgMarker, 42, "teahouse @ path");
-    testCount = testCount + 1;
+  assert(teahousePkgMarker, 42, "teahouse @ path");
+  testCount = testCount + 1;
 };
 
 void fn test_teahouse_export_clash() {
-    assert(sharedName, 1, "teahouse export loses to prior import");
-    testCount = testCount + 1;
+  assert(sharedName, 1, "teahouse export loses to prior import");
+  testCount = testCount + 1;
 };
 
 test_teahouse_path();

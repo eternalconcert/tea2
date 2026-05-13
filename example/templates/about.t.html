@@ -1,6 +1,7 @@
 {%extends templates/_base.t.html%}
-<h1>{%block title%}About{%endblock%}</h1>
+{%block title%}About{%endblock%}
 {%block content%}
+<h1>About</h1>
 <p>
   This page is part of the <strong>Tea2</strong> project: an implementation of the Tea programming language
   (lexer, parser, runtime) maintained as open source. The language is deliberately small so the whole
@@ -23,7 +24,7 @@
 </p>
 <p>
   If you are reading the generated output, the build metadata in the page header reflects how that snapshot
-  was produced (version <strong>%version%</strong>, <time>%build_date%</time>).
+  was produced (version <strong>&lbrace;%version%&rbrace;</strong>, <time>&lbrace;%build_date%&rbrace;</time>).
 </p>
 
 <h2>Contributing &amp; source</h2>

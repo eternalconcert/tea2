@@ -1,14 +1,14 @@
 import "@iterable.t";
 
 export str fn addContext(str templateContent, dict context) {
-    array contextItems = dictItems(context);
-    for (int i = 0; i < len(contextItems); i = i + 1) {
-        array item = contextItems[i];
-        str key = item[0];
-        str value = item[1];
-        templateContent = replace(templateContent, "{%" + key + "%}", value);
-    };
-    return templateContent;
+  array contextItems = dictItems(context);
+  for (int i = 0; i < len(contextItems); i = i + 1) {
+    array item = contextItems[i];
+    str key = item[0];
+    str value = item[1];
+    templateContent = replace(templateContent, "{%" + key + "%}", value);
+  };
+  return templateContent;
 };
 
 array fn getBaseTemplateNames(str template) {

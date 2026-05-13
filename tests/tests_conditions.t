@@ -1,45 +1,44 @@
 int testCount = 0;
 
-
 void fn test_eq() {
-    bool result = false;
+  bool result = false;
 
-    if (2 == 2) {
-      result = true;
-    };
-    assert(result, true);
-    testCount = testCount + 1;
+  if (2 == 2) {
+    result = true;
+  };
+  assert(result, true);
+  testCount = testCount + 1;
 };
 
 void fn test_gt() {
-    bool result = false;
+  bool result = false;
 
-    if (2 >= 2) {
-      result = true;
-    };
-    assert(result, true);
-    testCount = testCount + 1;
+  if (2 >= 2) {
+    result = true;
+  };
+  assert(result, true);
+  testCount = testCount + 1;
 };
 
 void fn test_gte() {
-    bool result = false;
+  bool result = false;
 
-    if (3 >= 2) {
-      result = true;
-    };
-    assert(result, true);
-    testCount = testCount + 1;
+  if (3 >= 2) {
+    result = true;
+  };
+  assert(result, true);
+  testCount = testCount + 1;
 };
 
 void fn test_not() {
-    bool result = false;
+  bool result = false;
 
-    if (not false) {
-      result = true;
-    };
-    assert(result, true);
-    assert(not true, false);
-    testCount = testCount + 1;
+  if (not false) {
+    result = true;
+  };
+  assert(result, true);
+  assert(not true, false);
+  testCount = testCount + 1;
 };
 
 // Running tests

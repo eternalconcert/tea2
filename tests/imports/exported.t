@@ -1,7 +1,7 @@
 str fn privateHelper() {
-    return "hidden";
+  return "hidden";
 };
 
 export str fn exportedHelper() {
-    return privateHelper();
+  return privateHelper();
 };

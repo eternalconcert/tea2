@@ -2,15 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>Tea 2 - {%block title%}</title>
     <link rel="stylesheet" type="text/css" href="/static/main.css">
-    <meta name="version" content="%version%">
+    <meta name="version" content="{%version%}">
     <meta name="generator" content="Tea Programming Language">
-    <meta name="build_date" content="%build_date%">
+    <meta name="build_date" content="{%build_date%}">
   </head>
 
   <body>
-    <nav>
+    <nav aria-label="Main navigation">
       <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/api.html">API</a></li>
@@ -19,6 +21,8 @@
         <li><a href="/imprint.html">Imprint</a></li>
       </ul>
     </nav>
-    {%block content%}
+    <main>
+      {%block content%}
+    </main>
   </body>
 </html>
